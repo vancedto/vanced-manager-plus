@@ -21,7 +21,6 @@
     <string name="retry">Opakovat</string>
     <string name="loading_apps_message">Načítání aplikací...</string>
     <string name="error_prefix">Chyba: %1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager od vanced.to</string>
     <string name="search_apps">Hledat aplikace…</string>
     <string name="no_apps_found">Nebyly nalezeny žádné aplikace pro \"%1$s\"</string>
     <string name="no_apps_available">Žádné dostupné aplikace</string>
@@ -113,4 +112,12 @@
     <string name="filter_not_installed">Nenainstalované</string>
     <string name="filter_updates">Aktualizace</string>
     <string name="no_apps_for_filter">Žádné aplikace neodpovídají tomuto filtru</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">Oblíbené</string>
+    <string name="favorite_add_title">Přidat do oblíbených</string>
+    <string name="favorite_add_message">Přidat %1$s do oblíbených?</string>
+    <string name="favorite_added">Přidáno do oblíbených</string>
+    <string name="favorite_removed">Odebráno z oblíbených</string>
+    <string name="no_favorites_yet">Žádné oblíbené. Klepněte na hvězdičku u aplikace pro přidání.</string>
 </resources>

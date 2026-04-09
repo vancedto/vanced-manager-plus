@@ -555,6 +555,9 @@ class AppBloc @Inject constructor(
 
             // Filter events
             is AppEvent.SetFilter -> setFilter(event.filter)
+
+            // Favorites events
+            is AppEvent.ToggleFavorite -> toggleFavorite(event.packageName)
         }
     }
     
@@ -589,6 +592,54 @@ class AppBloc @Inject constructor(
     }
 
     /**
+     * Apply persisted favorites flags to a list of apps.
+     */
+    private fun applyFavorites(apps: List<RevancedApp>): List<RevancedApp> {
+        val favorites = preferencesManager.getFavorites()
+        return if (favorites.isEmpty()) apps
+        else apps.map { it.copy(isFavorite = it.packageName in favorites) }
+    }
+
+    /**
+     * Toggle favorite status for an app.
+     * Removing is immediate; adding requires confirmation dialog.
+     */
+    private fun toggleFavorite(packageName: String) {
+        val currentState = _state.value as? AppState.Success ?: return
+        val app = currentState.apps.find { it.packageName == packageName } ?: return
+
+        if (app.isFavorite) {
+            val newFavorites = preferencesManager.getFavorites().toMutableSet()
+            newFavorites.remove(packageName)
+            preferencesManager.saveFavorites(newFavorites)
+            val updatedApps = currentState.apps.map {
+                if (it.packageName == packageName) it.copy(isFavorite = false) else it
+            }
+            _state.value = currentState.copy(apps = updatedApps)
+            showToast(stringProvider.getString(R.string.favorite_removed))
+        } else {
+            _state.value = currentState.copy(
+                dialogState = DialogState.Confirmation(
+                    title = stringProvider.getString(R.string.favorite_add_title),
+                    message = stringProvider.getString(R.string.favorite_add_message, app.title),
+                    onConfirmAction = {
+                        val favorites = preferencesManager.getFavorites().toMutableSet()
+                        favorites.add(packageName)
+                        preferencesManager.saveFavorites(favorites)
+                        val freshState = _state.value as? AppState.Success ?: return@Confirmation
+                        val updatedApps = freshState.apps.map {
+                            if (it.packageName == packageName) it.copy(isFavorite = true) else it
+                        }
+                        _state.value = freshState.copy(apps = updatedApps, dialogState = null)
+                        showToast(stringProvider.getString(R.string.favorite_added))
+                    },
+                    onCancelAction = { handleEvent(AppEvent.DismissDialog) }
+                )
+            )
+        }
+    }
+
+    /**
      * Load apps from cache first for fast UI, then trigger background refresh
      */
     private fun loadAppsFromCacheFirst() {
@@ -611,7 +662,7 @@ class AppBloc @Inject constructor(
                                 Log.w(TAG, "Failed to load config, using fallback", e)
                                 AppConfig(ThemeMode.DARK, Language.ENGLISH)
                             }
-                            _state.value = AppState.Success(result.data, config = config)
+                            _state.value = AppState.Success(applyFavorites(result.data), config = config)
                             
                             // Start background refresh after a short delay to let UI render
                             viewModelScope.launch {
@@ -666,7 +717,7 @@ class AppBloc @Inject constructor(
                                         AppConfig(ThemeMode.DARK, Language.ENGLISH)
                                     }
                                     
-                                    _state.value = AppState.Success(newApps, config = config)
+                                    _state.value = AppState.Success(applyFavorites(newApps), config = config)
                                     
                                     // Show a subtle toast if there are significant updates
                                     if (updatedApps.size > 1) {
@@ -699,7 +750,7 @@ class AppBloc @Inject constructor(
         if (currentState is AppState.Success) {
             val updatedApps = currentState.apps.map { app ->
                 if (app.packageName == updatedApp.packageName) {
-                    updatedApp
+                    updatedApp.copy(isFavorite = app.isFavorite)
                 } else {
                     app
                 }
@@ -731,7 +782,7 @@ class AppBloc @Inject constructor(
                                 Log.w(TAG, "Failed to load config during app loading, using fallback", e)
                                 AppConfig(ThemeMode.DARK, Language.ENGLISH)
                             }
-                            _state.value = AppState.Success(result.data, config = config)
+                            _state.value = AppState.Success(applyFavorites(result.data), config = config)
                         }
                         is Result.Error -> {
                             Log.e(TAG, "Failed to load apps", result.exception)

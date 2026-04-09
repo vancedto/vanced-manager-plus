@@ -20,7 +20,6 @@
     <string name="retry">Riprova</string>
     <string name="loading_apps_message">Caricamento app...</string>
     <string name="error_prefix">Errore: %1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager by vanced.to</string>
     <string name="search_apps">Cerca app…</string>
     <string name="no_apps_found">Nessuna app trovata per \"%1$s\"</string>
     <string name="no_apps_available">Nessuna applicazione disponibile</string>
@@ -113,4 +112,12 @@
     <string name="filter_not_installed">Non installate</string>
     <string name="filter_updates">Aggiornamenti</string>
     <string name="no_apps_for_filter">Nessuna app corrisponde a questo filtro</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">Preferiti</string>
+    <string name="favorite_add_title">Aggiungi ai preferiti</string>
+    <string name="favorite_add_message">Aggiungere %1$s ai preferiti?</string>
+    <string name="favorite_added">Aggiunto ai preferiti</string>
+    <string name="favorite_removed">Rimosso dai preferiti</string>
+    <string name="no_favorites_yet">Nessun preferito ancora. Tocca la stella su un\'app per aggiungerla.</string>
 </resources>

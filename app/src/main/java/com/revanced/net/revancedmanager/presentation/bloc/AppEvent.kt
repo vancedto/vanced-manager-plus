@@ -59,4 +59,7 @@ sealed class AppEvent {
 
     // Filter events
     data class SetFilter(val filter: AppFilterOption) : AppEvent()
+
+    // Favorites events
+    data class ToggleFavorite(val packageName: String) : AppEvent()
 }

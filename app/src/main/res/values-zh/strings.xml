@@ -21,7 +21,6 @@
     <string name="retry">重试</string>
     <string name="loading_apps_message">正在加载应用...</string>
     <string name="error_prefix">错误：%1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager by vanced.to</string>
     <string name="search_apps">搜索应用…</string>
     <string name="no_apps_found">未找到"%1$s"的应用</string>
     <string name="no_apps_available">没有可用的应用</string>
@@ -113,4 +112,12 @@
     <string name="filter_not_installed">未安装</string>
     <string name="filter_updates">有更新</string>
     <string name="no_apps_for_filter">没有符合此筛选条件的应用</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">收藏</string>
+    <string name="favorite_add_title">添加到收藏</string>
+    <string name="favorite_add_message">将 %1$s 添加到收藏列表？</string>
+    <string name="favorite_added">已添加到收藏</string>
+    <string name="favorite_removed">已从收藏中移除</string>
+    <string name="no_favorites_yet">还没有收藏。点击应用的星标即可添加。</string>
 </resources>

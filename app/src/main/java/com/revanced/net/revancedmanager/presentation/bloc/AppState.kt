@@ -37,6 +37,7 @@ sealed class AppState {
                     AppFilterOption.UPDATES_AVAILABLE -> searched.filter {
                         it.status == AppStatus.UPDATE_AVAILABLE
                     }
+                    AppFilterOption.FAVORITES -> searched.filter { it.isFavorite }
                 }
             }
     }

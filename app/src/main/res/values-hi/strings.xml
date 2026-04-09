@@ -20,7 +20,6 @@
     <string name="retry">पुनः प्रयास करें</string>
     <string name="loading_apps_message">ऐप्स लोड हो रहे हैं...</string>
     <string name="error_prefix">त्रुटि: %1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager by vanced.to</string>
     <string name="search_apps">ऐप्स खोजें…</string>
     <string name="no_apps_found">\"%1$s\" के लिए कोई ऐप नहीं मिला</string>
     <string name="no_apps_available">कोई ऐप उपलब्ध नहीं है</string>
@@ -119,4 +118,12 @@
     <string name="filter_not_installed">अस्थापित</string>
     <string name="filter_updates">अपडेट</string>
     <string name="no_apps_for_filter">इस फ़िल्टर से कोई ऐप मेल नहीं खाता</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">पसंदीदा</string>
+    <string name="favorite_add_title">पसंदीदा में जोड़ें</string>
+    <string name="favorite_add_message">%1$s को पसंदीदा सूची में जोड़ें?</string>
+    <string name="favorite_added">पसंदीदा में जोड़ा गया</string>
+    <string name="favorite_removed">पसंदीदा से हटाया गया</string>
+    <string name="no_favorites_yet">अभी कोई पसंदीदा नहीं। जोड़ने के लिए ऐप के स्टार पर टैप करें।</string>
 </resources>

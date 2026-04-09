@@ -20,7 +20,6 @@
     <string name="retry">Coba Lagi</string>
     <string name="loading_apps_message">Memuat aplikasi...</string>
     <string name="error_prefix">Error: %1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager oleh vanced.to</string>
     <string name="search_apps">Cari aplikasi…</string>
     <string name="no_apps_found">Tidak ada aplikasi untuk \"%1$s\"</string>
     <string name="no_apps_available">Tidak ada aplikasi tersedia</string>
@@ -81,4 +80,12 @@
     <string name="filter_not_installed">Belum terpasang</string>
     <string name="filter_updates">Pembaruan</string>
     <string name="no_apps_for_filter">Tidak ada aplikasi yang cocok dengan filter ini</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">Favorit</string>
+    <string name="favorite_add_title">Tambah ke favorit</string>
+    <string name="favorite_add_message">Tambahkan %1$s ke daftar favorit?</string>
+    <string name="favorite_added">Ditambahkan ke favorit</string>
+    <string name="favorite_removed">Dihapus dari favorit</string>
+    <string name="no_favorites_yet">Belum ada favorit. Ketuk bintang pada app untuk menambahkan.</string>
 </resources> 

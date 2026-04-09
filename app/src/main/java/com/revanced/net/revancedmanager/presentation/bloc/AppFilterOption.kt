@@ -4,5 +4,6 @@ enum class AppFilterOption {
     ALL,
     INSTALLED,
     NOT_INSTALLED,
-    UPDATES_AVAILABLE
+    UPDATES_AVAILABLE,
+    FAVORITES
 }

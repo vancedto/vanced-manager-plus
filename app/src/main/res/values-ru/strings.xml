@@ -18,7 +18,6 @@
     <string name="retry">Повторить</string>
     <string name="loading_apps_message">Загрузка приложений...</string>
     <string name="error_prefix">Ошибка: %1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager by vanced.to</string>
     <string name="search_apps">Поиск приложений…</string>
     <string name="no_apps_found">Приложения для «%1$s» не найдены</string>
     <string name="no_apps_available">Нет доступных приложений</string>
@@ -121,4 +120,12 @@
     <string name="filter_not_installed">Не установленные</string>
     <string name="filter_updates">Обновления</string>
     <string name="no_apps_for_filter">Нет приложений по этому фильтру</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">Избранное</string>
+    <string name="favorite_add_title">Добавить в избранное</string>
+    <string name="favorite_add_message">Добавить %1$s в избранное?</string>
+    <string name="favorite_added">Добавлено в избранное</string>
+    <string name="favorite_removed">Удалено из избранного</string>
+    <string name="no_favorites_yet">Нет избранного. Нажмите звезду на приложении, чтобы добавить.</string>
 </resources>

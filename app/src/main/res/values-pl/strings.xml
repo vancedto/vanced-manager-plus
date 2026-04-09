@@ -18,7 +18,6 @@
     <string name="retry">Ponów</string>
     <string name="loading_apps_message">Ładowanie aplikacji...</string>
     <string name="error_prefix">Błąd: %1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager by vanced.to</string>
     <string name="search_apps">Szukaj aplikacji…</string>
     <string name="no_apps_found">Nie znaleziono aplikacji dla „%1$s"</string>
     <string name="no_apps_available">Brak dostępnych aplikacji</string>
@@ -125,4 +124,12 @@
     <string name="filter_not_installed">Niezainstalowane</string>
     <string name="filter_updates">Aktualizacje</string>
     <string name="no_apps_for_filter">Brak aplikacji pasujących do tego filtra</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">Ulubione</string>
+    <string name="favorite_add_title">Dodaj do ulubionych</string>
+    <string name="favorite_add_message">Dodać %1$s do ulubionych?</string>
+    <string name="favorite_added">Dodano do ulubionych</string>
+    <string name="favorite_removed">Usunięto z ulubionych</string>
+    <string name="no_favorites_yet">Brak ulubionych. Dotknij gwiazdki przy aplikacji, aby dodać.</string>
 </resources>

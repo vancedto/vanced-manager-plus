@@ -20,7 +20,6 @@
     <string name="retry">إعادة المحاولة</string>
     <string name="loading_apps_message">جاري تحميل التطبيقات...</string>
     <string name="error_prefix">خطأ:  %1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager بواسطة vanced.to</string>
     <string name="search_apps">البحث في التطبيقات…</string>
     <string name="no_apps_found">لم يتم العثور على تطبيقات لـ \"%1$s\"</string>
     <string name="no_apps_available">لا توجد تطبيقات متاحة</string>
@@ -113,4 +112,12 @@
     <string name="filter_not_installed">غير مثبت</string>
     <string name="filter_updates">تحديثات</string>
     <string name="no_apps_for_filter">لا توجد تطبيقات تطابق هذا الفلتر</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">المفضلة</string>
+    <string name="favorite_add_title">إضافة إلى المفضلة</string>
+    <string name="favorite_add_message">إضافة %1$s إلى المفضلة?</string>
+    <string name="favorite_added">تمت الإضافة إلى المفضلة</string>
+    <string name="favorite_removed">تمت الإزالة من المفضلة</string>
+    <string name="no_favorites_yet">لا توجد مفضلة بعد. انقر على النجمة لإضافة تطبيق.</string>
 </resources>

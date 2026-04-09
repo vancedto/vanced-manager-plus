@@ -44,13 +44,18 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -89,6 +94,7 @@ fun MainScreen(
     val state by viewModel.state.collectAsState()
     val toastMessage by viewModel.toastMessage.collectAsState()
     val context = LocalContext.current
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     
     // Remember the current toast to cancel it when a new one appears
     var currentToast by remember { mutableStateOf<Toast?>(null) }
@@ -118,30 +124,39 @@ fun MainScreen(
     }
 
     Scaffold(
-        floatingActionButton = {
-            Row {
-                FloatingActionButton(
-                    onClick = {
-                        viewModel.handleEvent(AppEvent.ShowConfigDialog)
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                        Text(
+                            text = stringResource(R.string.app_name),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = stringResource(R.string.app_subtitle),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = "Settings"
-                    )
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                FloatingActionButton(
-                    onClick = {
-                        viewModel.handleEvent(AppEvent.RefreshApps)
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.handleEvent(AppEvent.RefreshApps) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = stringResource(R.string.retry)
+                        )
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Refresh,
-                        contentDescription = "Refresh apps"
-                    )
-                }
-            }
+                    IconButton(onClick = { viewModel.handleEvent(AppEvent.ShowConfigDialog) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = stringResource(R.string.settings)
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
         }
     ) { paddingValues ->
         when (val currentState = state) {
@@ -401,18 +416,6 @@ private fun AppListScreen(
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
-        item {
-            Text(
-                text = stringResource(R.string.revanced_manager_by),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                textAlign = TextAlign.Center
-            )
-        }
-        
         // Search + filter bar
         item {
             SearchAndFilterBar(
@@ -439,6 +442,7 @@ private fun AppListScreen(
                     Text(
                         text = when {
                             searchQuery.isNotBlank() -> stringResource(R.string.no_apps_found, searchQuery)
+                            filterOption == AppFilterOption.FAVORITES -> stringResource(R.string.no_favorites_yet)
                             filterOption != AppFilterOption.ALL -> stringResource(R.string.no_apps_for_filter)
                             else -> stringResource(R.string.no_apps_available)
                         },
@@ -472,6 +476,9 @@ private fun AppListScreen(
                 onOpenClick = {
                     onEvent(AppEvent.OpenApp(app.packageName))
                 },
+                onFavoriteToggle = {
+                    onEvent(AppEvent.ToggleFavorite(app.packageName))
+                },
                 isCompactMode = isCompactMode
             )
         }
@@ -487,7 +494,7 @@ private fun AppListScreen(
 
         // Bottom spacing
         item {
-            Spacer(modifier = Modifier.height(80.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
@@ -749,6 +756,16 @@ private fun SearchAndFilterBar(
                     label = {
                         Text(
                             text = stringResource(R.string.filter_updates),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                )
+                FilterChip(
+                    selected = filterOption == AppFilterOption.FAVORITES,
+                    onClick = { onFilterChange(AppFilterOption.FAVORITES) },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.filter_favorites),
                             style = MaterialTheme.typography.labelSmall
                         )
                     }

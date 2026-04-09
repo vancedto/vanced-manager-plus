@@ -21,7 +21,6 @@
     <string name="retry">Thử lại</string>
     <string name="loading_apps_message">Đang tải ứng dụng...</string>
     <string name="error_prefix">Lỗi: %1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager bởi vanced.to</string>
     <string name="search_apps">Tìm kiếm ứng dụng…</string>
     <string name="no_apps_found">Không tìm thấy ứng dụng nào cho \"%1$s\"</string>
     <string name="no_apps_available">Không có ứng dụng nào</string>
@@ -113,4 +112,12 @@
     <string name="filter_not_installed">Chưa cài đặt</string>
     <string name="filter_updates">Cập nhật</string>
     <string name="no_apps_for_filter">Không có ứng dụng nào phù hợp với bộ lọc</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">Yêu thích</string>
+    <string name="favorite_add_title">Thêm vào yêu thích</string>
+    <string name="favorite_add_message">Thêm %1$s vào danh sách yêu thích?</string>
+    <string name="favorite_added">Đã thêm vào yêu thích</string>
+    <string name="favorite_removed">Đã xóa khỏi yêu thích</string>
+    <string name="no_favorites_yet">Chưa có yêu thích. Nhấn ngôi sao trên ứng dụng để thêm.</string>
 </resources>

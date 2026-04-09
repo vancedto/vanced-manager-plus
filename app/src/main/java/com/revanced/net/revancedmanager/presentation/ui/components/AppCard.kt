@@ -23,8 +23,11 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Button
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -69,6 +72,7 @@ fun AppCard(
     onUninstallClick: () -> Unit,
     onOpenClick: () -> Unit,
     onReinstallClick: () -> Unit,
+    onFavoriteToggle: () -> Unit,
     isCompactMode: Boolean = false,
     modifier: Modifier = Modifier
 ) {
@@ -381,6 +385,20 @@ fun AppCard(
                             modifier = Modifier.weight(1f)
                         )
                     }
+                }
+
+                // Favorite toggle — always at far right of action row
+                IconButton(
+                    onClick = onFavoriteToggle,
+                    modifier = Modifier.size(26.dp)
+                ) {
+                    Icon(
+                        imageVector = if (app.isFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = if (app.isFavorite) Color(0xFFFFD700)
+                               else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }

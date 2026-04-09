@@ -18,7 +18,6 @@
     <string name="retry">Încearcă din nou</string>
     <string name="loading_apps_message">Se încarcă aplicațiile...</string>
     <string name="error_prefix">Eroare: %1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager by vanced.to</string>
     <string name="search_apps">Caută aplicații…</string>
     <string name="no_apps_found">Nu s-au găsit aplicații pentru „%1$s"</string>
     <string name="no_apps_available">Nicio aplicație disponibilă</string>
@@ -125,4 +124,12 @@
     <string name="filter_not_installed">Neinstalate</string>
     <string name="filter_updates">Actualizări</string>
     <string name="no_apps_for_filter">Nicio aplicație nu corespunde acestui filtru</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">Favorite</string>
+    <string name="favorite_add_title">Adaugă la favorite</string>
+    <string name="favorite_add_message">Adăugați %1$s la favorite?</string>
+    <string name="favorite_added">Adăugat la favorite</string>
+    <string name="favorite_removed">Eliminat din favorite</string>
+    <string name="no_favorites_yet">Niciun favorit încă. Apăsați steluța unei aplicații pentru a adăuga.</string>
 </resources>

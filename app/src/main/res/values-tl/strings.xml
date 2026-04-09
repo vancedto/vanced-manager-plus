@@ -18,7 +18,6 @@
     <string name="retry">Subukan Ulit</string>
     <string name="loading_apps_message">Naglo-load ng mga app...</string>
     <string name="error_prefix">Error: %1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager by vanced.to</string>
     <string name="search_apps">Maghanap ng apps…</string>
     <string name="no_apps_found">Walang nahanap na apps para sa \"%1$s\"</string>
     <string name="no_apps_available">Walang available na apps</string>
@@ -125,4 +124,12 @@
     <string name="filter_not_installed">Hindi naka-install</string>
     <string name="filter_updates">Mga Update</string>
     <string name="no_apps_for_filter">Walang app na tumutugma sa filter na ito</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">Mga Paborito</string>
+    <string name="favorite_add_title">Idagdag sa mga paborito</string>
+    <string name="favorite_add_message">Idagdag ang %1$s sa listahan ng mga paborito?</string>
+    <string name="favorite_added">Naidagdag sa mga paborito</string>
+    <string name="favorite_removed">Naalis sa mga paborito</string>
+    <string name="no_favorites_yet">Wala pang mga paborito. I-tap ang bituin sa isang app para magdagdag.</string>
 </resources>

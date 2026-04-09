@@ -14,7 +14,8 @@ data class RevancedApp(
     val requiresMicroG: Boolean,
     val index: Int,
     val status: AppStatus,
-    val downloadProgress: Float = 0f
+    val downloadProgress: Float = 0f,
+    val isFavorite: Boolean = false
 )
 
 /**

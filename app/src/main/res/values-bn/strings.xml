@@ -18,7 +18,6 @@
     <string name="retry">আবার চেষ্টা</string>
     <string name="loading_apps_message">অ্যাপ লোড হচ্ছে...</string>
     <string name="error_prefix">ত্রুটি: %1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager by vanced.to</string>
     <string name="search_apps">অ্যাপ খুঁজুন…</string>
     <string name="no_apps_found">\"%1$s\" এর জন্য কোনো অ্যাপ পাওয়া যায়নি</string>
     <string name="no_apps_available">কোনো অ্যাপ উপলব্ধ নেই</string>
@@ -125,4 +124,12 @@
     <string name="filter_not_installed">ইনস্টল নয়</string>
     <string name="filter_updates">আপডেট</string>
     <string name="no_apps_for_filter">এই ফিল্টারের সাথে কোনো অ্যাপ মেলে না</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">প্রিয়</string>
+    <string name="favorite_add_title">প্রিয়তে যোগ করুন</string>
+    <string name="favorite_add_message">%1$s প্রিয় তালিকায় যোগ করবেন?</string>
+    <string name="favorite_added">প্রিয়তে যোগ হয়েছে</string>
+    <string name="favorite_removed">প্রিয় থেকে সরানো হয়েছে</string>
+    <string name="no_favorites_yet">এখনো কোনো প্রিয় নেই। যোগ করতে অ্যাপের তারায় ট্যাপ করুন।</string>
 </resources>

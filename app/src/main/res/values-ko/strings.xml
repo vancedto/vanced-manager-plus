@@ -21,7 +21,6 @@
     <string name="retry">다시 시도</string>
     <string name="loading_apps_message">앱 로딩 중...</string>
     <string name="error_prefix">오류: %1$s</string>
-    <string name="revanced_manager_by">ReVanced Manager by vanced.to</string>
     <string name="search_apps">앱 검색…</string>
     <string name="no_apps_found">"%1$s"에 대한 앱을 찾을 수 없습니다</string>
     <string name="no_apps_available">사용 가능한 앱 없음</string>
@@ -113,4 +112,12 @@
     <string name="filter_not_installed">미설치</string>
     <string name="filter_updates">업데이트</string>
     <string name="no_apps_for_filter">이 필터에 맞는 앱이 없습니다</string>
+
+    <!-- Favorites -->
+    <string name="filter_favorites">즐겨찾기</string>
+    <string name="favorite_add_title">즐겨찾기에 추가</string>
+    <string name="favorite_add_message">%1$s을(를) 즐겨찾기에 추가할까요?</string>
+    <string name="favorite_added">즐겨찾기에 추가됨</string>
+    <string name="favorite_removed">즐겨찾기에서 제거됨</string>
+    <string name="no_favorites_yet">즐겨찾기가 없습니다. 앱의 별표를 탭하여 추가하세요.</string>
 </resources>
