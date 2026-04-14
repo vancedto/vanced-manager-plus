@@ -7,154 +7,162 @@ import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.revanced.net.revancedmanager.R
-import com.revanced.net.revancedmanager.core.common.LocaleHelper
-import com.revanced.net.revancedmanager.core.common.Result
 import com.revanced.net.revancedmanager.core.common.StringProvider
 import com.revanced.net.revancedmanager.data.local.preferences.PreferencesManager
 import com.revanced.net.revancedmanager.data.manager.AppManager
 import com.revanced.net.revancedmanager.data.manager.DownloadService
-import com.revanced.net.revancedmanager.data.manager.SimpleDownloadManager
-import com.revanced.net.revancedmanager.data.manager.RevancedPackageInstaller
 import com.revanced.net.revancedmanager.data.manager.InstallationResult
 import com.revanced.net.revancedmanager.data.manager.PackageChangedReceiver
 import com.revanced.net.revancedmanager.data.manager.PackageEvent
+import com.revanced.net.revancedmanager.data.manager.RevancedPackageInstaller
+import com.revanced.net.revancedmanager.data.manager.DebugLogManager
+import com.revanced.net.revancedmanager.data.manager.UninstallationResult
+import com.revanced.net.revancedmanager.data.manager.SimpleDownloadManager
 import com.revanced.net.revancedmanager.data.repository.DownloadStateRepository
-import com.revanced.net.revancedmanager.domain.model.AppConfig
 import com.revanced.net.revancedmanager.domain.model.AppStatus
-import com.revanced.net.revancedmanager.domain.model.Language
-import com.revanced.net.revancedmanager.domain.model.RevancedApp
-import com.revanced.net.revancedmanager.domain.model.ThemeMode
 import com.revanced.net.revancedmanager.domain.usecase.AppManagementUseCases
-import com.revanced.net.revancedmanager.domain.usecase.DownloadAppUseCase
-import com.revanced.net.revancedmanager.domain.usecase.GetAppsUseCase
-import com.revanced.net.revancedmanager.domain.usecase.InstallAppUseCase
-import com.revanced.net.revancedmanager.domain.usecase.OpenAppUseCase
-import com.revanced.net.revancedmanager.domain.usecase.UninstallAppUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 
+/** Tag used by all AppBloc extension files. */
+internal const val TAG_BLOC = "AppBloc"
+
 /**
- * BLoC for managing app state and handling user events
- * Improved version with better download/install flow and error handling
+ * Core ViewModel — owns state, routes events, and manages lifecycle.
+ * Domain logic lives in the companion extension files:
+ *   AppBlocDownload.kt, AppBlocInstall.kt, AppBlocAppList.kt, AppBlocConfig.kt
  */
 @HiltViewModel
 class AppBloc @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val useCases: AppManagementUseCases,
-    private val simpleDownloadManager: SimpleDownloadManager,
-    private val appManager: AppManager,
-    private val preferencesManager: PreferencesManager,
-    private val stringProvider: StringProvider,
-    private val packageInstaller: RevancedPackageInstaller,
-    private val downloadStateRepository: DownloadStateRepository,
-    private val packageChangedReceiver: PackageChangedReceiver
+    @ApplicationContext internal val context: Context,
+    internal val useCases: AppManagementUseCases,
+    internal val simpleDownloadManager: SimpleDownloadManager,
+    internal val appManager: AppManager,
+    internal val preferencesManager: PreferencesManager,
+    internal val stringProvider: StringProvider,
+    internal val packageInstaller: RevancedPackageInstaller,
+    internal val downloadStateRepository: DownloadStateRepository,
+    internal val packageChangedReceiver: PackageChangedReceiver,
+    val debugLogManager: DebugLogManager
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    companion object {
-        private const val TAG = "AppBloc"
-    }
-
-    private val _state = MutableStateFlow<AppState>(AppState.Loading)
+    // ---- Public state ----
+    internal val _state = MutableStateFlow<AppState>(AppState.Loading)
     val state: StateFlow<AppState> = _state.asStateFlow()
 
-    private val _toastMessage = MutableStateFlow<String?>(null)
+    internal val _toastMessage = MutableStateFlow<String?>(null)
     val toastMessage: StateFlow<String?> = _toastMessage.asStateFlow()
 
-    // Track concurrent download/install states
-    private val activeDownloads = mutableMapOf<String, kotlinx.coroutines.Job>()
-    private val installationRetries = mutableMapOf<String, Int>()
-    private val completedDownloads = mutableSetOf<String>()
+    // ---- Download tracking ----
+    internal val activeDownloads = mutableMapOf<String, kotlinx.coroutines.Job>()
+    internal val completedDownloads = mutableSetOf<String>()
 
-    // Sequential installation queue — only one install dialog is shown at a time.
-    private val installationQueue = mutableListOf<PendingInstallation>()
-    private var isInstallationInProgress = false
-    
-    // Track if app was backgrounded to determine auto-install behavior
-    private var wasAppBackgrounded = false
-    
-    // Track pending uninstalls/reinstalls for system event handling
-    private val pendingReinstalls = mutableMapOf<String, String>() // packageName -> apkPath
-    private val pendingUninstallChecks = mutableSetOf<String>() // packages waiting for uninstall confirmation
-    
+    // ---- Install queue ----
+    internal val installationRetries = mutableMapOf<String, Int>()
+    internal val installationQueue = mutableListOf<PendingInstallation>()
+    internal var isInstallationInProgress = false
+
+    // ---- Lifecycle ----
+    internal var wasAppBackgrounded = false
+
+    // ---- Uninstall / reinstall tracking ----
+    internal val pendingReinstalls = mutableMapOf<String, String>()         // packageName -> apkPath (retry flow)
+    internal val pendingReinstallDownloads = mutableMapOf<String, String>() // packageName -> downloadUrl (reinstall flow)
+    internal val pendingUninstallChecks = mutableSetOf<String>()
+
     data class PendingInstallation(
         val packageName: String,
         val filePath: String,
         val appName: String
     )
-    
-    // Broadcast receiver for download completion - enhanced for concurrent downloads
+
+    // ---- Broadcast receiver for download completion ----
     private val downloadCompleteBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 DownloadService.ACTION_DOWNLOAD_COMPLETE -> {
                     val packageName = intent.getStringExtra(DownloadService.EXTRA_PACKAGE_NAME)
                     val filePath = intent.getStringExtra(DownloadService.EXTRA_FILE_PATH)
-                    
                     if (packageName != null && filePath != null) {
-                        Log.i(TAG, "📥 Individual download complete broadcast: $packageName")
+                        Log.i(TAG_BLOC, "Individual download complete broadcast: $packageName")
                         handleEvent(AppEvent.DownloadCompleted(packageName, filePath))
                     }
                 }
-                
                 DownloadService.ACTION_ALL_DOWNLOADS_COMPLETE -> {
-                    Log.i(TAG, "🎉 All downloads complete broadcast received")
-                    
-                    val completedPackages = intent.getStringArrayListExtra("completed_packages") ?: arrayListOf()
-                    val completedNames = intent.getStringArrayListExtra("completed_names") ?: arrayListOf()
-                    val completedPaths = intent.getStringArrayListExtra("completed_paths") ?: arrayListOf()
-                    val failedPackages = intent.getStringArrayListExtra("failed_packages") ?: arrayListOf()
-                    val failedNames = intent.getStringArrayListExtra("failed_names") ?: arrayListOf()
-                    val failedErrors = intent.getStringArrayListExtra("failed_errors") ?: arrayListOf()
-                    
-                    // Auto-install all completed downloads immediately
-                    handleEvent(AppEvent.AutoInstallAllCompleted(
-                        completedPackages, completedNames, completedPaths,
-                        failedPackages, failedNames, failedErrors
-                    ))
+                    Log.i(TAG_BLOC, "All downloads complete broadcast received")
+                    handleEvent(
+                        AppEvent.AutoInstallAllCompleted(
+                            completedPackages = intent.getStringArrayListExtra("completed_packages") ?: arrayListOf(),
+                            completedNames = intent.getStringArrayListExtra("completed_names") ?: arrayListOf(),
+                            completedPaths = intent.getStringArrayListExtra("completed_paths") ?: arrayListOf(),
+                            failedPackages = intent.getStringArrayListExtra("failed_packages") ?: arrayListOf(),
+                            failedNames = intent.getStringArrayListExtra("failed_names") ?: arrayListOf(),
+                            failedErrors = intent.getStringArrayListExtra("failed_errors") ?: arrayListOf()
+                        )
+                    )
                 }
             }
         }
     }
 
     init {
-        Log.i(TAG, "AppBloc initialized")
+        Log.i(TAG_BLOC, "AppBloc initialized")
         handleEvent(AppEvent.LoadConfiguration)
-        handleEvent(AppEvent.LoadAppsFromCacheFirst)  // Changed to load cache first
-        
-        // Listen for installation events from PackageInstaller
+        handleEvent(AppEvent.LoadAppsFromCacheFirst)
         setupPackageInstallerListener()
-        
-        // Listen for system package events (install/uninstall completion)
+        setupUninstallListener()
         packageChangedReceiver.register()
         setupPackageChangedListener()
-        
-        // Setup lifecycle observer
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        
-        // Register broadcast receiver for download completion
         registerDownloadBroadcastReceiver()
     }
-    
-    /**
-     * Setup listener for Android system package change events
-     * This provides more reliable detection than polling
-     */
+
+    // ---- Lifecycle ----
+
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+        Log.i(TAG_BLOC, "APP MOVED TO FOREGROUND — was backgrounded: $wasAppBackgrounded")
+        if (wasAppBackgrounded) {
+            checkPendingDownloadsOnForeground()
+            checkPendingUninstallsOnForeground()
+        } else {
+            resetAllQueuesAndPendingDownloads()
+        }
+        wasAppBackgrounded = false
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        Log.i(TAG_BLOC, "APP MOVED TO BACKGROUND")
+        wasAppBackgrounded = true
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
+        try {
+            context.unregisterReceiver(downloadCompleteBroadcastReceiver)
+        } catch (e: Exception) {
+            Log.w(TAG_BLOC, "Failed to unregister broadcast receiver", e)
+        }
+        packageChangedReceiver.unregister()
+    }
+
+    // ---- Listener setup ----
+
     private fun setupPackageChangedListener() {
         packageChangedReceiver.packageEvents
             .onEach { event ->
@@ -165,87 +173,31 @@ class AppBloc @Inject constructor(
                             is PackageEvent.Updated -> event.packageName
                             else -> return@onEach
                         }
-                        Log.i(TAG, "📦 System event: Package installed/updated: $packageName")
+                        Log.i(TAG_BLOC, "System event: Package installed/updated: $packageName")
                         pendingUninstallChecks.remove(packageName)
                         val installedVersion = appManager.getInstalledVersion(packageName)
-                        if (installedVersion != null) {
-                            handleInstallationSuccess(packageName, installedVersion)
-                        }
+                        if (installedVersion != null) handleInstallationSuccess(packageName, installedVersion)
                     }
                     is PackageEvent.Uninstalled -> {
-                        Log.i(TAG, "🗑️ System event: Package uninstalled: ${event.packageName}")
+                        Log.i(TAG_BLOC, "System event: Package uninstalled: ${event.packageName}")
                         pendingUninstallChecks.remove(event.packageName)
-                        
-                        // Check if this was part of a reinstall flow
-                        val pendingPath = pendingReinstalls.remove(event.packageName)
-                        if (pendingPath != null) {
-                            Log.i(TAG, "🔄 Proceeding with reinstall after uninstall: ${event.packageName}")
-                            installApp(event.packageName, pendingPath)
-                        } else {
-                            updateAppStatus(event.packageName, AppStatus.NOT_INSTALLED)
-                            showToast(stringProvider.getString(R.string.uninstallation_completed))
-                        }
-                    }
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    /**
-     * Setup PackageInstaller listener for immediate and accurate installation feedback
-     */
-    private fun setupPackageInstallerListener() {
-        packageInstaller.installationResults
-            .onEach { result ->
-                when (result) {
-                    is InstallationResult.Success -> {
-                        Log.i(TAG, "✅ Installation successful: ${result.packageName}")
-                        handleInstallationSuccess(result.packageName, appManager.getInstalledVersion(result.packageName) ?: "Unknown")
-                        // Clean up queue after successful installation
-                        Log.i(TAG, "🔄 Installation success - cleaning up queue")
-                        processNextInstallation()
-                    }
-                    
-                    is InstallationResult.Failed -> {
-                        Log.i(TAG, "❌ Installation failed: ${result.packageName}, error: ${result.error}")
-                        
-                        // 🔥 Check if user aborted/cancelled installation - don't retry in this case
-                        val isUserAbort = result.error.contains("aborted", ignoreCase = true) || 
-                                         result.error.contains("cancelled", ignoreCase = true) ||
-                                         result.error.contains("user denied", ignoreCase = true) ||
-                                         result.statusCode == android.content.pm.PackageInstaller.STATUS_FAILURE_ABORTED
-                        
-                        if (isUserAbort) {
-                            Log.i(TAG, "🚫 User aborted installation for: ${result.packageName}, not showing retry dialog")
-                            handleInstallationAborted(result.packageName, result.error)
-                        } else {
-                            handleInstallationFailedWithRetry(result.packageName, result.error)
-                        }
-                        
-                        // Clean up queue after failed installation
-                        Log.i(TAG, "🔄 Installation failed - cleaning up queue")
-                        processNextInstallation()
-                    }
-                    
-                    is InstallationResult.PendingUserAction -> {
-                        Log.i(TAG, "⏳ User action required for: ${result.packageName}")
-                        showToast(stringProvider.getString(R.string.installation_pending_user_action))
-                        
-                        // Start a timeout to handle user cancellation/inaction - but only when app is in foreground
-                        viewModelScope.launch {
-                            kotlinx.coroutines.delay(30000) // 30 seconds timeout
-                            
-                            // 🔥 ONLY process timeout if app is currently in foreground
-                            if (!wasAppBackgrounded) {
-                                // Check if this specific installation is still pending
-                                val stillPending = installationQueue.any { it.packageName == result.packageName }
-                                if (stillPending) {
-                                    Log.w(TAG, "⏰ Installation timeout for: ${result.packageName}, assuming user cancelled")
-                                    handleInstallationAborted(result.packageName, "User cancelled or timeout")
-                                    processNextInstallation()
-                                }
-                            } else {
-                                Log.i(TAG, "⏳ App is backgrounded, skipping timeout cleanup for: ${result.packageName}")
+                        val pendingApkPath = pendingReinstalls.remove(event.packageName)
+                        val pendingDownloadUrl = pendingReinstallDownloads.remove(event.packageName)
+                        when {
+                            pendingApkPath != null -> {
+                                // Retry flow: reinstall from already-downloaded APK
+                                installApp(event.packageName, pendingApkPath)
+                            }
+                            pendingDownloadUrl != null -> {
+                                // Reinstall flow: fetch latest version from network
+                                Log.i(TAG_BLOC, "Starting reinstall download for: ${event.packageName}")
+                                completedDownloads.remove(event.packageName)
+                                updateAppStatus(event.packageName, AppStatus.DOWNLOADING)
+                                downloadApp(event.packageName, pendingDownloadUrl)
+                            }
+                            else -> {
+                                updateAppStatus(event.packageName, AppStatus.NOT_INSTALLED)
+                                showToast(stringProvider.getString(R.string.uninstallation_completed))
                             }
                         }
                     }
@@ -253,10 +205,75 @@ class AppBloc @Inject constructor(
             }
             .launchIn(viewModelScope)
     }
-    
-    /**
-     * Register broadcast receiver for download completion events - enhanced for concurrent downloads
-     */
+
+    private fun setupPackageInstallerListener() {
+        packageInstaller.installationResults
+            .onEach { result ->
+                when (result) {
+                    is InstallationResult.Success -> {
+                        Log.i(TAG_BLOC, "Installation successful: ${result.packageName}")
+                        handleInstallationSuccess(
+                            result.packageName,
+                            appManager.getInstalledVersion(result.packageName) ?: "Unknown"
+                        )
+                        processNextInstallation()
+                    }
+                    is InstallationResult.Failed -> {
+                        Log.i(TAG_BLOC, "Installation failed: ${result.packageName}, error: ${result.error}")
+                        val isUserAbort = result.error.contains("aborted", ignoreCase = true) ||
+                                         result.error.contains("cancelled", ignoreCase = true) ||
+                                         result.error.contains("user denied", ignoreCase = true) ||
+                                         result.statusCode == android.content.pm.PackageInstaller.STATUS_FAILURE_ABORTED
+                        if (isUserAbort) handleInstallationAborted(result.packageName, result.error)
+                        else handleInstallationFailedWithRetry(result.packageName, result.error)
+                        processNextInstallation()
+                    }
+                    is InstallationResult.PendingUserAction -> {
+                        Log.i(TAG_BLOC, "User action required for: ${result.packageName}")
+                        showToast(stringProvider.getString(R.string.installation_pending_user_action))
+                        viewModelScope.launch {
+                            kotlinx.coroutines.delay(30_000)
+                            if (!wasAppBackgrounded && installationQueue.any { it.packageName == result.packageName }) {
+                                Log.w(TAG_BLOC, "Installation timeout for: ${result.packageName}")
+                                handleInstallationAborted(result.packageName, "User cancelled or timeout")
+                                processNextInstallation()
+                            }
+                        }
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun setupUninstallListener() {
+        packageInstaller.uninstallationResults
+            .onEach { result ->
+                when (result) {
+                    is UninstallationResult.Cancelled -> {
+                        Log.i(TAG_BLOC, "Uninstall cancelled by user: ${result.packageName}")
+                        pendingReinstalls.remove(result.packageName)
+                        pendingReinstallDownloads.remove(result.packageName)
+                        pendingUninstallChecks.remove(result.packageName)
+                        viewModelScope.launch { updateSingleAppStatus(result.packageName) }
+                        showToast(stringProvider.getString(R.string.uninstallation_cancelled))
+                    }
+                    is UninstallationResult.Failed -> {
+                        Log.w(TAG_BLOC, "Uninstall failed: ${result.packageName}, code=${result.statusCode}")
+                        pendingReinstalls.remove(result.packageName)
+                        pendingReinstallDownloads.remove(result.packageName)
+                        pendingUninstallChecks.remove(result.packageName)
+                        viewModelScope.launch { updateSingleAppStatus(result.packageName) }
+                        showError(stringProvider.getString(R.string.uninstallation_failed, result.message))
+                    }
+                    is UninstallationResult.Success -> {
+                        // Handled by PackageChangedReceiver (PackageEvent.Uninstalled)
+                        Log.i(TAG_BLOC, "Uninstall success confirmed via PackageInstaller: ${result.packageName}")
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
     private fun registerDownloadBroadcastReceiver() {
         val filter = IntentFilter().apply {
             addAction(DownloadService.ACTION_DOWNLOAD_COMPLETE)
@@ -267,249 +284,70 @@ class AppBloc @Inject constructor(
         } else {
             context.registerReceiver(downloadCompleteBroadcastReceiver, filter)
         }
-        Log.i(TAG, "📡 Enhanced download broadcast receiver registered")
     }
-    
-    /**
-     * Lifecycle event - App moved to foreground
-     */
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
-        Log.i(TAG, "🌟 === APP MOVED TO FOREGROUND === 🌟")
-        Log.i(TAG, "📱 Owner: ${owner.javaClass.simpleName}")
-        Log.i(TAG, "📱 Was backgrounded: $wasAppBackgrounded")
-        
-        if (wasAppBackgrounded) {
-            Log.i(TAG, "🔄 App was backgrounded, checking pending downloads...")
-            checkPendingDownloadsOnForeground()
-            
-            // Check pending uninstalls that might have completed in background
-            checkPendingUninstallsOnForeground()
-        } else {
-            Log.i(TAG, "🔄 Fresh app start, resetting all queues and pending downloads...")
-            resetAllQueuesAndPendingDownloads()
-        }
-        
-        // Reset background flag
-        wasAppBackgrounded = false
-    }
-    
-    /**
-     * Check for pending uninstalls that may have completed while app was backgrounded
-     */
+
+    // ---- Lifecycle helpers (background/foreground) ----
+
     private fun checkPendingUninstallsOnForeground() {
         viewModelScope.launch {
             pendingUninstallChecks.toList().forEach { packageName ->
                 if (!appManager.isAppInstalled(packageName)) {
-                    Log.i(TAG, "📦 Background uninstall detected: $packageName")
+                    Log.i(TAG_BLOC, "Background uninstall detected: $packageName")
                     pendingUninstallChecks.remove(packageName)
-                    val path = pendingReinstalls.remove(packageName)
-                    if (path != null) {
-                        Log.i(TAG, "🔄 Proceeding with reinstall after background uninstall: $packageName")
-                        installApp(packageName, path)
-                    } else {
-                        updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-                        showToast(stringProvider.getString(R.string.uninstallation_completed))
-                    }
-                }
-            }
-        }
-    }
-    
-    override fun onStop(owner: LifecycleOwner) {
-        super.onStop(owner)
-        Log.i(TAG, "⭐ === APP MOVED TO BACKGROUND === ⭐")
-        wasAppBackgrounded = true
-    }
-    
-    /**
-     * Reset all queues and pending downloads on fresh app start
-     */
-    private fun resetAllQueuesAndPendingDownloads() {
-        Log.i(TAG, "🗑️ === RESETTING ALL QUEUES AND PENDING DOWNLOADS ===")
-        
-        viewModelScope.launch {
-            try {
-                // Clear installation queue
-                clearInstallationQueue()
-                
-                // Clear all pending download states
-                downloadStateRepository.clearAllDownloadStates()
-                Log.i(TAG, "🗑️ Cleared all download states from database")
-                
-                // Reset all app statuses to UPDATE_AVAILABLE if they were in downloading/installing states
-                val currentState = _state.value
-                if (currentState is AppState.Success) {
-                    val updatedApps = currentState.apps.map { app ->
-                        when (app.status) {
-                            AppStatus.DOWNLOADING,
-                            AppStatus.INSTALLING -> {
-                                // Resolve the actual install state so first-time installs show
-                                // NOT_INSTALLED and updates show UPDATE_AVAILABLE.
-                                val actual = resolveActualStatus(app.packageName)
-                                Log.i(TAG, "🔄 Resetting ${app.packageName} from ${app.status} to $actual")
-                                app.copy(status = actual, downloadProgress = 0f)
-                            }
-                            else -> app
+                    val pendingApkPath = pendingReinstalls.remove(packageName)
+                    val pendingDownloadUrl = pendingReinstallDownloads.remove(packageName)
+                    when {
+                        pendingApkPath != null -> installApp(packageName, pendingApkPath)
+                        pendingDownloadUrl != null -> {
+                            completedDownloads.remove(packageName)
+                            updateAppStatus(packageName, AppStatus.DOWNLOADING)
+                            downloadApp(packageName, pendingDownloadUrl)
+                        }
+                        else -> {
+                            updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
+                            showToast(stringProvider.getString(R.string.uninstallation_completed))
                         }
                     }
-                    _state.value = currentState.copy(apps = updatedApps)
                 }
-                
-                Log.i(TAG, "✅ All queues and pending downloads reset successfully")
-                
-            } catch (e: Exception) {
-                Log.e(TAG, "❌ Error resetting queues and pending downloads", e)
             }
         }
     }
-    
-    /**
-     * Check for pending downloads when app comes to foreground
-     * Enhanced to force-check download service status and handle missed broadcasts
-     */
-    private fun checkPendingDownloadsOnForeground() {
-        Log.i(TAG, "🔍 === CHECKING PENDING DOWNLOADS ON FOREGROUND ===")
-        
+
+    private fun resetAllQueuesAndPendingDownloads() {
         viewModelScope.launch {
             try {
-                // Debug auto-install preference first
-                val isAutoInstallEnabled = preferencesManager.isAutoInstallEnabled()
-                Log.i(TAG, "🔧 Auto-install enabled: $isAutoInstallEnabled")
-                
-                // 🔥 NEW: Force check download service progress to catch missed broadcasts
-                Log.i(TAG, "🔍 Force checking download service status...")
-                checkDownloadServiceProgress()
-                
-                // Small delay to let service updates process
-                delay(1000)
-                
-                val completedDownloads = downloadStateRepository.getCompletedDownloads()
-                val activeDownloads = downloadStateRepository.getActiveDownloads()
-                
-                Log.i(TAG, "📊 Found ${completedDownloads.size} completed downloads, ${activeDownloads.size} active downloads")
-                
-                // Debug completed downloads details
-                completedDownloads.forEachIndexed { index, download ->
-                    Log.i(TAG, "📦 Completed download [$index]: ${download.packageName}")
-                    Log.i(TAG, "    📂 File path: ${download.filePath}")
-                    Log.i(TAG, "    📅 Created: ${download.createdAt}")
-                    Log.i(TAG, "    📅 Updated: ${download.updatedAt}")
-                    
-                    // Check if file exists
-                    val fileExists = download.filePath?.let { java.io.File(it).exists() } ?: false
-                    Log.i(TAG, "    📁 File exists: $fileExists")
+                // Clear all in-memory tracking state
+                clearInstallationQueue()
+                activeDownloads.values.forEach { it.cancel() }
+                activeDownloads.clear()
+                completedDownloads.clear()
+                pendingReinstalls.clear()
+                pendingReinstallDownloads.clear()
+                pendingUninstallChecks.clear()
+                installationRetries.clear()
+
+                // Clear persisted download state so stale entries can't interfere
+                downloadStateRepository.clearAllDownloadStates()
+
+                // Re-resolve every app's status from device state — don't trust what was in memory
+                val currentState = _state.value
+                if (currentState is AppState.Success) {
+                    _state.value = currentState.copy(
+                        apps = currentState.apps.map { app ->
+                            val actual = resolveActualStatus(app.packageName)
+                            app.copy(status = actual, downloadProgress = 0f)
+                        }
+                    )
                 }
-                
-                // 🔥 Process completed downloads immediately
-                if (completedDownloads.isNotEmpty()) {
-                    Log.i(TAG, "🚀 Processing ${completedDownloads.size} completed downloads immediately")
-                    
-                    completedDownloads.forEach { download ->
-                        Log.i(TAG, "⚡ Triggering installation for completed download: ${download.packageName}")
-                        
-                        // Trigger installation immediately
-                        queueInstallation(download.packageName, download.filePath!!, download.appName)
-                    }
-                } else {
-                    Log.i(TAG, "📭 No completed downloads found")
-                }
-                
-                // Handle active downloads that might have been interrupted or need status update
-                activeDownloads.forEach { download ->
-                    Log.w(TAG, "🔄 Found active download, checking status: ${download.packageName}")
-                    
-                    // Check if file actually exists and is complete
-                    val filePath = download.filePath
-                    if (filePath != null && java.io.File(filePath).exists()) {
-                        Log.i(TAG, "📦 Active download appears complete, marking as completed: ${download.packageName}")
-                        // Mark as completed and trigger installation
-                        downloadStateRepository.markDownloadCompleted(download.packageName, filePath)
-                        queueInstallation(download.packageName, filePath, download.appName)
-                    } else {
-                        Log.w(TAG, "❌ Active download file missing or incomplete, cleaning up: ${download.packageName}")
-                        // Reset UI state - user can retry if needed
-                        updateAppStatus(download.packageName, AppStatus.UPDATE_AVAILABLE)
-                        // Clean up the interrupted download state
-                        downloadStateRepository.removeDownloadState(download.packageName)
-                    }
-                }
-                
-                // Clean up old failed downloads
-                downloadStateRepository.cleanupOldFailedDownloads()
-                
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Error checking pending downloads", e)
+                Log.e(TAG_BLOC, "Error resetting queues and pending downloads", e)
             }
         }
     }
-    
-    /**
-     * Force check download service progress to catch missed broadcasts
-     */
-    private fun checkDownloadServiceProgress() {
-        try {
-            Log.i(TAG, "🔍 Checking SimpleDownloadManager for active downloads...")
-            
-            // Get current download progress from SimpleDownloadManager
-            val activeDownloads = simpleDownloadManager.getActiveDownloads()
-            
-            Log.i(TAG, "📊 SimpleDownloadManager reports ${activeDownloads.size} active downloads")
-            
-            activeDownloads.forEach { (packageName, download) ->
-                Log.i(TAG, "📥 Active download: $packageName - Progress: ${download.progress}% - Complete: ${download.isComplete}")
-                
-                if (download.isComplete && download.filePath != null) {
-                    Log.i(TAG, "🎉 Found completed download that may have missed broadcast: $packageName")
 
-                    // Skip if the app is already installed or mid-install — this prevents a
-                    // re-install when the user returns to the foreground within the 5-second
-                    // window that SimpleDownloadManager keeps completed entries.
-                    val currentStatus = (_state.value as? AppState.Success)
-                        ?.apps?.find { it.packageName == packageName }?.status
-                    if (currentStatus == AppStatus.UP_TO_DATE ||
-                        currentStatus == AppStatus.INSTALLING ||
-                        installationQueue.any { it.packageName == packageName }) {
-                        Log.i(TAG, "⏭️ Skipping already handled/installing package: $packageName (status=$currentStatus)")
-                    } else {
-                        // Trigger download completion handling
-                        handleEvent(AppEvent.DownloadCompleted(packageName, download.filePath!!))
-                    }
-                } else if (!download.isComplete) {
-                    Log.i(TAG, "🔄 Download still in progress: $packageName (${download.progress}%)")
-                    
-                    // Update UI progress
-                    updateAppProgress(packageName, download.progress)
-                    updateAppStatus(packageName, AppStatus.DOWNLOADING)
-                }
-            }
-            
-        } catch (e: Exception) {
-            Log.w(TAG, "⚠️ Error checking download service progress", e)
-        }
-    }
-    
-    /**
-     * Clean up resources when ViewModel is destroyed
-     */
-    override fun onCleared() {
-        super.onCleared()
-        try {
-            context.unregisterReceiver(downloadCompleteBroadcastReceiver)
-            Log.i(TAG, "Download broadcast receiver unregistered")
-        } catch (e: Exception) {
-            Log.w(TAG, "Failed to unregister broadcast receiver", e)
-        }
-        
-        // Unregister PackageChangedReceiver
-        packageChangedReceiver.unregister()
-    }
+    // ---- Event router ----
 
-    /**
-     * Handle incoming events
-     */
     fun handleEvent(event: AppEvent) {
-        Log.d(TAG, "Handling event: ${event::class.simpleName}")
         when (event) {
             is AppEvent.LoadApps -> loadApps(forceRefresh = false)
             is AppEvent.RefreshApps -> loadApps(forceRefresh = true)
@@ -517,7 +355,13 @@ class AppBloc @Inject constructor(
             is AppEvent.BackgroundRefreshApps -> backgroundRefreshApps()
             is AppEvent.UpdateSingleApp -> updateSingleApp(event.app)
             is AppEvent.DownloadApp -> downloadApp(event.packageName, event.downloadUrl)
+            is AppEvent.CancelDownload -> cancelDownload(event.packageName)
+            is AppEvent.DownloadCompleted -> handleDownloadCompleted(event.packageName, event.filePath)
+            is AppEvent.DownloadFailed -> handleDownloadFailed(event.packageName, event.error)
             is AppEvent.InstallApp -> installApp(event.packageName, event.apkFilePath)
+            is AppEvent.RetryInstallation -> retryInstallation(event.packageName, event.apkFilePath, event.shouldUninstallFirst)
+            is AppEvent.InstallationCompleted -> handleInstallationCompleted(event.packageName, event.success)
+            is AppEvent.ConfirmUninstallBeforeReinstall -> confirmUninstallBeforeReinstall(event.packageName, event.apkFilePath)
             is AppEvent.UninstallApp -> uninstallApp(event.packageName)
             is AppEvent.ShowReinstallConfirmation -> showReinstallConfirmation(event.packageName)
             is AppEvent.ReinstallApp -> reinstallApp(event.packageName)
@@ -525,1592 +369,82 @@ class AppBloc @Inject constructor(
             is AppEvent.UpdateAppProgress -> updateAppProgress(event.packageName, event.progress)
             is AppEvent.UpdateAppStatus -> updateAppStatus(event.packageName, event.status)
             is AppEvent.ShowError -> showError(event.message)
-            is AppEvent.RetryInstallation -> retryInstallation(event.packageName, event.apkFilePath, event.shouldUninstallFirst)
-            is AppEvent.CancelDownload -> cancelDownload(event.packageName)
-            is AppEvent.ConfirmUninstallBeforeReinstall -> confirmUninstallBeforeReinstall(event.packageName, event.apkFilePath)
-            is AppEvent.DismissDialog -> dismissDialog()
-            is AppEvent.DismissDialogAndUpdateStatus -> {
-                dismissDialog()
-                updateAppStatus(event.packageName, event.status)
-            }
-
-            is AppEvent.DownloadCompleted -> handleDownloadCompleted(event.packageName, event.filePath)
-            is AppEvent.DownloadFailed -> handleDownloadFailed(event.packageName, event.error)
-            is AppEvent.InstallationCompleted -> handleInstallationCompleted(event.packageName, event.success)
             is AppEvent.ShowConfirmationDialog -> showConfirmationDialog(event.title, event.message, event.onConfirm, event.onCancel)
-            is AppEvent.ShowConfigDialog -> showConfigDialog()
-            is AppEvent.SaveConfiguration -> saveConfiguration(event.config)
-            is AppEvent.UpdateCompactMode -> updateCompactMode(event.enabled)
-            is AppEvent.LoadConfiguration -> loadConfiguration()
-            
-            // Concurrent downloads events - simplified for auto-install
+            is AppEvent.DismissDialog -> dismissDialog()
+            is AppEvent.DismissDialogAndUpdateStatus -> { dismissDialog(); updateAppStatus(event.packageName, event.status) }
             is AppEvent.AutoInstallAllCompleted -> autoInstallAllCompleted(
                 event.completedPackages, event.completedNames, event.completedPaths,
                 event.failedPackages, event.failedNames, event.failedErrors
             )
-            
-            // Search events
+            is AppEvent.NavigateToSettings -> navigateToSettings()
+            is AppEvent.NavigateBackFromSettings -> navigateBackFromSettings()
+            is AppEvent.SaveSettings -> saveSettings(event.config)
+            is AppEvent.ResetSettings -> resetSettings()
+            is AppEvent.LoadConfiguration -> loadConfiguration()
             is AppEvent.SearchApps -> searchApps(event.query)
             is AppEvent.ClearSearch -> clearSearch()
-
-            // Filter events
             is AppEvent.SetFilter -> setFilter(event.filter)
-
-            // Favorites events
             is AppEvent.ToggleFavorite -> toggleFavorite(event.packageName)
         }
     }
-    
-    /**
-     * Search apps by query (title or package name)
-     */
-    private fun searchApps(query: String) {
-        val currentState = _state.value
-        if (currentState is AppState.Success) {
-            _state.value = currentState.copy(searchQuery = query)
-        }
-    }
-    
-    /**
-     * Clear search query
-     */
-    private fun clearSearch() {
-        val currentState = _state.value
-        if (currentState is AppState.Success) {
-            _state.value = currentState.copy(searchQuery = "")
-        }
+
+    // ---- Shared UI helpers (used by all extension files) ----
+
+    internal fun showError(message: String) {
+        Log.w(TAG_BLOC, "Showing error: $message")
+        _toastMessage.value = message
     }
 
-    /**
-     * Set the active filter option
-     */
-    private fun setFilter(filter: AppFilterOption) {
-        val currentState = _state.value
-        if (currentState is AppState.Success) {
-            _state.value = currentState.copy(filterOption = filter)
-        }
+    internal fun showToast(message: String) {
+        _toastMessage.value = message
     }
 
-    /**
-     * Apply persisted favorites flags to a list of apps.
-     */
-    private fun applyFavorites(apps: List<RevancedApp>): List<RevancedApp> {
-        val favorites = preferencesManager.getFavorites()
-        return if (favorites.isEmpty()) apps
-        else apps.map { it.copy(isFavorite = it.packageName in favorites) }
+    fun clearToast() {
+        _toastMessage.value = null
     }
 
-    /**
-     * Toggle favorite status for an app.
-     * Removing is immediate; adding requires confirmation dialog.
-     */
-    private fun toggleFavorite(packageName: String) {
-        val currentState = _state.value as? AppState.Success ?: return
-        val app = currentState.apps.find { it.packageName == packageName } ?: return
-
-        if (app.isFavorite) {
-            val newFavorites = preferencesManager.getFavorites().toMutableSet()
-            newFavorites.remove(packageName)
-            preferencesManager.saveFavorites(newFavorites)
-            val updatedApps = currentState.apps.map {
-                if (it.packageName == packageName) it.copy(isFavorite = false) else it
-            }
-            _state.value = currentState.copy(apps = updatedApps)
-            showToast(stringProvider.getString(R.string.favorite_removed))
-        } else {
-            _state.value = currentState.copy(
-                dialogState = DialogState.Confirmation(
-                    title = stringProvider.getString(R.string.favorite_add_title),
-                    message = stringProvider.getString(R.string.favorite_add_message, app.title),
-                    onConfirmAction = {
-                        val favorites = preferencesManager.getFavorites().toMutableSet()
-                        favorites.add(packageName)
-                        preferencesManager.saveFavorites(favorites)
-                        val freshState = _state.value as? AppState.Success ?: return@Confirmation
-                        val updatedApps = freshState.apps.map {
-                            if (it.packageName == packageName) it.copy(isFavorite = true) else it
-                        }
-                        _state.value = freshState.copy(apps = updatedApps, dialogState = null)
-                        showToast(stringProvider.getString(R.string.favorite_added))
-                    },
-                    onCancelAction = { handleEvent(AppEvent.DismissDialog) }
-                )
-            )
-        }
-    }
-
-    /**
-     * Load apps from cache first for fast UI, then trigger background refresh
-     */
-    private fun loadAppsFromCacheFirst() {
-        Log.i(TAG, "Loading apps from cache first for fast UI")
-        viewModelScope.launch {
-            useCases.appRepository.getAppsFromCacheImmediately()
-                .onEach { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            Log.d(TAG, "No cache available, loading from network")
-                            _state.value = AppState.Loading
-                            // If no cache, fallback to normal loading
-                            loadApps(forceRefresh = false)
-                        }
-                        is Result.Success -> {
-                            Log.i(TAG, "Cache loaded successfully: ${result.data.size} items")
-                            val config = try {
-                                preferencesManager.getAppConfig()
-                            } catch (e: Exception) {
-                                Log.w(TAG, "Failed to load config, using fallback", e)
-                                AppConfig(ThemeMode.DARK, Language.ENGLISH)
-                            }
-                            _state.value = AppState.Success(applyFavorites(result.data), config = config)
-                            
-                            // Start background refresh after a short delay to let UI render
-                            viewModelScope.launch {
-                                delay(500) // 500ms delay to let UI stabilize
-                                Log.i(TAG, "Starting background refresh after UI render")
-                                handleEvent(AppEvent.BackgroundRefreshApps)
-                            }
-                        }
-                        is Result.Error -> {
-                            Log.e(TAG, "Failed to load cached apps", result.exception)
-                            // If cache loading fails, fallback to normal loading
-                            loadApps(forceRefresh = false)
-                        }
-                    }
-                }
-                .launchIn(this)
-        }
-    }
-
-    /**
-     * Background refresh apps and update UI smoothly
-     */
-    private fun backgroundRefreshApps() {
-        Log.i(TAG, "Background refresh starting")
-        viewModelScope.launch {
-            useCases.appRepository.backgroundRefreshApps()
-                .onEach { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            Log.d(TAG, "Background refresh in progress...")
-                            // Don't show loading state during background refresh
-                        }
-                        is Result.Success -> {
-                            Log.i(TAG, "Background refresh completed: ${result.data.size} items")
-                            
-                            val currentState = _state.value
-                            if (currentState is AppState.Success) {
-                                val oldApps = currentState.apps
-                                val newApps = result.data
-                                
-                                // Find which apps have been updated
-                                val updatedApps = useCases.appRepository.getUpdatedApps(oldApps, newApps)
-                                
-                                if (updatedApps.isNotEmpty()) {
-                                    Log.i(TAG, "Found ${updatedApps.size} updated apps, updating UI smoothly")
-                                    
-                                    // Update the entire list with smooth transition
-                                    val config = try {
-                                        preferencesManager.getAppConfig()
-                                    } catch (e: Exception) {
-                                        Log.w(TAG, "Failed to load config, using fallback", e)
-                                        AppConfig(ThemeMode.DARK, Language.ENGLISH)
-                                    }
-                                    
-                                    _state.value = AppState.Success(applyFavorites(newApps), config = config)
-                                    
-                                    // Show a subtle toast if there are significant updates
-                                    if (updatedApps.size > 1) {
-                                        showToast(stringProvider.getString(R.string.apps_updated, updatedApps.size))
-                                    }
-                                } else {
-                                    Log.d(TAG, "No app updates found during background refresh")
-                                }
-                            } else {
-                                Log.w(TAG, "Background refresh completed but current state is not Success")
-                            }
-                        }
-                        is Result.Error -> {
-                            Log.w(TAG, "Background refresh failed, keeping current state", result.exception)
-                            // Don't update UI on background refresh failure
-                            // User will still see cached data
-                        }
-                    }
-                }
-                .launchIn(this)
-        }
-    }
-
-    /**
-     * Update a single app in the current list
-     */
-    private fun updateSingleApp(updatedApp: RevancedApp) {
-        Log.d(TAG, "Updating single app: ${updatedApp.packageName}")
-        val currentState = _state.value
-        if (currentState is AppState.Success) {
-            val updatedApps = currentState.apps.map { app ->
-                if (app.packageName == updatedApp.packageName) {
-                    updatedApp.copy(isFavorite = app.isFavorite)
-                } else {
-                    app
-                }
-            }
-            _state.value = currentState.copy(apps = updatedApps)
-            Log.d(TAG, "Single app updated in UI: ${updatedApp.packageName}")
-        }
-    }
-
-    /**
-     * Load apps from repository
-     */
-    private fun loadApps(forceRefresh: Boolean) {
-        Log.i(TAG, "Loading apps, forceRefresh: $forceRefresh")
-        viewModelScope.launch {
-            useCases.getAppsUseCase(forceRefresh)
-                .onEach { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            Log.d(TAG, "Apps loading...")
-                            _state.value = AppState.Loading
-                        }
-                        is Result.Success -> {
-                            Log.i(TAG, "Apps loaded successfully: ${result.data.size} items")
-                            // Ensure config is included when transitioning to Success state
-                            val config = try {
-                                preferencesManager.getAppConfig()
-                            } catch (e: Exception) {
-                                Log.w(TAG, "Failed to load config during app loading, using fallback", e)
-                                AppConfig(ThemeMode.DARK, Language.ENGLISH)
-                            }
-                            _state.value = AppState.Success(applyFavorites(result.data), config = config)
-                        }
-                        is Result.Error -> {
-                            Log.e(TAG, "Failed to load apps", result.exception)
-                            // Ensure config is included even in Error state
-                            val config = try {
-                                preferencesManager.getAppConfig()
-                            } catch (e: Exception) {
-                                Log.w(TAG, "Failed to load config during app error, using fallback", e)
-                                AppConfig(ThemeMode.DARK, Language.ENGLISH)
-                            }
-                            _state.value = AppState.Error(
-                                message = result.message,
-                                dialogState = null,
-                                config = config
-                            )
-                        }
-                    }
-                }
-                .launchIn(this)
-        }
-    }
-
-    /**
-     * Download an app using modern WorkManager-based system
-     */
-    private fun downloadApp(packageName: String, downloadUrl: String) {
-        Log.i(TAG, "Starting download: $packageName")
-        Log.d(TAG, "Download URL: $downloadUrl")
-        
-        // Cancel any existing download for this package
-        cancelDownload(packageName)
-
-        // Clear completed downloads tracking to allow re-download and installation
-        completedDownloads.remove(packageName)
-        Log.i(TAG, "🗑️ Cleared completed downloads tracking for: $packageName")
-
-        // Remove from installation queue — if a previous download queued an install with an old
-        // APK path, that entry must be removed so the new download's path is used instead.
-        installationQueue.removeAll { it.packageName == packageName }
-        Log.i(TAG, "🗑️ Removed stale queue entry for: $packageName")
-        
-        // Storage space check is handled in the service
-        // Proceed directly to download
-        
-        val downloadJob = viewModelScope.launch {
-            try {
-                // Update app status to downloading
-                updateAppStatus(packageName, AppStatus.DOWNLOADING)
-                updateAppProgress(packageName, 0f)
-                
-                // Show starting message
-                showToast(stringProvider.getString(R.string.download_starting))
-                Log.i(TAG, "Download starting for: $packageName")
-                
-                simpleDownloadManager.downloadApp(packageName, downloadUrl)
-                    .catch { error ->
-                        Log.e(TAG, "Download failed for $packageName", error)
-                        val errorMessage = when {
-                            error.message?.contains("insufficient memory", ignoreCase = true) == true ||
-                            error.message?.contains("OutOfMemoryError", ignoreCase = true) == true -> {
-                                stringProvider.getString(R.string.download_failed_memory)
-                            }
-                            error.message?.contains("space", ignoreCase = true) == true -> {
-                                stringProvider.getString(R.string.download_failed_storage)
-                            }
-                            else -> {
-                                stringProvider.getString(R.string.download_failed, error.message ?: "Unknown error")
-                            }
-                        }
-                        handleDownloadFailed(packageName, errorMessage)
-                    }
-                    .onEach { download ->
-                        // Update progress
-                        val progressPercent = download.progress * 100f
-                        updateAppProgress(packageName, download.progress)
-                        
-                        // Log progress more frequently for better monitoring
-                        Log.d(TAG, "Download progress for $packageName: ${String.format("%.2f", progressPercent)}% (${download.progress})")
-                        
-                        // Additional detailed logging for progress tracking
-                        if (progressPercent > 0f) {
-                            Log.i(TAG, "[$packageName] Download progress: ${String.format("%.1f", progressPercent)}%")
-                        }
-                        
-                        if (download.isComplete && download.filePath != null) {
-                            Log.i(TAG, "Download completed for $packageName: ${download.filePath}")
-                            handleDownloadCompleted(packageName, download.filePath)
-                            // Stop progress monitoring after completion
-                            return@onEach
-                        }
-                    }
-                    .launchIn(this)
-                
-            } catch (e: Exception) {
-                Log.e(TAG, "Download error for $packageName", e)
-                val errorMessage = when {
-                    e.message?.contains("insufficient memory", ignoreCase = true) == true ||
-                    e.message?.contains("OutOfMemoryError", ignoreCase = true) == true -> {
-                        stringProvider.getString(R.string.download_failed_memory)
-                    }
-                    e.message?.contains("space", ignoreCase = true) == true -> {
-                        stringProvider.getString(R.string.download_failed_storage)
-                    }
-                    else -> {
-                        stringProvider.getString(R.string.download_failed, e.message ?: "Unknown error")
-                    }
-                }
-                handleDownloadFailed(packageName, errorMessage)
-            }
-        }
-        
-        activeDownloads[packageName] = downloadJob
-    }
-
-    /**
-     * Handle download completion - auto-install immediately
-     */
-    private fun handleDownloadCompleted(packageName: String, filePath: String) {
-        // Prevent duplicate handling of the same download completion
-        if (completedDownloads.contains(packageName)) {
-            Log.w(TAG, "Download completion already handled for: $packageName")
-            return
-        }
-        
-        Log.i(TAG, "🚀 Download completed, queueing for installation: $packageName -> $filePath")
-        completedDownloads.add(packageName)
-        activeDownloads.remove(packageName)
-        
-        // Get app name for better logging
-        val currentState = _state.value
-        val appName = if (currentState is AppState.Success) {
-            currentState.apps.find { it.packageName == packageName }?.title ?: packageName
-        } else {
-            packageName
-        }
-        
-        // Add to installation queue
-        queueInstallation(packageName, filePath, appName)
-        showToast(stringProvider.getString(R.string.download_completed_installing))
-    }
-
-    /**
-     * Handle download failure — restore actual install status so the UI stays consistent.
-     */
-    private fun handleDownloadFailed(packageName: String, error: String) {
-        Log.e(TAG, "Download failed: $packageName - $error")
-        activeDownloads.remove(packageName)
-
-        // Determine correct status from what is actually installed on the device
-        val restoredStatus = resolveActualStatus(packageName)
-        updateAppStatus(packageName, restoredStatus)
-        updateAppProgress(packageName, 0f)
-        showError(error)
-    }
-
-    /**
-     * Cancel an ongoing download — restore actual install status so the UI stays consistent.
-     */
-    private fun cancelDownload(packageName: String) {
-        Log.i(TAG, "Cancelling download: $packageName")
-        activeDownloads[packageName]?.cancel()
-        activeDownloads.remove(packageName)
-
-        simpleDownloadManager.cancelDownload(packageName)
-
-        val restoredStatus = resolveActualStatus(packageName)
-        updateAppStatus(packageName, restoredStatus)
-        updateAppProgress(packageName, 0f)
-
-        // Only show the cancellation toast if the download was really in progress (not called
-        // internally as part of a re-download).
-        if (restoredStatus != AppStatus.DOWNLOADING) {
-            showToast(stringProvider.getString(R.string.download_cancelled))
-        }
-    }
-
-    /**
-     * Install an app using queue system (public interface)
-     */
-    private fun installApp(packageName: String, apkFilePath: String) {
-        val currentState = _state.value
-        val appName = if (currentState is AppState.Success) {
-            currentState.apps.find { it.packageName == packageName }?.title ?: packageName
-        } else {
-            packageName
-        }
-        
-        Log.i(TAG, "📋 Queueing app installation: $appName ($packageName)")
-        queueInstallation(packageName, apkFilePath, appName)
-    }
-    
-    /**
-     * Install an app directly using PackageInstaller API (used by queue)
-     */
-    private fun installAppDirect(packageName: String, apkFilePath: String) {
-        Log.i(TAG, "🚀 Installing app directly: $packageName from $apkFilePath")
-        viewModelScope.launch {
-            try {
-                val result = useCases.installAppUseCase(packageName, apkFilePath)
-                when (result) {
-                    is Result.Success -> {
-                        if (result.data) {
-                            Log.i(TAG, "✅ Installation started successfully: $packageName")
-                            showToast(stringProvider.getString(R.string.installation_started))
-                            // PackageInstaller will handle the rest via BroadcastReceiver
-                        } else {
-                            Log.w(TAG, "⚠️ Installation failed to start: $packageName")
-                            handleInstallationFailedWithRetry(packageName, stringProvider.getString(R.string.installation_failed_start))
-                        }
-                    }
-                    is Result.Error -> {
-                        Log.e(TAG, "❌ Installation error: $packageName", result.exception)
-                        handleInstallationFailedWithRetry(packageName, result.message)
-                    }
-                    is Result.Loading -> {
-                        // Should not happen in this case
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "💥 Installation exception: $packageName", e)
-                handleInstallationFailedWithRetry(packageName, e.message ?: "Installation failed")
-            }
-        }
-    }
-
-    /**
-     * Handle installation failure with immediate error feedback and retry dialog
-     */
-    private fun handleInstallationFailedWithRetry(packageName: String, error: String) {
-        val currentRetries = installationRetries[packageName] ?: 0
-        
-        // Update app status based on current installation state
-        val currentState = _state.value
-        if (currentState is AppState.Success) {
-            val app = currentState.apps.find { it.packageName == packageName }
-            app?.let {
-                val isInstalled = appManager.isAppInstalled(packageName)
-                val newStatus = if (isInstalled) {
-                    val installedVersion = appManager.getInstalledVersion(packageName)
-                    if (installedVersion != null) {
-                        when (compareVersions(installedVersion, app.latestVersion)) {
-                            0 -> AppStatus.UP_TO_DATE
-                            1 -> AppStatus.UP_TO_DATE
-                            else -> AppStatus.UPDATE_AVAILABLE
-                        }
-                    } else {
-                        AppStatus.NOT_INSTALLED
-                    }
-                } else {
-                    AppStatus.NOT_INSTALLED
-                }
-                
-                updateAppStatus(packageName, newStatus)
-            }
-        }
-        
-        if (currentRetries < 1) { // Allow one retry
-            installationRetries[packageName] = currentRetries + 1
-            
-            // Show retry dialog
-            showConfirmationDialog(
-                title = stringProvider.getString(R.string.installation_failed_title),
-                message = stringProvider.getString(R.string.installation_failed_retry_message, error),
-                onConfirm = AppEvent.RetryInstallation(packageName, getDownloadPath(packageName) ?: "", shouldUninstallFirst = true),
-                onCancel = AppEvent.DismissDialogAndUpdateStatus(packageName, AppStatus.UPDATE_AVAILABLE)
-            )
-        } else {
-            // Max retries reached
-            installationRetries.remove(packageName)
-            showError(stringProvider.getString(R.string.download_failed, error))
-        }
-        
-        // Remove from installation queue
-        installationQueue.removeAll { it.packageName == packageName }
-        Log.i(TAG, "🗑️ Removed failed installation from queue: $packageName")
-        
-        // Remove from download state database to prevent re-queuing
-        viewModelScope.launch {
-            try {
-                downloadStateRepository.removeDownloadState(packageName)
-                Log.i(TAG, "🗑️ Removed failed installation from download state: $packageName")
-            } catch (e: Exception) {
-                Log.w(TAG, "Failed to remove download state for failed installation", e)
-            }
-        }
-    }
-
-    /**
-     * Handle successful installation
-     */
-    private fun handleInstallationSuccess(packageName: String, installedVersion: String) {
-        val currentState = _state.value
-        if (currentState is AppState.Success) {
-            val app = currentState.apps.find { it.packageName == packageName }
-            app?.let {
-                val newStatus = when (compareVersions(installedVersion, app.latestVersion)) {
-                    0 -> AppStatus.UP_TO_DATE  // Same version as latest
-                    1 -> AppStatus.UP_TO_DATE  // Installed version is newer than latest
-                    else -> AppStatus.UPDATE_AVAILABLE  // Still needs update (rare case)
-                }
-                
-                val updatedApps = currentState.apps.map { appItem ->
-                    if (appItem.packageName == packageName) {
-                        appItem.copy(
-                            status = newStatus,
-                            currentVersion = installedVersion,
-                            downloadProgress = 0f
-                        )
-                    } else {
-                        appItem
-                    }
-                }
-                
-                _state.value = currentState.copy(apps = updatedApps)
-                showToast(stringProvider.getString(R.string.installation_completed))
-                
-                // Clear pending install state and retries
-                preferencesManager.removeKey("pending_install_${packageName}")
-                installationRetries.remove(packageName)
-                completedDownloads.remove(packageName)
-                
-                // Remove from installation queue
-                installationQueue.removeAll { it.packageName == packageName }
-                Log.i(TAG, "🗑️ Removed successful installation from queue: $packageName")
-                
-                // Remove download state from database after successful installation
-                viewModelScope.launch {
-                    try {
-                        downloadStateRepository.removeDownloadState(packageName)
-                        Log.d(TAG, "Removed download state after successful installation: $packageName")
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Failed to remove download state", e)
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Update status of a single app without refreshing the entire list
-     * This prevents screen flickering and unnecessary API calls
-     */
-    private suspend fun updateSingleAppStatus(packageName: String) {
-        try {
-            val currentState = _state.value
-            if (currentState is AppState.Success) {
-                val appToUpdate = currentState.apps.find { it.packageName == packageName }
-                if (appToUpdate != null) {
-                    // Don't update status if app is currently being processed
-                    // This prevents overriding INSTALLING/DOWNLOADING/UNINSTALLING states
-                    if (appToUpdate.status in listOf(
-                        AppStatus.DOWNLOADING,
-                        AppStatus.INSTALLING,
-                        AppStatus.UNINSTALLING
-                    )) {
-                        // Only handle UNINSTALLING status here, others are handled by their respective monitoring functions
-                        if (appToUpdate.status == AppStatus.UNINSTALLING) {
-                            val isInstalled = appManager.isAppInstalled(packageName)
-                            if (!isInstalled) {
-                                // Uninstallation completed
-                                val updatedApps = currentState.apps.map { app ->
-                                    if (app.packageName == packageName) {
-                                        app.copy(
-                                            status = AppStatus.NOT_INSTALLED,
-                                            currentVersion = null,
-                                            downloadProgress = 0f
-                                        )
-                                    } else {
-                                        app
-                                    }
-                                }
-                                
-                                _state.value = currentState.copy(apps = updatedApps)
-                                showToast(stringProvider.getString(R.string.uninstallation_completed))
-                            }
-                        }
-                        // For DOWNLOADING and INSTALLING, don't interfere - let their monitoring functions handle
-                        return
-                    }
-                    
-                    // Normal status update for non-processing apps
-                    val isInstalled = appManager.isAppInstalled(packageName)
-                    val installedVersion = if (isInstalled) {
-                        appManager.getInstalledVersion(packageName)
-                    } else {
-                        null
-                    }
-                    
-                    // Determine new status based on installation state
-                    val newStatus = when {
-                        !isInstalled -> AppStatus.NOT_INSTALLED
-                        installedVersion != null -> {
-                            when (compareVersions(installedVersion, appToUpdate.latestVersion)) {
-                                0 -> AppStatus.UP_TO_DATE  // Same version
-                                1 -> AppStatus.UP_TO_DATE  // Installed version is newer
-                                else -> AppStatus.UPDATE_AVAILABLE  // Latest version is newer
-                            }
-                        }
-                        else -> AppStatus.NOT_INSTALLED
-                    }
-                    
-                    // Only update if status actually changed
-                    if (newStatus != appToUpdate.status) {
-                        val updatedApps = currentState.apps.map { app ->
-                            if (app.packageName == packageName) {
-                                app.copy(
-                                    status = newStatus,
-                                    currentVersion = installedVersion,
-                                    downloadProgress = 0f
-                                )
-                            } else {
-                                app
-                            }
-                        }
-                        
-                        _state.value = currentState.copy(apps = updatedApps)
-                        showToast(stringProvider.getString(R.string.app_status_updated))
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            // If single app update fails, fallback to full refresh
-            loadApps(forceRefresh = true)
-        }
-    }
-
-    /**
-     * Handle installation completion
-     */
-    private fun handleInstallationCompleted(packageName: String, success: Boolean) {
-        if (success) {
-            updateAppStatus(packageName, AppStatus.UP_TO_DATE)
-            showToast(stringProvider.getString(R.string.installation_completed))
-            installationRetries.remove(packageName)
-            
-            // Clear pending install state  
-            preferencesManager.removeKey("pending_install_${packageName}")
-        } else {
-            val currentState = _state.value
-            if (currentState is AppState.Success) {
-                val app = currentState.apps.find { it.packageName == packageName }
-                app?.let {
-                    val apkFilePath = getDownloadPath(packageName) ?: preferencesManager.getPendingInstallPath(packageName)
-                    if (apkFilePath != null) {
-                        handleInstallationFailed(packageName, apkFilePath, stringProvider.getString(R.string.installation_failed_start))
-                    } else {
-                        updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-                        showError(stringProvider.getString(R.string.installation_failed_apk_not_found))
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Handle installation aborted by user - no retry dialog
-     */
-    private fun handleInstallationAborted(packageName: String, error: String) {
-        Log.i(TAG, "🚫 Installation aborted by user: $packageName")
-        
-        // Clean up without retry
-        installationRetries.remove(packageName)
-        
-        // 🔥 Check actual installation status instead of assuming UPDATE_AVAILABLE
-        val currentState = _state.value
-        if (currentState is AppState.Success) {
-            val app = currentState.apps.find { it.packageName == packageName }
-            app?.let {
-                val isInstalled = appManager.isAppInstalled(packageName)
-                val newStatus = if (isInstalled) {
-                    val installedVersion = appManager.getInstalledVersion(packageName)
-                    if (installedVersion != null) {
-                        when (compareVersions(installedVersion, app.latestVersion)) {
-                            0 -> AppStatus.UP_TO_DATE
-                            1 -> AppStatus.UP_TO_DATE
-                            else -> AppStatus.UPDATE_AVAILABLE
-                        }
-                    } else {
-                        AppStatus.NOT_INSTALLED
-                    }
-                } else {
-                    AppStatus.NOT_INSTALLED
-                }
-                
-                Log.i(TAG, "📦 After user abort, setting status to: $newStatus (installed: $isInstalled)")
-                updateAppStatus(packageName, newStatus)
-            }
-        }
-        
-        // Show simple error message without retry option
-        showToast(stringProvider.getString(R.string.installation_cancelled_by_user))
-        
-        // Clean up download state and installation queue
-        viewModelScope.launch {
-            downloadStateRepository.removeDownloadState(packageName)
-            Log.i(TAG, "🗑️ Removed download state after user abort: $packageName")
-        }
-        
-        // Remove from installation queue and completed downloads tracking
-        installationQueue.removeAll { it.packageName == packageName }
-        completedDownloads.remove(packageName)
-        Log.i(TAG, "🗑️ Removed from installation queue and completed downloads after user abort: $packageName")
-    }
-
-    /**
-     * Handle installation failure with retry logic
-     */
-    private fun handleInstallationFailed(packageName: String, apkFilePath: String, error: String) {
-        val currentRetries = installationRetries[packageName] ?: 0
-        
-        if (currentRetries < 1) { // Allow one retry
-            installationRetries[packageName] = currentRetries + 1
-            
-            // Show retry dialog
-            showConfirmationDialog(
-                title = stringProvider.getString(R.string.installation_failed_title),
-                message = stringProvider.getString(R.string.installation_failed_retry_message, error),
-                onConfirm = AppEvent.RetryInstallation(packageName, apkFilePath, shouldUninstallFirst = true),
-                onCancel = AppEvent.UpdateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-            )
-        } else {
-            // Max retries reached
-            installationRetries.remove(packageName)
-            updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-            showError(stringProvider.getString(R.string.download_failed, error))
-        }
-    }
-
-    /**
-     * Retry installation with optional uninstall first
-     * Uses system events for detection, with fallback polling after 5s
-     */
-    private fun retryInstallation(packageName: String, apkFilePath: String, shouldUninstallFirst: Boolean) {
-        dismissDialog()
-        
-        if (shouldUninstallFirst) {
-            viewModelScope.launch {
-                try {
-                    // Check if package is actually installed before attempting uninstall
-                    val isInstalled = appManager.isAppInstalled(packageName)
-                    if (!isInstalled) {
-                        Log.i(TAG, "📦 Package $packageName is not installed, skipping uninstall and proceeding with installation")
-                        showToast(stringProvider.getString(R.string.app_not_installed_proceeding))
-                        installApp(packageName, apkFilePath)
-                        return@launch
-                    }
-                    
-                    // Store pending reinstall and track uninstall
-                    pendingReinstalls[packageName] = apkFilePath
-                    pendingUninstallChecks.add(packageName)
-                    
-                    // First uninstall the existing app
-                    updateAppStatus(packageName, AppStatus.UNINSTALLING)
-                    val uninstallResult = useCases.uninstallAppUseCase(packageName)
-                    when (uninstallResult) {
-                        is Result.Success -> {
-                            if (uninstallResult.data) {
-                                showToast(stringProvider.getString(R.string.old_version_uninstalled))
-                                
-                                // Fallback: if system event not received within 5s, poll and proceed
-                                delay(5000)
-                                if (pendingUninstallChecks.contains(packageName)) {
-                                    Log.w(TAG, "⚠️ System event not received for reinstall, checking manually")
-                                    if (!appManager.isAppInstalled(packageName)) {
-                                        pendingUninstallChecks.remove(packageName)
-                                        val path = pendingReinstalls.remove(packageName)
-                                        if (path != null) {
-                                            Log.i(TAG, "🔄 Proceeding with reinstall via fallback: $packageName")
-                                            installApp(packageName, path)
-                                        }
-                                    }
-                                }
-                            } else {
-                                pendingReinstalls.remove(packageName)
-                                pendingUninstallChecks.remove(packageName)
-                                showError(stringProvider.getString(R.string.failed_uninstall_old_version))
-                                updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-                            }
-                        }
-                        is Result.Error -> {
-                            pendingReinstalls.remove(packageName)
-                            pendingUninstallChecks.remove(packageName)
-                            showError(stringProvider.getString(R.string.failed_uninstall_old_version_error, uninstallResult.message))
-                            updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-                        }
-                        is Result.Loading -> {
-                            // Should not happen
-                        }
-                    }
-                } catch (e: Exception) {
-                    pendingReinstalls.remove(packageName)
-                    pendingUninstallChecks.remove(packageName)
-                    showError(stringProvider.getString(R.string.failed_uninstall_old_version_error, e.message ?: ""))
-                    updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-                }
-            }
-        } else {
-            installApp(packageName, apkFilePath)
-        }
-    }
-
-    /**
-     * Confirm uninstall before reinstall
-     */
-    private fun confirmUninstallBeforeReinstall(packageName: String, apkFilePath: String) {
-        val currentState = _state.value
-        if (currentState is AppState.Success) {
-            val app = currentState.apps.find { it.packageName == packageName }
-            app?.let {
-                showConfirmationDialog(
-                    title = stringProvider.getString(R.string.uninstall_required_title),
-                    message = stringProvider.getString(R.string.uninstall_required_message, app.title),
-                    onConfirm = AppEvent.RetryInstallation(packageName, apkFilePath, shouldUninstallFirst = true),
-                    onCancel = AppEvent.UpdateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-                )
-            }
-        }
-    }
-
-    /**
-     * Uninstall an app
-     * Uses system events for detection, with fallback polling after 5s
-     */
-    private fun uninstallApp(packageName: String) {
-        dismissDialog()
-        
-        viewModelScope.launch {
-            try {
-                updateAppStatus(packageName, AppStatus.UNINSTALLING)
-                pendingUninstallChecks.add(packageName)
-                
-                val result = useCases.uninstallAppUseCase(packageName)
-                when (result) {
-                    is Result.Success -> {
-                        if (result.data) {
-                            showToast(stringProvider.getString(R.string.uninstallation_started))
-                            
-                            // Fallback: if system event not received within 5s, poll manually
-                            delay(5000)
-                            if (pendingUninstallChecks.contains(packageName)) {
-                                Log.w(TAG, "⚠️ System event not received, checking manually for: $packageName")
-                                if (!appManager.isAppInstalled(packageName)) {
-                                    pendingUninstallChecks.remove(packageName)
-                                    updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-                                    showToast(stringProvider.getString(R.string.uninstallation_completed))
-                                } else {
-                                    Log.d(TAG, "📦 Package still installed, waiting for system event...")
-                                }
-                            }
-                        } else {
-                            pendingUninstallChecks.remove(packageName)
-                            showError(stringProvider.getString(R.string.failed_start_uninstallation))
-                            updateSingleAppStatus(packageName)
-                        }
-                    }
-                    is Result.Error -> {
-                        pendingUninstallChecks.remove(packageName)
-                        showError(stringProvider.getString(R.string.uninstallation_failed, result.message))
-                        updateSingleAppStatus(packageName)
-                    }
-                    is Result.Loading -> {
-                        // Should not happen in this case
-                    }
-                }
-            } catch (e: Exception) {
-                pendingUninstallChecks.remove(packageName)
-                showError(stringProvider.getString(R.string.uninstallation_failed, e.message ?: ""))
-                updateSingleAppStatus(packageName)
-            }
-        }
-    }
-
-    /**
-     * Show confirmation dialog before reinstalling an app
-     */
-    private fun showReinstallConfirmation(packageName: String) {
-        val currentState = _state.value
-        if (currentState is AppState.Success) {
-            val app = currentState.apps.find { it.packageName == packageName }
-            if (app != null) {
-                val title = stringProvider.getString(R.string.reinstall_confirmation_title)
-                val message = stringProvider.getString(R.string.reinstall_confirmation_message, app.title)
-                val confirmEvent = AppEvent.ReinstallApp(packageName)
-                val cancelEvent = AppEvent.DismissDialog
-                
-                handleEvent(AppEvent.ShowConfirmationDialog(title, message, confirmEvent, cancelEvent))
-            }
-        }
-    }
-
-    /**
-     * Reinstall an app (uninstall -> download -> install)
-     */
-    private fun reinstallApp(packageName: String) {
-        dismissDialog()
-        
-        viewModelScope.launch {
-            try {
-                val currentState = _state.value
-                if (currentState is AppState.Success) {
-                    val app = currentState.apps.find { it.packageName == packageName }
-                    if (app != null) {
-                        // Step 1: Uninstall
-                        updateAppStatus(packageName, AppStatus.UNINSTALLING)
-                        showToast(stringProvider.getString(R.string.reinstall_started))
-                        
-                        val uninstallResult = useCases.uninstallAppUseCase(packageName)
-                        when (uninstallResult) {
-                            is Result.Success -> {
-                                if (uninstallResult.data) {
-                                    // Wait for uninstallation to complete
-                                    delay(3000)
-                                    
-                                    // Step 2: Download latest version
-                                    updateAppStatus(packageName, AppStatus.DOWNLOADING)
-                                    updateAppProgress(packageName, 0f)
-                                    
-                                    // Clear completed downloads tracking
-                                    completedDownloads.remove(packageName)
-                                    
-                                    simpleDownloadManager.downloadApp(packageName, app.downloadUrl)
-                                        .catch { error ->
-                                            Log.e(TAG, "Reinstall download failed for $packageName", error)
-                                            showError(stringProvider.getString(R.string.reinstall_failed, error.message ?: "Download failed"))
-                                            updateSingleAppStatus(packageName)
-                                        }
-                                        .onEach { download ->
-                                            // Update progress
-                                            updateAppProgress(packageName, download.progress)
-                                            
-                                            // Download completed, proceed to install
-                                             if (download.progress >= 1.0f) {
-                                                 // Step 3: Install
-                                                 val filePath = download.filePath
-                                                 if (filePath != null) {
-                                                     updateAppStatus(packageName, AppStatus.INSTALLING)
-                                                     val installResult = useCases.installAppUseCase(packageName, filePath)
-                                                     when (installResult) {
-                                                         is Result.Success -> {
-                                                             if (installResult.data) {
-                                                                 showToast(stringProvider.getString(R.string.reinstall_completed))
-                                                             } else {
-                                                                 showError(stringProvider.getString(R.string.reinstall_failed))
-                                                                 updateSingleAppStatus(packageName)
-                                                             }
-                                                         }
-                                                         is Result.Error -> {
-                                                             showError(stringProvider.getString(R.string.reinstall_failed, installResult.message))
-                                                             updateSingleAppStatus(packageName)
-                                                         }
-                                                         is Result.Loading -> {
-                                                             // Should not happen
-                                                         }
-                                                     }
-                                                 } else {
-                                                     showError(stringProvider.getString(R.string.reinstall_failed, "File path is null"))
-                                                     updateSingleAppStatus(packageName)
-                                                 }
-                                             }
-                                        }.launchIn(this@launch)
-                                } else {
-                                    showError(stringProvider.getString(R.string.reinstall_failed))
-                                    updateSingleAppStatus(packageName)
-                                }
-                            }
-                            is Result.Error -> {
-                                showError(stringProvider.getString(R.string.reinstall_failed, uninstallResult.message))
-                                updateSingleAppStatus(packageName)
-                            }
-                            is Result.Loading -> {
-                                // Should not happen
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                showError(stringProvider.getString(R.string.reinstall_failed, e.message ?: ""))
-                updateSingleAppStatus(packageName)
-            }
-        }
-    }
-
-    /**
-     * Open an installed app
-     */
-    private fun openApp(packageName: String) {
-        viewModelScope.launch {
-            try {
-                val result = useCases.openAppUseCase(packageName)
-                when (result) {
-                    is Result.Success -> {
-                        if (!result.data) {
-                            showError(stringProvider.getString(R.string.failed_open_app))
-                        }
-                    }
-                    is Result.Error -> {
-                        showError(stringProvider.getString(R.string.failed_open_app_error, result.message))
-                    }
-                    is Result.Loading -> {
-                        // Should not happen in this case
-                    }
-                }
-            } catch (e: Exception) {
-                showError(stringProvider.getString(R.string.failed_open_app_error, e.message ?: ""))
-            }
-        }
-    }
-
-    /**
-     * Show confirmation dialog
-     */
-    private fun showConfirmationDialog(title: String, message: String, onConfirm: AppEvent, onCancel: AppEvent?) {
-        val currentState = _state.value
+    internal fun showConfirmationDialog(title: String, message: String, onConfirm: AppEvent, onCancel: AppEvent?) {
         val dialogState = DialogState.Confirmation(
             title = title,
             message = message,
             onConfirmAction = { handleEvent(onConfirm) },
             onCancelAction = onCancel?.let { { handleEvent(it) } }
         )
-        
-        when (currentState) {
-            is AppState.Success -> {
-                _state.value = currentState.copy(dialogState = dialogState)
-            }
-            is AppState.Error -> {
-                _state.value = currentState.copy(dialogState = dialogState)
-            }
-            is AppState.Loading -> {
-                // Can't show dialog during loading
-            }
+        when (val currentState = _state.value) {
+            is AppState.Success -> _state.value = currentState.copy(dialogState = dialogState)
+            is AppState.Error -> _state.value = currentState.copy(dialogState = dialogState)
+            is AppState.Loading -> Unit
         }
     }
 
-    /**
-     * Dismiss dialog
-     */
-    private fun dismissDialog() {
-        val currentState = _state.value
-        when (currentState) {
-            is AppState.Success -> {
-                _state.value = currentState.copy(dialogState = null)
-            }
-            is AppState.Error -> {
-                _state.value = currentState.copy(dialogState = null)
-            }
-            is AppState.Loading -> {
-                // No dialog to dismiss
-            }
+    internal fun dismissDialog() {
+        when (val currentState = _state.value) {
+            is AppState.Success -> _state.value = currentState.copy(dialogState = null)
+            is AppState.Error -> _state.value = currentState.copy(dialogState = null)
+            is AppState.Loading -> Unit
         }
     }
 
-    /**
-     * Update app progress
-     */
-    private fun updateAppProgress(packageName: String, progress: Float) {
-        val currentState = _state.value
-        if (currentState is AppState.Success) {
-            val updatedApps = currentState.apps.map { app ->
-                if (app.packageName == packageName) {
-                    app.copy(downloadProgress = progress)
-                } else {
-                    app
-                }
-            }
-            _state.value = currentState.copy(apps = updatedApps)
-        }
-    }
-
-    /**
-     * Update app status
-     */
-    private fun updateAppStatus(packageName: String, status: AppStatus) {
-        val currentState = _state.value
-        if (currentState is AppState.Success) {
-            val updatedApps = currentState.apps.map { app ->
-                if (app.packageName == packageName) {
-                    app.copy(status = status)
-                } else {
-                    app
-                }
-            }
-            _state.value = currentState.copy(apps = updatedApps)
-        }
-    }
-
-    /**
-     * Show error message
-     */
-    private fun showError(message: String) {
-        Log.w(TAG, "Showing error: $message")
-        _toastMessage.value = message
-    }
-
-    /**
-     * Show toast message
-     */
-    private fun showToast(message: String) {
-        Log.d(TAG, "Showing toast: $message")
-        _toastMessage.value = message
-    }
-    
-    /**
-     * Clear toast message after showing
-     */
-    fun clearToast() {
-        _toastMessage.value = null
-    }
-
-    /**
-     * Get download path for a package
-     */
-    private fun getDownloadPath(packageName: String): String? {
-        val downloadDir = File(context.getExternalFilesDir(null), "downloads")
-        val apkFile = File(downloadDir, "$packageName.apk")
+    internal fun getDownloadPath(packageName: String): String? {
+        val apkFile = File(File(context.getExternalFilesDir(null), "downloads"), "$packageName.apk")
         return if (apkFile.exists()) apkFile.absolutePath else null
     }
 
-    /**
-     * Determine the correct AppStatus for a package by querying the PackageManager.
-     * Used to restore status after a download cancel or failure.
-     */
-    private fun resolveActualStatus(packageName: String): AppStatus {
-        if (!appManager.isAppInstalled(packageName)) return AppStatus.NOT_INSTALLED
-        val installedVersion = appManager.getInstalledVersion(packageName) ?: return AppStatus.NOT_INSTALLED
-        val latestVersion = (_state.value as? AppState.Success)
-            ?.apps?.find { it.packageName == packageName }?.latestVersion ?: return AppStatus.UP_TO_DATE
-        return when (compareVersions(installedVersion, latestVersion)) {
-            0, 1 -> AppStatus.UP_TO_DATE
-            else -> AppStatus.UPDATE_AVAILABLE
-        }
-    }
-
-    /**
-     * Compare version strings
-     * @return 1 if version1 > version2, -1 if version1 < version2, 0 if equal
-     */
-    private fun compareVersions(version1: String, version2: String): Int {
-        if (version1.isEmpty() || version2.isEmpty()) {
-            return 0
-        }
-        
-        return try {
-            val parts1 = version1.split(".").map { part ->
-                part.takeWhile { it.isDigit() }.ifEmpty { "0" }
-            }
-            val parts2 = version2.split(".").map { part ->
-                part.takeWhile { it.isDigit() }.ifEmpty { "0" }
-            }
-            
-            val length = minOf(parts1.size, parts2.size)
-            
-            for (i in 0 until length) {
-                val num1 = parts1[i].toLongOrNull() ?: 0L
-                val num2 = parts2[i].toLongOrNull() ?: 0L
-                
-                when {
-                    num1 > num2 -> return 1
-                    num1 < num2 -> return -1
-                }
-            }
-            
-            parts1.size.compareTo(parts2.size)
-        } catch (e: Exception) {
-            0
-        }
-    }
-    
-    /**
-     * Show configuration dialog with proper config loading
-     */
-    private fun showConfigDialog() {
-        // Always get the latest config from PreferencesManager to ensure accurate values
-        val config = try {
-            preferencesManager.getAppConfig()
-        } catch (e: Exception) {
-            Log.w(TAG, "Failed to load config, using fallback", e)
-            // Fallback to dark theme and English as requested
-            AppConfig(ThemeMode.DARK, Language.ENGLISH)
-        }
-        
-        val dialogState = DialogState.Configuration(
-            config = config,
-            onSave = { newConfig -> handleEvent(AppEvent.SaveConfiguration(newConfig)) },
-            onCancel = { handleEvent(AppEvent.DismissDialog) }
-        )
-        
-        val currentState = _state.value
-        when (currentState) {
-            is AppState.Success -> {
-                _state.value = currentState.copy(dialogState = dialogState, config = config)
-            }
-            is AppState.Error -> {
-                _state.value = currentState.copy(dialogState = dialogState, config = config)
-            }
-            is AppState.Loading -> {
-                // For loading state, we can still show the dialog with current config
-                _state.value = AppState.Success(
-                    apps = emptyList(), 
-                    dialogState = dialogState, 
-                    config = config
-                )
-            }
-        }
-    }
-    
-    /**
-     * Save configuration with immediate language application
-     */
-    private fun saveConfiguration(config: AppConfig) {
-        Log.i(TAG, "🔧 === SAVE CONFIGURATION START ===")
-        Log.i(TAG, "🔧 New config - Theme: ${config.themeMode}, Language: ${config.language.displayName} (${config.language.code})")
-        
-        val previousConfig = when (val currentState = _state.value) {
-            is AppState.Success -> {
-                Log.d(TAG, "🔧 Previous config from Success state: ${currentState.config}")
-                currentState.config
-            }
-            is AppState.Error -> {
-                Log.d(TAG, "🔧 Previous config from Error state: ${currentState.config}")
-                currentState.config
-            }
-            else -> {
-                Log.d(TAG, "🔧 No previous config, using default")
-                AppConfig()
-            }
-        }
-        
-        Log.i(TAG, "🔧 Previous config - Theme: ${previousConfig.themeMode}, Language: ${previousConfig.language.displayName} (${previousConfig.language.code})")
-        
-        // Save to preferences
-        Log.d(TAG, "🔧 Saving config to preferences...")
-        preferencesManager.saveAppConfig(config)
-        Log.d(TAG, "🔧 Config saved to preferences successfully")
-        
-        // Update state
-        val currentState = _state.value
-        Log.d(TAG, "🔧 Current state type: ${currentState::class.simpleName}")
-        when (currentState) {
-            is AppState.Success -> {
-                Log.d(TAG, "🔧 Updating Success state with new config")
-                _state.value = currentState.copy(config = config, dialogState = null)
-            }
-            is AppState.Error -> {
-                Log.d(TAG, "🔧 Updating Error state with new config")
-                _state.value = currentState.copy(config = config, dialogState = null)
-            }
-            is AppState.Loading -> {
-                Log.w(TAG, "🔧 Can't update config during loading state")
-            }
-        }
-        
-        // Check if language changed and apply immediately
-        val languageChanged = previousConfig.language != config.language
-        Log.i(TAG, "🔧 Language changed: $languageChanged")
-        
-        if (languageChanged) {
-            Log.i(TAG, "🔧 === LANGUAGE CHANGE DETECTED ===")
-            Log.i(TAG, "🔧 From: ${previousConfig.language.displayName} (${previousConfig.language.code})")
-            Log.i(TAG, "🔧 To: ${config.language.displayName} (${config.language.code})")
-            Log.i(TAG, "🔧 Current thread: ${Thread.currentThread().name}")
-            Log.i(TAG, "🔧 ================================")
-            Log.i(TAG, "🔧 Language changed - applying immediately without toast")
-            applyLanguageImmediately(config.language)
-        } else {
-            Log.d(TAG, "🔧 No language change, just saving config with toast")
-            showToast(stringProvider.getString(R.string.configuration_saved))
-        }
-        
-        Log.i(TAG, "🔧 === SAVE CONFIGURATION END ===")
-    }
-    
-    /**
-     * Update compact mode setting
-     */
-    private fun updateCompactMode(enabled: Boolean) {
-        Log.i(TAG, "🔧 Updating compact mode to: $enabled")
-        
-        val currentState = _state.value
-        val currentConfig = when (currentState) {
-            is AppState.Success -> currentState.config
-            is AppState.Error -> currentState.config
-            else -> AppConfig()
-        }
-        
-        val newConfig = currentConfig.copy(compactMode = enabled)
-        saveConfiguration(newConfig)
-    }
-    
-    /**
-     * Apply language immediately using LocaleHelper with activity recreation
-     */
-    private fun applyLanguageImmediately(newLanguage: Language) {
-        Log.i(TAG, "🌍 === APPLY LANGUAGE IMMEDIATELY START ===")
-        Log.i(TAG, "🌍 Target language: ${newLanguage.displayName} (${newLanguage.code})")
-        Log.i(TAG, "🌍 Current thread: ${Thread.currentThread().name}")
-        
+    private fun openApp(packageName: String) {
         viewModelScope.launch {
             try {
-                Log.i(TAG, "🌍 Inside viewModelScope.launch")
-                Log.i(TAG, "🌍 Coroutine thread: ${Thread.currentThread().name}")
-                
-                // Handle language codes with country codes (e.g., es-ES -> es)
-                val languageCode = if (newLanguage.code.contains("-")) {
-                    val cleanCode = newLanguage.code.split("-")[0]
-                    Log.d(TAG, "🌍 Cleaned language code: ${newLanguage.code} -> $cleanCode")
-                    cleanCode
-                } else {
-                    Log.d(TAG, "🌍 Using original language code: ${newLanguage.code}")
-                    newLanguage.code
+                val result = useCases.openAppUseCase(packageName)
+                when (result) {
+                    is com.revanced.net.revancedmanager.core.common.Result.Success -> {
+                        if (!result.data) showError(stringProvider.getString(R.string.failed_open_app))
+                    }
+                    is com.revanced.net.revancedmanager.core.common.Result.Error ->
+                        showError(stringProvider.getString(R.string.failed_open_app_error, result.message))
+                    is com.revanced.net.revancedmanager.core.common.Result.Loading -> Unit
                 }
-                
-                Log.i(TAG, "🌍 Final language code to apply: $languageCode")
-                
-                // Update state first (before recreation)
-                Log.d(TAG, "🌍 Updating state before language application...")
-                val currentState = _state.value
-                Log.d(TAG, "🌍 Current state type: ${currentState::class.simpleName}")
-                
-                when (currentState) {
-                    is AppState.Success -> {
-                        Log.d(TAG, "🌍 Updating Success state with new language")
-                        val updatedConfig = currentState.config.copy(language = newLanguage)
-                        _state.value = currentState.copy(config = updatedConfig)
-                        Log.d(TAG, "🌍 Success state updated")
-                    }
-                    is AppState.Error -> {
-                        Log.d(TAG, "🌍 Updating Error state with new language")
-                        val updatedConfig = currentState.config.copy(language = newLanguage)
-                        _state.value = currentState.copy(config = updatedConfig)
-                        Log.d(TAG, "🌍 Error state updated")
-                    }
-                    else -> {
-                        Log.w(TAG, "🌍 State is Loading, cannot update")
-                    }
-                }
-                
-                Log.i(TAG, "🌍 About to call LocaleHelper.applyLocaleToActivity...")
-                Log.i(TAG, "🌍 Context type: ${context::class.simpleName}")
-                Log.i(TAG, "🌍 Context toString: $context")
-                
-                // Use LocaleHelper for reliable language switching
-                Log.i(TAG, "🌍 About to recreate activity for language change...")
-                LocaleHelper.applyLocaleToActivity(context, languageCode)
-                
-                Log.i(TAG, "🌍 LocaleHelper.applyLocaleToActivity called")
-                Log.i(TAG, "🌍 Apply language immediately completed successfully")
-                
-                // Note: No toast for language change - user will see UI change immediately
-                
             } catch (e: Exception) {
-                Log.e(TAG, "🌍 💥 Exception in applyLanguageImmediately", e)
-                Log.e(TAG, "🌍 💥 Exception message: ${e.message}")
-                Log.e(TAG, "🌍 💥 Exception cause: ${e.cause}")
-                showToast(stringProvider.getString(R.string.error_applying_language))
-            }
-        }
-        
-        Log.i(TAG, "🌍 === APPLY LANGUAGE IMMEDIATELY END ===")
-    }
-    
-    /**
-     * Load configuration with robust error handling
-     */
-    private fun loadConfiguration() {
-        val config = try {
-            preferencesManager.getAppConfig()
-        } catch (e: Exception) {
-            Log.w(TAG, "Failed to load configuration, using fallback", e)
-            // Use fallback configuration as requested: DARK theme and ENGLISH language
-            AppConfig(ThemeMode.DARK, Language.ENGLISH)
-        }
-        
-        Log.d(TAG, "Loaded configuration: theme=${config.themeMode}, language=${config.language.displayName}")
-        
-        val currentState = _state.value
-        when (currentState) {
-            is AppState.Success -> {
-                _state.value = currentState.copy(config = config)
-            }
-            is AppState.Error -> {
-                _state.value = currentState.copy(config = config)
-            }
-            is AppState.Loading -> {
-                // Store config for when loading completes
-                // We'll apply it once the state transitions to Success or Error
-                Log.d(TAG, "Config loaded during loading state, will apply when state is ready")
+                showError(stringProvider.getString(R.string.failed_open_app_error, e.message ?: ""))
             }
         }
     }
-    
-    // ============= SEQUENTIAL INSTALLATION QUEUE =============
-
-    /**
-     * Add a package to the installation queue.
-     * If no install is currently in progress, starts it immediately; otherwise the item
-     * waits until [processNextInstallation] is called after the current install finishes.
-     */
-    private fun queueInstallation(packageName: String, filePath: String, appName: String = packageName) {
-        Log.i(TAG, "📋 Queuing installation: $appName ($packageName)")
-
-        if (installationQueue.any { it.packageName == packageName }) {
-            Log.w(TAG, "⚠️ Already in queue, skipping: $packageName")
-            return
-        }
-
-        installationQueue.add(PendingInstallation(packageName, filePath, appName))
-        Log.i(TAG, "📋 Queue size: ${installationQueue.size}, inProgress: $isInstallationInProgress")
-
-        if (!isInstallationInProgress) {
-            triggerNextInstallation()
-        }
-        // else: will be picked up when the current install finishes via processNextInstallation()
-    }
-
-    /**
-     * Start the next pending installation from the front of the queue.
-     * Must only be called when [isInstallationInProgress] is false.
-     */
-    private fun triggerNextInstallation() {
-        val next = installationQueue.firstOrNull()
-        if (next == null) {
-            Log.i(TAG, "📋 Installation queue empty, nothing to start")
-            isInstallationInProgress = false
-            return
-        }
-
-        isInstallationInProgress = true
-        Log.i(TAG, "🚀 Starting next installation: ${next.appName} (${next.packageName})")
-        updateAppStatus(next.packageName, AppStatus.INSTALLING)
-        installAppDirect(next.packageName, next.filePath)
-    }
-
-    /**
-     * Called after every install result (success / failure / cancel).
-     * Removes the finished entry and starts the next one.
-     */
-    private fun processNextInstallation() {
-        Log.i(TAG, "📋 processNextInstallation — queue size before cleanup: ${installationQueue.size}")
-
-        // Remove entries that are no longer pending (installed, not-installed, update-available)
-        installationQueue.removeAll { installation ->
-            val state = _state.value as? AppState.Success
-            val status = state?.apps?.find { it.packageName == installation.packageName }?.status
-            val done = status == AppStatus.UP_TO_DATE ||
-                       status == AppStatus.NOT_INSTALLED ||
-                       status == AppStatus.UPDATE_AVAILABLE
-            if (done) Log.i(TAG, "🗑️ Removing finished entry: ${installation.appName}")
-            done
-        }
-
-        isInstallationInProgress = false
-        Log.i(TAG, "📋 Queue size after cleanup: ${installationQueue.size}")
-        triggerNextInstallation()
-    }
-
-    /**
-     * Clear the entire installation queue (app restart / error recovery).
-     */
-    private fun clearInstallationQueue() {
-        Log.i(TAG, "🗑️ Clearing installation queue (${installationQueue.size} items)")
-        installationQueue.clear()
-        isInstallationInProgress = false
-    }
-    
-    // ============= CONCURRENT DOWNLOADS HANDLING - AUTO INSTALL =============
-    
-    /**
-     * Auto-install all completed downloads immediately without showing dialog
-     */
-    private fun autoInstallAllCompleted(
-        completedPackages: List<String>,
-        completedNames: List<String>,
-        completedPaths: List<String>,
-        failedPackages: List<String>,
-        failedNames: List<String>,
-        failedErrors: List<String>
-    ) {
-        Log.i(TAG, "🚀 Auto-installing all completed downloads")
-        Log.i(TAG, "📊 Completed: ${completedPackages.size}, Failed: ${failedPackages.size}")
-        
-        viewModelScope.launch {
-            try {
-                // Update UI states for failed downloads first
-                failedPackages.forEach { packageName ->
-                    updateAppStatus(packageName, AppStatus.UPDATE_AVAILABLE)
-                }
-                
-                // Queue all completed downloads for installation.
-                // Skip packages that were already handled by an individual ACTION_DOWNLOAD_COMPLETE
-                // broadcast (their individual handler ran first and may have already installed the
-                // app before this ALL_COMPLETE broadcast fires).
-                val successState = _state.value as? AppState.Success
-                completedPackages.zip(completedNames).zip(completedPaths).forEach { (namePackage, path) ->
-                    val (packageName, appName) = namePackage
-                    val currentStatus = successState?.apps?.find { it.packageName == packageName }?.status
-                    if (currentStatus == AppStatus.UP_TO_DATE) {
-                        Log.w(TAG, "⏭️ Skipping re-queue for already installed package: $packageName")
-                        return@forEach
-                    }
-                    if (currentStatus == AppStatus.INSTALLING ||
-                        installationQueue.any { it.packageName == packageName }) {
-                        Log.w(TAG, "⏭️ Skipping re-queue for already-installing package: $packageName")
-                        return@forEach
-                    }
-                    Log.i(TAG, "📋 Queueing for installation: $appName ($packageName)")
-                    queueInstallation(packageName, path, appName)
-                }
-                
-                // Show summary toast
-                if (completedPackages.isNotEmpty()) {
-                    val message = if (completedPackages.size == 1) {
-                        "Installing ${completedNames[0]}..."
-                    } else {
-                        "Installing ${completedPackages.size} apps..."
-                    }
-                    showToast(message)
-                }
-                
-                // Show failed downloads toast if any
-                if (failedPackages.isNotEmpty()) {
-                    showToast("${failedPackages.size} downloads failed")
-                }
-                
-            } catch (e: Exception) {
-                Log.e(TAG, "Error auto-installing completed downloads", e)
-                showError("Failed to auto-install apps: ${e.message}")
-            }
-        }
-    }
-    
 }

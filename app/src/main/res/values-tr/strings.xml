@@ -5,19 +5,20 @@
     <string name="settings">Ayarlar</string>
     <string name="theme">Tema</string>
     <string name="language">Dil</string>
+    <string name="compact_mode">Kompakt mod</string>
     <string name="theme_light">Açık</string>
     <string name="theme_dark">Koyu</string>
     <string name="theme_system">Sistem</string>
-    <string name="apply">Uygula</string>
     <string name="cancel">İptal</string>
-    <string name="restart_app">Uygulamayı Yeniden Başlat</string>
-    <string name="restart_later">Sonra</string>
+    <string name="select_language">Dil seç</string>
+    <string name="tap_to_change">Değiştirmek için dokunun</string>
     
     <!-- Main Screen -->
     <string name="confirm">Onayla</string>
     <string name="retry">Yeniden Dene</string>
     <string name="loading_apps_message">Uygulamalar yükleniyor...</string>
     <string name="error_prefix">Hata: %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">Uygulama ara…</string>
     <string name="no_apps_found">\"%1$s\" için uygulama bulunamadı</string>
     <string name="no_apps_available">Kullanılabilir uygulama yok</string>
@@ -27,13 +28,16 @@
     <string name="update">Güncelle</string>
     <string name="open">Aç</string>
     <string name="uninstall">Kaldır</string>
-    <string name="downloading">İndiriliyor</string>
+    <string name="reinstall">Yeniden kur</string>
+    <string name="reinstall_started">Yeniden kurulum başlatıldı</string>
+    <string name="reinstall_failed">Yeniden kurulum başarısız</string>
     <string name="installing">Kuruluyor</string>
     <string name="uninstalling">Kaldırılıyor</string>
     <string name="unknown">Bilinmiyor</string>
     <string name="installed_version">Kurulu: v%1$s</string>
     <string name="latest_version">Son sürüm: v%1$s</string>
     <string name="downloading_progress">İndiriliyor %1$d%%</string>
+    <string name="show_less">Daha az göster</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">İndirme başlatılıyor...</string>
@@ -41,7 +45,6 @@
     <string name="download_failed">İndirme başarısız: %1$s</string>
     <string name="download_failed_memory">Yetersiz bellek nedeniyle indirme başarısız. Lütfen diğer uygulamaları kapatın ve tekrar deneyin.</string>
     <string name="download_failed_storage">Yetersiz depolama alanı nedeniyle indirme başarısız. Lütfen alan boşaltın ve tekrar deneyin.</string>
-    <string name="insufficient_storage_error">Yetersiz depolama alanı. Mevcut: %1$d MB. Lütfen alan boşaltın ve tekrar deneyin.</string>
     <string name="download_cancelled">İndirme iptal edildi</string>
     <string name="installation_started">Kurulum başlatıldı</string>
     <string name="installation_completed">Kurulum başarıyla tamamlandı</string>
@@ -50,6 +53,7 @@
     <string name="installation_pending_user_action">Kurulum için kullanıcı onayı bekleniyor</string>
     <string name="uninstallation_started">Kaldırma başlatıldı</string>
     <string name="uninstallation_completed">Kaldırma başarıyla tamamlandı</string>
+    <string name="uninstallation_cancelled">Kaldırma kullanıcı tarafından iptal edildi</string>
     <string name="uninstallation_failed">Kaldırma başarısız: %1$s</string>
     <string name="failed_start_uninstallation">Kaldırma başlatılamadı</string>
     <string name="failed_open_app">Uygulama açılamadı</string>
@@ -57,65 +61,24 @@
     <string name="old_version_uninstalled">Eski sürüm kaldırıldı, kurulum yeniden deneniyor...</string>
     <string name="failed_uninstall_old_version">Eski sürüm kaldırılamadı</string>
     <string name="failed_uninstall_old_version_error">Eski sürüm kaldırılamadı: %1$s</string>
+    <string name="app_not_installed_proceeding">Uygulama kurulu değil, indirme ile devam ediliyor</string>
+    <string name="installation_cancelled_by_user">Kurulum kullanıcı tarafından iptal edildi</string>
     <string name="app_status_updated">Uygulama durumu güncellendi</string>
+    <string name="apps_updated">Uygulamalar güncellendi</string>
     <string name="configuration_saved">Yapılandırma kaydedildi</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">Kurulum Başarısız</string>
     <string name="uninstall_required_title">Kaldırma Gerekli</string>
-    <string name="language_changed_title">Dil Değiştirildi</string>
+    <string name="reinstall_confirmation_title">Yeniden kurulumu onayla</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">Kurulum başarısız: %1$s\n\nYeniden denemek istiyor musunuz? Bu, eski sürümü önce kaldıracaktır.</string>
     <string name="uninstall_required_message">%1$s kurulumunu yeniden denemek için önce eski sürümün kaldırılması gerekiyor. Devam edilsin mi?</string>
-    <string name="language_changed_message">Dil %1$s olarak değiştirildi.\n\nDeğişikliklerin uygulanması için şimdi uygulamayı yeniden başlatmak istiyor musunuz?</string>
-    
-    <!-- Language Selection -->
-    <string name="select_language">Dil seç</string>
-    <string name="tap_to_change">Değiştirmek için dokunun</string>
-    
-    <!-- Compact Mode -->
-    <string name="compact_mode">Kompakt mod</string>
-    
-    <!-- Reinstall Feature -->
-    <string name="reinstall">Yeniden kur</string>
-    <string name="reinstall_started">Yeniden kurulum başlatıldı</string>
-    <string name="reinstall_completed">Yeniden kurulum tamamlandı</string>
-    <string name="reinstall_failed">Yeniden kurulum başarısız</string>
-    
-    <!-- Read More/Show Less -->
-    <string name="read_more">Daha fazla oku</string>
-    <string name="show_less">Daha az göster</string>
-    
-    <!-- Additional Installation Messages -->
-    <string name="app_not_installed_proceeding">Uygulama kurulu değil, indirme ile devam ediliyor</string>
-    <string name="installation_cancelled_by_user">Kurulum kullanıcı tarafından iptal edildi</string>
-    <string name="apps_updated">Uygulamalar güncellendi</string>
-    <string name="error_applying_language">Dil uygulanırken hata</string>
-    
-    <!-- Reinstall Confirmation Dialog -->
-    <string name="reinstall_confirmation_title">Yeniden kurulumu onayla</string>
     <string name="reinstall_confirmation_message">%1$s uygulamasını yeniden kurmak istediğinizden emin misiniz? Bu, mevcut sürümü kaldıracak ve en son sürümü kuracaktır.</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">İndirme tamamlandı ve kuruluma hazır</string>
-    <string name="auto_install_enabled">Otomatik kurulum etkinleştirildi</string>
-    <string name="auto_install_disabled">Otomatik kurulum devre dışı bırakıldı</string>
-    <string name="pending_downloads_found">Bekleyen indirmeler bulundu</string>
-    <string name="background_download_completed">Arka plan indirmesi tamamlandı</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">İndirmeler tamamlandı</string>
-    <string name="downloads_complete_summary">%2$d indirmeden %1$d tanesi başarıyla tamamlandı</string>
-    <string name="successfully_downloaded">Başarıyla indirildi</string>
-    <string name="failed_downloads">Başarısız indirmeler</string>
-    <string name="install_all_button">Tümünü kur</string>
-    <string name="install_button">Kur</string>
     <string name="close_button">Kapat</string>
-    <string name="installing_multiple_apps">%1$d uygulama kuruluyor</string>
-    <string name="installing_single_app">%1$s kuruluyor</string>
-    <string name="downloads_in_progress">İndirmeler devam ediyor</string>
-    <string name="concurrent_downloads_active">%1$d eşzamanlı indirme aktif</string>
 
     <!-- Filter -->
     <string name="filter_label">Filtrele</string>
@@ -124,6 +87,27 @@
     <string name="filter_not_installed">Yüklenmedi</string>
     <string name="filter_updates">Güncellemeler</string>
     <string name="no_apps_for_filter">Bu filtreyle eşleşen uygulama yok</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">Hata Ayıklama Modu</string>
+    <string name="debug_mode_description">Sorun giderme için kayıt tutar (maks. 7 gün)</string>
+    <string name="debug_view_logs">Kayıtları Görüntüle</string>
+    <string name="debug_share_logs">Kayıtları Paylaş</string>
+    <string name="debug_logs_title">Hata Ayıklama Kayıtları</string>
+    <string name="debug_no_logs_available">Kayıt yok.\nHata ayıklama modunu etkinleştirin ve sorunu yeniden oluşturun.</string>
+    <string name="debug_no_logs_to_share">Paylaşılacak kayıt yok</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">Geri</string>
+    <string name="save">Kaydet</string>
+    <string name="settings_section_appearance">Görünüm</string>
+    <string name="settings_section_display">Ekran</string>
+    <string name="settings_section_debug">Hata Ayıklama</string>
+    <string name="settings_section_danger_zone">Tehlikeli Bölge</string>
+    <string name="settings_reset_button">Tüm ayarları sıfırla</string>
+    <string name="settings_reset_confirm_title">Ayarlar sıfırlansın mı?</string>
+    <string name="settings_reset_confirm_message">Tüm ayarlar varsayılan değerlerine sıfırlanacak. Bu işlem geri alınamaz.</string>
+    <string name="settings_reset_to_defaults">Ayarlar sıfırlandı</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favoriler</string>

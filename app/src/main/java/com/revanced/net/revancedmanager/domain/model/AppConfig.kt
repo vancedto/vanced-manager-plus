@@ -6,7 +6,8 @@ package com.revanced.net.revancedmanager.domain.model
 data class AppConfig(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val language: Language = Language.ENGLISH,
-    val compactMode: Boolean = true // Default to compact mode enabled
+    val compactMode: Boolean = true, // Default to compact mode enabled
+    val debugModeEnabled: Boolean = false
 )
 
 /**

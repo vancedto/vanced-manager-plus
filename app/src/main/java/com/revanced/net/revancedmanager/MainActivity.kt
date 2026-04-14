@@ -1,6 +1,7 @@
 package com.revanced.net.revancedmanager
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -69,6 +70,22 @@ class MainActivity : ComponentActivity() {
         // Activity cleanup - no special handling needed for the new approach
     }
     
+    /**
+     * Android 7+ quirk: after attachBaseContext the system may call applyOverrideConfiguration
+     * and reset the locale back to the device default. We prevent that by copying the locale
+     * we set in attachBaseContext back into overrideConfiguration before calling super.
+     */
+    override fun applyOverrideConfiguration(overrideConfiguration: Configuration?) {
+        if (overrideConfiguration != null) {
+            // Preserve the uiMode (dark/light) that Android passes in, but inherit everything
+            // else (including locale) from the base context we configured in attachBaseContext.
+            val uiMode = overrideConfiguration.uiMode
+            overrideConfiguration.setTo(baseContext.resources.configuration)
+            overrideConfiguration.uiMode = uiMode
+        }
+        super.applyOverrideConfiguration(overrideConfiguration)
+    }
+
     override fun attachBaseContext(newBase: Context?) {
         // Apply language configuration using LocaleHelper
         newBase?.let { context ->

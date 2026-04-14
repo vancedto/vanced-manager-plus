@@ -9,10 +9,7 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_system">System</string>
-    <string name="apply">Apply</string>
     <string name="cancel">Cancel</string>
-    <string name="restart_app">Restart App</string>
-    <string name="restart_later">Later</string>
     <string name="select_language">Select Language</string>
     <string name="tap_to_change">Tap to change</string>
     
@@ -33,16 +30,13 @@
     <string name="uninstall">Uninstall</string>
     <string name="reinstall">Re-install</string>
     <string name="reinstall_started">Reinstallation started</string>
-    <string name="reinstall_completed">Reinstallation completed successfully</string>
     <string name="reinstall_failed">Reinstallation failed</string>
-    <string name="downloading">Downloading</string>
     <string name="installing">Installing</string>
     <string name="uninstalling">Uninstalling</string>
     <string name="unknown">Unknown</string>
     <string name="installed_version">Installed: v%1$s</string>
     <string name="latest_version">Latest: v%1$s</string>
     <string name="downloading_progress">Downloading %1$d%%</string>
-    <string name="read_more">Read more</string>
     <string name="show_less">Show less</string>
     
     <!-- Toast Messages -->
@@ -51,7 +45,6 @@
     <string name="download_failed">Download failed: %1$s</string>
     <string name="download_failed_memory">Download failed due to insufficient memory. Please close other apps and try again.</string>
     <string name="download_failed_storage">Download failed due to insufficient storage space. Please free up some space and try again.</string>
-    <string name="insufficient_storage_error">Insufficient storage space. Available: %1$d MB. Please free up space and try again.</string>
     <string name="download_cancelled">Download cancelled</string>
     <string name="installation_started">Installation started</string>
     <string name="installation_completed">Installation completed successfully</string>
@@ -60,6 +53,7 @@
     <string name="installation_pending_user_action">Waiting for user confirmation to install</string>
     <string name="uninstallation_started">Uninstallation started</string>
     <string name="uninstallation_completed">Uninstallation completed successfully</string>
+    <string name="uninstallation_cancelled">Uninstallation cancelled by user</string>
     <string name="uninstallation_failed">Uninstallation failed: %1$s</string>
     <string name="failed_start_uninstallation">Failed to start uninstallation</string>
     <string name="failed_open_app">Failed to open app</string>
@@ -72,39 +66,19 @@
     <string name="app_status_updated">App status updated</string>
     <string name="apps_updated">%1$d apps updated</string>
     <string name="configuration_saved">Configuration saved</string>
-    <string name="error_applying_language">Failed to apply language</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">Installation Failed</string>
     <string name="uninstall_required_title">Uninstall Required</string>
-    <string name="language_changed_title">Language Changed</string>
     <string name="reinstall_confirmation_title">Reinstall Application</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">Installation failed: %1$s\n\nDo you want to retry? This will uninstall the old version first if it exists.</string>
     <string name="uninstall_required_message">To retry installation of %1$s, the old version needs to be uninstalled first. Continue?</string>
-    <string name="language_changed_message">Language has been changed to %1$s.\n\nRestart the app now to apply the changes?</string>
     <string name="reinstall_confirmation_message">This will uninstall the current version of %1$s and download and install the latest version.\n\nDo you want to continue?</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">%1$s download completed and ready to install</string>
-    <string name="auto_install_enabled">Auto-install enabled</string>
-    <string name="auto_install_disabled">Auto-install disabled</string>
-    <string name="pending_downloads_found">Found %1$d pending downloads</string>
-    <string name="background_download_completed">Background download completed</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">Downloads Complete</string>
-    <string name="downloads_complete_summary">%1$d completed, %2$d failed</string>
-    <string name="successfully_downloaded">Successfully Downloaded (%1$d)</string>
-    <string name="failed_downloads">Failed Downloads (%1$d)</string>
-    <string name="install_all_button">Install All (%1$d)</string>
-    <string name="install_button">Install</string>
     <string name="close_button">Close</string>
-    <string name="installing_multiple_apps">Installing %1$d apps...</string>
-    <string name="installing_single_app">Installing %1$s...</string>
-    <string name="downloads_in_progress">Downloads in progress</string>
-    <string name="concurrent_downloads_active">%1$d downloads active</string>
 
     <!-- Filter -->
     <string name="filter_label">Filter</string>
@@ -113,6 +87,27 @@
     <string name="filter_not_installed">Not Installed</string>
     <string name="filter_updates">Updates</string>
     <string name="no_apps_for_filter">No apps match this filter</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">Debug Mode</string>
+    <string name="debug_mode_description">Save detailed logs for troubleshooting (max 7 days)</string>
+    <string name="debug_view_logs">View Logs</string>
+    <string name="debug_share_logs">Share Logs</string>
+    <string name="debug_logs_title">Debug Logs</string>
+    <string name="debug_no_logs_available">No debug logs available.\nEnable debug mode and reproduce the issue first.</string>
+    <string name="debug_no_logs_to_share">No debug logs to share</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">Back</string>
+    <string name="save">Save</string>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_section_display">Display</string>
+    <string name="settings_section_debug">Debug</string>
+    <string name="settings_section_danger_zone">Danger Zone</string>
+    <string name="settings_reset_button">Reset all settings to defaults</string>
+    <string name="settings_reset_confirm_title">Reset Settings?</string>
+    <string name="settings_reset_confirm_message">All settings will be reset to their default values. This cannot be undone.</string>
+    <string name="settings_reset_to_defaults">Settings reset to defaults</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favorites</string>

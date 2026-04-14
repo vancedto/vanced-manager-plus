@@ -9,10 +9,7 @@
     <string name="theme_light">Světlý</string>
     <string name="theme_dark">Tmavý</string>
     <string name="theme_system">Systémový</string>
-    <string name="apply">Použít</string>
     <string name="cancel">Zrušit</string>
-    <string name="restart_app">Restartovat aplikaci</string>
-    <string name="restart_later">Později</string>
     <string name="select_language">Vybrat jazyk</string>
     <string name="tap_to_change">Klepněte pro změnu</string>
     
@@ -21,6 +18,7 @@
     <string name="retry">Opakovat</string>
     <string name="loading_apps_message">Načítání aplikací...</string>
     <string name="error_prefix">Chyba: %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">Hledat aplikace…</string>
     <string name="no_apps_found">Nebyly nalezeny žádné aplikace pro \"%1$s\"</string>
     <string name="no_apps_available">Žádné dostupné aplikace</string>
@@ -32,16 +30,13 @@
     <string name="uninstall">Odinstalovat</string>
     <string name="reinstall">Přeinstalovat</string>
     <string name="reinstall_started">Přeinstalace zahájena</string>
-    <string name="reinstall_completed">Přeinstalace úspěšně dokončena</string>
     <string name="reinstall_failed">Přeinstalace selhala</string>
-    <string name="downloading">Stahování</string>
     <string name="installing">Instalace</string>
     <string name="uninstalling">Odinstalace</string>
     <string name="unknown">Neznámý</string>
     <string name="installed_version">Nainstalováno: v%1$s</string>
     <string name="latest_version">Nejnovější: v%1$s</string>
     <string name="downloading_progress">Stahování %1$d%%</string>
-    <string name="read_more">Číst více</string>
     <string name="show_less">Zobrazit méně</string>
     
     <!-- Toast Messages -->
@@ -50,7 +45,6 @@
     <string name="download_failed">Stahování selhalo: %1$s</string>
     <string name="download_failed_memory">Stahování selhalo kvůli nedostatku paměti. Zavřete prosím ostatní aplikace a zkuste to znovu.</string>
     <string name="download_failed_storage">Stahování selhalo kvůli nedostatku úložného prostoru. Uvolněte prosím místo a zkuste to znovu.</string>
-    <string name="insufficient_storage_error">Nedostatek úložného prostoru. Dostupné: %1$d MB. Uvolněte prosím místo a zkuste to znovu.</string>
     <string name="download_cancelled">Stahování zrušeno</string>
     <string name="installation_started">Instalace zahájena</string>
     <string name="installation_completed">Instalace úspěšně dokončena</string>
@@ -59,6 +53,7 @@
     <string name="installation_pending_user_action">Čekání na potvrzení instalace uživatelem</string>
     <string name="uninstallation_started">Odinstalace zahájena</string>
     <string name="uninstallation_completed">Odinstalace úspěšně dokončena</string>
+    <string name="uninstallation_cancelled">Odinstalace zrušena uživatelem</string>
     <string name="uninstallation_failed">Odinstalace selhala: %1$s</string>
     <string name="failed_start_uninstallation">Nepodařilo se zahájit odinstalaci</string>
     <string name="failed_open_app">Nepodařilo se otevřít aplikaci</string>
@@ -71,39 +66,19 @@
     <string name="app_status_updated">Stav aplikace aktualizován</string>
     <string name="apps_updated">Aktualizováno %1$d aplikací</string>
     <string name="configuration_saved">Konfigurace uložena</string>
-    <string name="error_applying_language">Nepodařilo se použít jazyk</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">Instalace selhala</string>
     <string name="uninstall_required_title">Vyžadována odinstalace</string>
-    <string name="language_changed_title">Jazyk změněn</string>
     <string name="reinstall_confirmation_title">Přeinstalovat aplikaci</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">Instalace selhala: %1$s\n\nChcete to zkusit znovu? Pokud existuje, bude nejprve odinstalována stará verze.</string>
     <string name="uninstall_required_message">Pro opakování instalace %1$s je nutné nejprve odinstalovat starou verzi. Pokračovat?</string>
-    <string name="language_changed_message">Jazyk byl změněn na %1$s.\n\nRestartovat aplikaci nyní pro použití změn?</string>
     <string name="reinstall_confirmation_message">Tím se odinstaluje aktuální verze %1$s a stáhne a nainstaluje se nejnovější verze.\n\nChcete pokračovat?</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">%1$s staženo a připraveno k instalaci</string>
-    <string name="auto_install_enabled">Automatická instalace povolena</string>
-    <string name="auto_install_disabled">Automatická instalace zakázána</string>
-    <string name="pending_downloads_found">Nalezeno %1$d čekajících stahování</string>
-    <string name="background_download_completed">Stahování na pozadí dokončeno</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">Stahování dokončeno</string>
-    <string name="downloads_complete_summary">%1$d úspěšných, %2$d neúspěšných</string>
-    <string name="successfully_downloaded">Úspěšně staženo (%1$d)</string>
-    <string name="failed_downloads">Neúspěšná stahování (%1$d)</string>
-    <string name="install_all_button">Instalovat vše (%1$d)</string>
-    <string name="install_button">Instalovat</string>
     <string name="close_button">Zavřít</string>
-    <string name="installing_multiple_apps">Instalace %1$d aplikací...</string>
-    <string name="installing_single_app">Instalace %1$s...</string>
-    <string name="downloads_in_progress">Probíhá stahování</string>
-    <string name="concurrent_downloads_active">%1$d aktivních stahování</string>
 
     <!-- Filter -->
     <string name="filter_label">Filtrovat</string>
@@ -112,6 +87,27 @@
     <string name="filter_not_installed">Nenainstalované</string>
     <string name="filter_updates">Aktualizace</string>
     <string name="no_apps_for_filter">Žádné aplikace neodpovídají tomuto filtru</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">Režim ladění</string>
+    <string name="debug_mode_description">Ukládá podrobné protokoly (max. 7 dní)</string>
+    <string name="debug_view_logs">Zobrazit protokoly</string>
+    <string name="debug_share_logs">Sdílet protokoly</string>
+    <string name="debug_logs_title">Protokoly ladění</string>
+    <string name="debug_no_logs_available">Žádné protokoly.\nPovolte režim ladění a reprodukujte problém.</string>
+    <string name="debug_no_logs_to_share">Žádné protokoly ke sdílení</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">Zpět</string>
+    <string name="save">Uložit</string>
+    <string name="settings_section_appearance">Vzhled</string>
+    <string name="settings_section_display">Zobrazení</string>
+    <string name="settings_section_debug">Ladění</string>
+    <string name="settings_section_danger_zone">Nebezpečná zóna</string>
+    <string name="settings_reset_button">Obnovit vše na výchozí</string>
+    <string name="settings_reset_confirm_title">Obnovit nastavení?</string>
+    <string name="settings_reset_confirm_message">Vše bude obnoveno na výchozí hodnoty. Tuto akci nelze vrátit zpět.</string>
+    <string name="settings_reset_to_defaults">Nastavení obnoveno</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Oblíbené</string>

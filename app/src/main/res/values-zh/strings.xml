@@ -9,10 +9,7 @@
     <string name="theme_light">浅色</string>
     <string name="theme_dark">深色</string>
     <string name="theme_system">跟随系统</string>
-    <string name="apply">应用</string>
     <string name="cancel">取消</string>
-    <string name="restart_app">重启应用</string>
-    <string name="restart_later">稍后</string>
     <string name="select_language">选择语言</string>
     <string name="tap_to_change">点击更改</string>
     
@@ -21,6 +18,7 @@
     <string name="retry">重试</string>
     <string name="loading_apps_message">正在加载应用...</string>
     <string name="error_prefix">错误：%1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">搜索应用…</string>
     <string name="no_apps_found">未找到"%1$s"的应用</string>
     <string name="no_apps_available">没有可用的应用</string>
@@ -30,19 +28,16 @@
     <string name="update">更新</string>
     <string name="open">打开</string>
     <string name="uninstall">卸载</string>
-    <string name="downloading">正在下载</string>
+    <string name="reinstall">重新安装</string>
+    <string name="reinstall_started">重新安装已开始</string>
+    <string name="reinstall_failed">重新安装失败</string>
     <string name="installing">正在安装</string>
     <string name="uninstalling">正在卸载</string>
     <string name="unknown">未知</string>
     <string name="installed_version">已安装: v%1$s</string>
     <string name="latest_version">最新版: v%1$s</string>
     <string name="downloading_progress">正在下载 %1$d%%</string>
-    <string name="read_more">阅读更多</string>
     <string name="show_less">收起</string>
-    <string name="reinstall">重新安装</string>
-    <string name="reinstall_started">重新安装已开始</string>
-    <string name="reinstall_completed">重新安装成功</string>
-    <string name="reinstall_failed">重新安装失败</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">开始下载...</string>
@@ -50,7 +45,6 @@
     <string name="download_failed">下载失败：%1$s</string>
     <string name="download_failed_memory">下载失败，内存不足。请关闭其他应用并重试。</string>
     <string name="download_failed_storage">下载失败，存储空间不足。请释放空间并重试。</string>
-    <string name="insufficient_storage_error">存储空间不足。可用：%1$d MB。请释放空间并重试。</string>
     <string name="download_cancelled">下载已取消</string>
     <string name="installation_started">安装已开始</string>
     <string name="installation_completed">安装成功完成</string>
@@ -59,6 +53,7 @@
     <string name="installation_pending_user_action">等待用户确认安装</string>
     <string name="uninstallation_started">卸载已开始</string>
     <string name="uninstallation_completed">卸载成功完成</string>
+    <string name="uninstallation_cancelled">用户已取消卸载</string>
     <string name="uninstallation_failed">卸载失败：%1$s</string>
     <string name="failed_start_uninstallation">启动卸载失败</string>
     <string name="failed_open_app">打开应用失败</string>
@@ -71,39 +66,19 @@
     <string name="app_status_updated">应用状态已更新</string>
     <string name="apps_updated">已更新%1$d个应用</string>
     <string name="configuration_saved">配置已保存</string>
-    <string name="error_applying_language">应用语言失败</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">安装失败</string>
     <string name="uninstall_required_title">需要卸载</string>
-    <string name="language_changed_title">语言已更改</string>
     <string name="reinstall_confirmation_title">重新安装应用</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">安装失败：%1$s\n\n您想要重试吗？如果存在旧版本，这将首先卸载旧版本。</string>
     <string name="uninstall_required_message">要重试安装%1$s，需要先卸载旧版本。继续？</string>
-    <string name="language_changed_message">语言已更改为%1$s。\n\n现在重启应用以应用更改？</string>
     <string name="reinstall_confirmation_message">这将卸载当前版本的%1$s并下载安装最新版本。\n\n您想要继续吗？</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">%1$s下载完成，准备安装</string>
-    <string name="auto_install_enabled">自动安装已启用</string>
-    <string name="auto_install_disabled">自动安装已禁用</string>
-    <string name="pending_downloads_found">发现%1$d个待下载项</string>
-    <string name="background_download_completed">后台下载完成</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">下载完成</string>
-    <string name="downloads_complete_summary">%1$d成功，%2$d失败</string>
-    <string name="successfully_downloaded">下载成功（%1$d）</string>
-    <string name="failed_downloads">下载失败（%1$d）</string>
-    <string name="install_all_button">全部安装（%1$d）</string>
-    <string name="install_button">安装</string>
     <string name="close_button">关闭</string>
-    <string name="installing_multiple_apps">正在安装%1$d个应用...</string>
-    <string name="installing_single_app">正在安装%1$s...</string>
-    <string name="downloads_in_progress">下载进行中</string>
-    <string name="concurrent_downloads_active">%1$d个下载活跃</string>
 
     <!-- Filter -->
     <string name="filter_label">筛选</string>
@@ -112,6 +87,27 @@
     <string name="filter_not_installed">未安装</string>
     <string name="filter_updates">有更新</string>
     <string name="no_apps_for_filter">没有符合此筛选条件的应用</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">调试模式</string>
+    <string name="debug_mode_description">保存详细日志（最多7天）</string>
+    <string name="debug_view_logs">查看日志</string>
+    <string name="debug_share_logs">分享日志</string>
+    <string name="debug_logs_title">调试日志</string>
+    <string name="debug_no_logs_available">暂无日志。\n请开启调试模式并复现问题。</string>
+    <string name="debug_no_logs_to_share">无可分享的日志</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">返回</string>
+    <string name="save">保存</string>
+    <string name="settings_section_appearance">外观</string>
+    <string name="settings_section_display">显示</string>
+    <string name="settings_section_debug">调试</string>
+    <string name="settings_section_danger_zone">危险区域</string>
+    <string name="settings_reset_button">恢复所有默认设置</string>
+    <string name="settings_reset_confirm_title">重置设置？</string>
+    <string name="settings_reset_confirm_message">所有设置将恢复为默认值，此操作不可撤销。</string>
+    <string name="settings_reset_to_defaults">设置已重置</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">收藏</string>

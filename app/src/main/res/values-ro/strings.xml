@@ -5,19 +5,20 @@
     <string name="settings">Setări</string>
     <string name="theme">Temă</string>
     <string name="language">Limbă</string>
+    <string name="compact_mode">Mod compact</string>
     <string name="theme_light">Deschis</string>
     <string name="theme_dark">Întunecat</string>
     <string name="theme_system">Sistem</string>
-    <string name="apply">Aplică</string>
     <string name="cancel">Anulează</string>
-    <string name="restart_app">Repornește App</string>
-    <string name="restart_later">Mai târziu</string>
+    <string name="select_language">Selectează limba</string>
+    <string name="tap_to_change">Atingeți pentru a schimba</string>
     
     <!-- Main Screen -->
     <string name="confirm">Confirmă</string>
     <string name="retry">Încearcă din nou</string>
     <string name="loading_apps_message">Se încarcă aplicațiile...</string>
     <string name="error_prefix">Eroare: %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">Caută aplicații…</string>
     <string name="no_apps_found">Nu s-au găsit aplicații pentru „%1$s"</string>
     <string name="no_apps_available">Nicio aplicație disponibilă</string>
@@ -27,13 +28,16 @@
     <string name="update">Actualizează</string>
     <string name="open">Deschide</string>
     <string name="uninstall">Dezinstalează</string>
-    <string name="downloading">Se descarcă</string>
+    <string name="reinstall">Reinstalează</string>
+    <string name="reinstall_started">Reinstalare începută</string>
+    <string name="reinstall_failed">Reinstalare eșuată</string>
     <string name="installing">Se instalează</string>
     <string name="uninstalling">Se dezinstalează</string>
     <string name="unknown">Necunoscut</string>
     <string name="installed_version">Instalată: v%1$s</string>
     <string name="latest_version">Cea mai recentă: v%1$s</string>
     <string name="downloading_progress">Se descarcă %1$d%%</string>
+    <string name="show_less">Arată mai puțin</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Se începe descărcarea...</string>
@@ -41,7 +45,6 @@
     <string name="download_failed">Descărcare eșuată: %1$s</string>
     <string name="download_failed_memory">Descărcare eșuată din cauza memoriei insuficiente. Închideți alte aplicații și încercați din nou.</string>
     <string name="download_failed_storage">Descărcare eșuată din cauza spațiului insuficient. Eliberați spațiu și încercați din nou.</string>
-    <string name="insufficient_storage_error">Spațiu insuficient. Disponibil: %1$d MB. Eliberați spațiu și încercați din nou.</string>
     <string name="download_cancelled">Descărcare anulată</string>
     <string name="installation_started">Instalare începută</string>
     <string name="installation_completed">Instalare completată cu succes</string>
@@ -50,6 +53,7 @@
     <string name="installation_pending_user_action">Se așteaptă confirmarea utilizatorului pentru instalare</string>
     <string name="uninstallation_started">Dezinstalare începută</string>
     <string name="uninstallation_completed">Dezinstalare completată cu succes</string>
+    <string name="uninstallation_cancelled">Dezinstalare anulată de utilizator</string>
     <string name="uninstallation_failed">Dezinstalare eșuată: %1$s</string>
     <string name="failed_start_uninstallation">Nu s-a putut începe dezinstalarea</string>
     <string name="failed_open_app">Nu s-a putut deschide aplicația</string>
@@ -57,65 +61,24 @@
     <string name="old_version_uninstalled">Versiunea veche dezinstalată, se reîncearcă instalarea...</string>
     <string name="failed_uninstall_old_version">Nu s-a putut dezinstala versiunea veche</string>
     <string name="failed_uninstall_old_version_error">Nu s-a putut dezinstala versiunea veche: %1$s</string>
+    <string name="app_not_installed_proceeding">Aplicația nu este instalată, se continuă cu descărcarea</string>
+    <string name="installation_cancelled_by_user">Instalare anulată de utilizator</string>
     <string name="app_status_updated">Status aplicație actualizat</string>
+    <string name="apps_updated">Aplicații actualizate</string>
     <string name="configuration_saved">Configurație salvată</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">Instalare eșuată</string>
     <string name="uninstall_required_title">Dezinstalare necesară</string>
-    <string name="language_changed_title">Limbă schimbată</string>
+    <string name="reinstall_confirmation_title">Confirmă reinstalarea</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">Instalare eșuată: %1$s\n\nVreți să încercați din nou? Aceasta va dezinstala mai întâi versiunea veche dacă există.</string>
     <string name="uninstall_required_message">Pentru a reîncerca instalarea %1$s, versiunea veche trebuie dezinstalată mai întâi. Continuați?</string>
-    <string name="language_changed_message">Limba a fost schimbată în %1$s.\n\nReporniți aplicația acum pentru a aplica modificările?</string>
-    
-    <!-- Language Selection -->
-    <string name="select_language">Selectează limba</string>
-    <string name="tap_to_change">Atingeți pentru a schimba</string>
-    
-    <!-- Compact Mode -->
-    <string name="compact_mode">Mod compact</string>
-    
-    <!-- Reinstall Feature -->
-    <string name="reinstall">Reinstalează</string>
-    <string name="reinstall_started">Reinstalare începută</string>
-    <string name="reinstall_completed">Reinstalare completată</string>
-    <string name="reinstall_failed">Reinstalare eșuată</string>
-    
-    <!-- Read More/Show Less -->
-    <string name="read_more">Citește mai mult</string>
-    <string name="show_less">Arată mai puțin</string>
-    
-    <!-- Additional Installation Messages -->
-    <string name="app_not_installed_proceeding">Aplicația nu este instalată, se continuă cu descărcarea</string>
-    <string name="installation_cancelled_by_user">Instalare anulată de utilizator</string>
-    <string name="apps_updated">Aplicații actualizate</string>
-    <string name="error_applying_language">Eroare la aplicarea limbii</string>
-    
-    <!-- Reinstall Confirmation Dialog -->
-    <string name="reinstall_confirmation_title">Confirmă reinstalarea</string>
     <string name="reinstall_confirmation_message">Sunteți sigur că doriți să reinstalați %1$s? Aceasta va dezinstala versiunea curentă și va instala cea mai recentă versiune.</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">Descărcare completată și gata pentru instalare</string>
-    <string name="auto_install_enabled">Instalare automată activată</string>
-    <string name="auto_install_disabled">Instalare automată dezactivată</string>
-    <string name="pending_downloads_found">Descărcări în așteptare găsite</string>
-    <string name="background_download_completed">Descărcare în fundal completată</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">Descărcări complete</string>
-    <string name="downloads_complete_summary">%1$d din %2$d descărcări completate cu succes</string>
-    <string name="successfully_downloaded">Descărcat cu succes</string>
-    <string name="failed_downloads">Descărcări eșuate</string>
-    <string name="install_all_button">Instalează toate</string>
-    <string name="install_button">Instalează</string>
     <string name="close_button">Închide</string>
-    <string name="installing_multiple_apps">Se instalează %1$d aplicații</string>
-    <string name="installing_single_app">Se instalează %1$s</string>
-    <string name="downloads_in_progress">Descărcări în progres</string>
-    <string name="concurrent_downloads_active">%1$d descărcări simultane active</string>
 
     <!-- Filter -->
     <string name="filter_label">Filtrare</string>
@@ -124,6 +87,27 @@
     <string name="filter_not_installed">Neinstalate</string>
     <string name="filter_updates">Actualizări</string>
     <string name="no_apps_for_filter">Nicio aplicație nu corespunde acestui filtru</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">Mod depanare</string>
+    <string name="debug_mode_description">Salvează jurnale detaliate (max. 7 zile)</string>
+    <string name="debug_view_logs">Vezi jurnale</string>
+    <string name="debug_share_logs">Distribuie jurnale</string>
+    <string name="debug_logs_title">Jurnale depanare</string>
+    <string name="debug_no_logs_available">Fără jurnale.\nActivați depanarea și reproduceți problema.</string>
+    <string name="debug_no_logs_to_share">Niciun jurnal de distribuit</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">Înapoi</string>
+    <string name="save">Salvează</string>
+    <string name="settings_section_appearance">Aspect</string>
+    <string name="settings_section_display">Afișaj</string>
+    <string name="settings_section_debug">Depanare</string>
+    <string name="settings_section_danger_zone">Zonă periculoasă</string>
+    <string name="settings_reset_button">Resetare la valori implicite</string>
+    <string name="settings_reset_confirm_title">Resetare setări?</string>
+    <string name="settings_reset_confirm_message">Toate setările vor fi resetate. Aceasta nu poate fi anulată.</string>
+    <string name="settings_reset_to_defaults">Setări resetate</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favorite</string>

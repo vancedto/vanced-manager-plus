@@ -5,19 +5,20 @@
     <string name="settings">Configuración</string>
     <string name="theme">Tema</string>
     <string name="language">Idioma</string>
+    <string name="compact_mode">Interfaz compacta</string>
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Oscuro</string>
     <string name="theme_system">Sistema</string>
-    <string name="apply">Aplicar</string>
     <string name="cancel">Cancelar</string>
-    <string name="restart_app">Reiniciar App</string>
-    <string name="restart_later">Más tarde</string>
+    <string name="select_language">Seleccionar idioma</string>
+    <string name="tap_to_change">Toca para cambiar</string>
     
     <!-- Main Screen -->
     <string name="confirm">Confirmar</string>
     <string name="retry">Reintentar</string>
     <string name="loading_apps_message">Cargando aplicaciones...</string>
     <string name="error_prefix">Error: %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">Buscar aplicaciones…</string>
     <string name="no_apps_found">No se encontraron apps para \"%1$s\"</string>
     <string name="no_apps_available">No hay aplicaciones disponibles</string>
@@ -27,13 +28,16 @@
     <string name="update">Actualizar</string>
     <string name="open">Abrir</string>
     <string name="uninstall">Desinstalar</string>
-    <string name="downloading">Descargando</string>
+    <string name="reinstall">Reinstalar</string>
+    <string name="reinstall_started">Reinstalación iniciada</string>
+    <string name="reinstall_failed">Reinstalación falló</string>
     <string name="installing">Instalando</string>
     <string name="uninstalling">Desinstalando</string>
     <string name="unknown">Desconocido</string>
     <string name="installed_version">Instalada: v%1$s</string>
     <string name="latest_version">Última: v%1$s</string>
     <string name="downloading_progress">Descargando %1$d%%</string>
+    <string name="show_less">Mostrar menos</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Iniciando descarga...</string>
@@ -41,7 +45,6 @@
     <string name="download_failed">Descarga falló: %1$s</string>
     <string name="download_failed_memory">Descarga falló por memoria insuficiente. Cierre otras aplicaciones e intente de nuevo.</string>
     <string name="download_failed_storage">Descarga falló por espacio insuficiente. Libere espacio e intente de nuevo.</string>
-    <string name="insufficient_storage_error">Espacio insuficiente. Disponible: %1$d MB. Libere espacio e intente de nuevo.</string>
     <string name="download_cancelled">Descarga cancelada</string>
     <string name="installation_started">Instalación iniciada</string>
     <string name="installation_completed">Instalación completada exitosamente</string>
@@ -50,6 +53,7 @@
     <string name="installation_pending_user_action">Esperando confirmación del usuario para instalar</string>
     <string name="uninstallation_started">Desinstalación iniciada</string>
     <string name="uninstallation_completed">Desinstalación completada exitosamente</string>
+    <string name="uninstallation_cancelled">Desinstalación cancelada por el usuario</string>
     <string name="uninstallation_failed">Desinstalación falló: %1$s</string>
     <string name="failed_start_uninstallation">No se pudo iniciar desinstalación</string>
     <string name="failed_open_app">No se pudo abrir la aplicación</string>
@@ -57,18 +61,24 @@
     <string name="old_version_uninstalled">Versión anterior desinstalada, reintentando instalación...</string>
     <string name="failed_uninstall_old_version">No se pudo desinstalar versión anterior</string>
     <string name="failed_uninstall_old_version_error">No se pudo desinstalar versión anterior: %1$s</string>
+    <string name="app_not_installed_proceeding">App no instalada, procediendo con la instalación...</string>
+    <string name="installation_cancelled_by_user">Instalación cancelada por el usuario</string>
     <string name="app_status_updated">Estado de aplicación actualizado</string>
+    <string name="apps_updated">%1$d apps actualizadas</string>
     <string name="configuration_saved">Configuración guardada</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">Instalación Falló</string>
     <string name="uninstall_required_title">Desinstalación Requerida</string>
-    <string name="language_changed_title">Idioma Cambiado</string>
+    <string name="reinstall_confirmation_title">Reinstalar aplicación</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">Instalación falló: %1$s\n\n¿Desea reintentar? Esto desinstalará la versión anterior primero si existe.</string>
     <string name="uninstall_required_message">Para reintentar la instalación de %1$s, la versión anterior debe desinstalarse primero. ¿Continuar?</string>
-    <string name="language_changed_message">El idioma ha cambiado a %1$s.\n\n¿Reiniciar la aplicación ahora para aplicar los cambios?</string>
+    <string name="reinstall_confirmation_message">Esto desinstalará la versión actual de %1$s y descargará e instalará la última versión.\n\n¿Desea continuar?</string>
+    
+    <!-- Concurrent Downloads Dialog -->
+    <string name="close_button">Cerrar</string>
 
     <!-- Filter -->
     <string name="filter_label">Filtrar</string>
@@ -78,6 +88,27 @@
     <string name="filter_updates">Actualizaciones</string>
     <string name="no_apps_for_filter">Ninguna app coincide con este filtro</string>
 
+    <!-- Debug Mode -->
+    <string name="debug_mode">Modo Debug</string>
+    <string name="debug_mode_description">Guarda registros detallados (máx. 7 días)</string>
+    <string name="debug_view_logs">Ver registros</string>
+    <string name="debug_share_logs">Compartir registros</string>
+    <string name="debug_logs_title">Registros de Debug</string>
+    <string name="debug_no_logs_available">Sin registros.\nActiva el modo debug y reproduce el problema.</string>
+    <string name="debug_no_logs_to_share">No hay registros para compartir</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">Atrás</string>
+    <string name="save">Guardar</string>
+    <string name="settings_section_appearance">Apariencia</string>
+    <string name="settings_section_display">Pantalla</string>
+    <string name="settings_section_debug">Debug</string>
+    <string name="settings_section_danger_zone">Zona peligrosa</string>
+    <string name="settings_reset_button">Restablecer ajustes</string>
+    <string name="settings_reset_confirm_title">¿Restablecer ajustes?</string>
+    <string name="settings_reset_confirm_message">Todos los ajustes se restablecerán. Esta acción no se puede deshacer.</string>
+    <string name="settings_reset_to_defaults">Ajustes restablecidos</string>
+
     <!-- Favorites -->
     <string name="filter_favorites">Favoritos</string>
     <string name="favorite_add_title">Añadir a favoritos</string>
@@ -85,4 +116,4 @@
     <string name="favorite_added">Añadido a favoritos</string>
     <string name="favorite_removed">Eliminado de favoritos</string>
     <string name="no_favorites_yet">No hay favoritos aún. Toca la estrella de una app para añadirla.</string>
-</resources> 
+</resources>

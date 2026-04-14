@@ -48,9 +48,10 @@ sealed class AppEvent {
     ) : AppEvent()
     
     // Configuration events
-    data object ShowConfigDialog : AppEvent()
-    data class SaveConfiguration(val config: AppConfig) : AppEvent()
-    data class UpdateCompactMode(val enabled: Boolean) : AppEvent()
+    data object NavigateToSettings : AppEvent()
+    data object NavigateBackFromSettings : AppEvent()
+    data class SaveSettings(val config: AppConfig) : AppEvent()
+    data object ResetSettings : AppEvent()
     data object LoadConfiguration : AppEvent()
     
     // Search events

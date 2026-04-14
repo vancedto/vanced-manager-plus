@@ -14,7 +14,8 @@ sealed class AppState {
         val searchQuery: String = "",
         val filterOption: AppFilterOption = AppFilterOption.ALL,
         val dialogState: DialogState? = null,
-        val config: AppConfig = AppConfig()
+        val config: AppConfig = AppConfig(),
+        val showSettings: Boolean = false
     ) : AppState() {
         /**
          * Returns filtered apps based on search query and active filter option.
@@ -42,9 +43,10 @@ sealed class AppState {
             }
     }
     data class Error(
-        val message: String, 
+        val message: String,
         val dialogState: DialogState? = null,
-        val config: AppConfig = AppConfig()
+        val config: AppConfig = AppConfig(),
+        val showSettings: Boolean = false
     ) : AppState()
 }
 
@@ -63,12 +65,6 @@ sealed class DialogState {
         val title: String,
         val message: String,
         val progress: Float? = null
-    ) : DialogState()
-    
-    data class Configuration(
-        val config: AppConfig,
-        val onSave: (AppConfig) -> Unit,
-        val onCancel: () -> Unit
     ) : DialogState()
 }
 

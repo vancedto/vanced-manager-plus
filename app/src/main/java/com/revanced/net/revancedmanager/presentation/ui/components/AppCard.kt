@@ -1,6 +1,7 @@
 package com.revanced.net.revancedmanager.presentation.ui.components
 
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -331,14 +332,33 @@ fun AppCard(
                                 color = MaterialTheme.colorScheme.updateColor,
                                 modifier = Modifier.weight(1f)
                             )
+                            CompactActionButton(
+                                text = stringResource(R.string.uninstall),
+                                icon = Icons.Default.Delete,
+                                onClick = onUninstallClick,
+                                color = MaterialTheme.colorScheme.uninstallColor,
+                                modifier = Modifier.weight(1f)
+                            )
+                        } else {
+                            // Compact: icon-only uninstall button
+                            Box(
+                                modifier = Modifier
+                                    .size(26.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.uninstallColor,
+                                        shape = RoundedCornerShape(4.dp)
+                                    )
+                                    .clickable { onUninstallClick() },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.uninstall),
+                                    tint = Color.White,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
                         }
-                        CompactActionButton(
-                            text = stringResource(R.string.uninstall),
-                            icon = Icons.Default.Delete,
-                            onClick = onUninstallClick,
-                            color = MaterialTheme.colorScheme.uninstallColor,
-                            modifier = Modifier.weight(1f)
-                        )
                     }
                     AppStatus.DOWNLOADING -> {
                         CompactActionButton(

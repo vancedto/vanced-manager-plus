@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Coffee
@@ -78,8 +79,8 @@ import com.revanced.net.revancedmanager.presentation.bloc.AppEvent
 import com.revanced.net.revancedmanager.presentation.bloc.AppFilterOption
 import com.revanced.net.revancedmanager.presentation.bloc.AppState
 import com.revanced.net.revancedmanager.presentation.bloc.DialogState
+import com.revanced.net.revancedmanager.presentation.bloc.shareDebugLogs
 import com.revanced.net.revancedmanager.presentation.ui.components.AppCard
-import com.revanced.net.revancedmanager.presentation.ui.components.ConfigDialog
 import kotlinx.coroutines.delay
 
 /**
@@ -95,6 +96,12 @@ fun MainScreen(
     val toastMessage by viewModel.toastMessage.collectAsState()
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+
+    val showSettings = when (val s = state) {
+        is AppState.Success -> s.showSettings
+        is AppState.Error -> s.showSettings
+        else -> false
+    }
     
     // Remember the current toast to cancel it when a new one appears
     var currentToast by remember { mutableStateOf<Toast?>(null) }
@@ -126,37 +133,57 @@ fun MainScreen(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
-                title = {
-                    Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+            if (showSettings) {
+                TopAppBar(
+                    title = {
                         Text(
-                            text = stringResource(R.string.app_name),
+                            text = stringResource(R.string.settings),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold
                         )
-                        Text(
-                            text = stringResource(R.string.app_subtitle),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { viewModel.handleEvent(AppEvent.NavigateBackFromSettings) }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.back)
+                            )
+                        }
                     }
-                },
-                actions = {
-                    IconButton(onClick = { viewModel.handleEvent(AppEvent.RefreshApps) }) {
-                        Icon(
-                            imageVector = Icons.Filled.Refresh,
-                            contentDescription = stringResource(R.string.retry)
-                        )
-                    }
-                    IconButton(onClick = { viewModel.handleEvent(AppEvent.ShowConfigDialog) }) {
-                        Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = stringResource(R.string.settings)
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
+                )
+            } else {
+                TopAppBar(
+                    title = {
+                        Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                            Text(
+                                text = stringResource(R.string.app_name),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = stringResource(R.string.app_subtitle),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { viewModel.handleEvent(AppEvent.RefreshApps) }) {
+                            Icon(
+                                imageVector = Icons.Filled.Refresh,
+                                contentDescription = stringResource(R.string.retry)
+                            )
+                        }
+                        IconButton(onClick = { viewModel.handleEvent(AppEvent.NavigateToSettings) }) {
+                            Icon(
+                                imageVector = Icons.Filled.Settings,
+                                contentDescription = stringResource(R.string.settings)
+                            )
+                        }
+                    },
+                    scrollBehavior = scrollBehavior
+                )
+            }
         }
     ) { paddingValues ->
         when (val currentState = state) {
@@ -164,93 +191,99 @@ fun MainScreen(
                 LoadingScreen(modifier = Modifier.padding(paddingValues))
             }
             is AppState.Success -> {
-                AppListScreen(
-                    apps = currentState.filteredApps,
-                    searchQuery = currentState.searchQuery,
-                    filterOption = currentState.filterOption,
-                    onSearchQueryChange = { query ->
-                        viewModel.handleEvent(AppEvent.SearchApps(query))
-                    },
-                    onClearSearch = {
-                        viewModel.handleEvent(AppEvent.ClearSearch)
-                    },
-                    onFilterChange = { filter ->
-                        viewModel.handleEvent(AppEvent.SetFilter(filter))
-                    },
-                    onEvent = viewModel::handleEvent,
-                    isCompactMode = currentState.config.compactMode,
-                    modifier = Modifier.padding(paddingValues)
-                )
-                
-                // Handle dialogs
-                currentState.dialogState?.let { dialogState ->
-                    when (dialogState) {
-                        is DialogState.Confirmation -> {
-                            ConfirmationDialog(
-                                title = dialogState.title,
-                                message = dialogState.message,
-                                onConfirm = {
-                                    dialogState.onConfirmAction()
-                                },
-                                onCancel = {
-                                    dialogState.onCancelAction?.invoke() ?: viewModel.handleEvent(AppEvent.DismissDialog)
-                                }
-                            )
-                        }
-                        is DialogState.Progress -> {
-                            ProgressDialog(
-                                title = dialogState.title,
-                                message = dialogState.message,
-                                progress = dialogState.progress
-                            )
-                        }
-                        is DialogState.Configuration -> {
-                            ConfigDialog(
-                                config = dialogState.config,
-                                onSave = dialogState.onSave,
-                                onCancel = dialogState.onCancel,
-                                onCompactModeChange = { }
-                            )
+                if (currentState.showSettings) {
+                    SettingsScreen(
+                        currentConfig = currentState.config,
+                        onSave = { newConfig -> viewModel.handleEvent(AppEvent.SaveSettings(newConfig)) },
+                        onCancel = { viewModel.handleEvent(AppEvent.NavigateBackFromSettings) },
+                        onResetSettings = { viewModel.handleEvent(AppEvent.ResetSettings) },
+                        getLogContent = { viewModel.debugLogManager.getLastLines() },
+                        onShareLogs = { viewModel.shareDebugLogs() },
+                        modifier = Modifier.padding(paddingValues)
+                    )
+                } else {
+                    AppListScreen(
+                        apps = currentState.filteredApps,
+                        searchQuery = currentState.searchQuery,
+                        filterOption = currentState.filterOption,
+                        onSearchQueryChange = { query ->
+                            viewModel.handleEvent(AppEvent.SearchApps(query))
+                        },
+                        onClearSearch = {
+                            viewModel.handleEvent(AppEvent.ClearSearch)
+                        },
+                        onFilterChange = { filter ->
+                            viewModel.handleEvent(AppEvent.SetFilter(filter))
+                        },
+                        onEvent = viewModel::handleEvent,
+                        isCompactMode = currentState.config.compactMode,
+                        modifier = Modifier.padding(paddingValues)
+                    )
+
+                    // Handle dialogs
+                    currentState.dialogState?.let { dialogState ->
+                        when (dialogState) {
+                            is DialogState.Confirmation -> {
+                                ConfirmationDialog(
+                                    title = dialogState.title,
+                                    message = dialogState.message,
+                                    onConfirm = { dialogState.onConfirmAction() },
+                                    onCancel = {
+                                        dialogState.onCancelAction?.invoke()
+                                            ?: viewModel.handleEvent(AppEvent.DismissDialog)
+                                    }
+                                )
+                            }
+                            is DialogState.Progress -> {
+                                ProgressDialog(
+                                    title = dialogState.title,
+                                    message = dialogState.message,
+                                    progress = dialogState.progress
+                                )
+                            }
                         }
                     }
                 }
             }
             is AppState.Error -> {
-                ErrorScreen(
-                    message = currentState.message,
-                    onRetry = { viewModel.handleEvent(AppEvent.RefreshApps) },
-                    modifier = Modifier.padding(paddingValues)
-                )
-                
-                // Handle dialogs in error state too
-                currentState.dialogState?.let { dialogState ->
-                    when (dialogState) {
-                        is DialogState.Confirmation -> {
-                            ConfirmationDialog(
-                                title = dialogState.title,
-                                message = dialogState.message,
-                                onConfirm = {
-                                    dialogState.onConfirmAction()
-                                },
-                                onCancel = {
-                                    dialogState.onCancelAction?.invoke() ?: viewModel.handleEvent(AppEvent.DismissDialog)
-                                }
-                            )
-                        }
-                        is DialogState.Progress -> {
-                            ProgressDialog(
-                                title = dialogState.title,
-                                message = dialogState.message,
-                                progress = dialogState.progress
-                            )
-                        }
-                        is DialogState.Configuration -> {
-                            ConfigDialog(
-                                config = dialogState.config,
-                                onSave = dialogState.onSave,
-                                onCancel = dialogState.onCancel,
-                                onCompactModeChange = { }
-                            )
+                if (currentState.showSettings) {
+                    SettingsScreen(
+                        currentConfig = currentState.config,
+                        onSave = { newConfig -> viewModel.handleEvent(AppEvent.SaveSettings(newConfig)) },
+                        onCancel = { viewModel.handleEvent(AppEvent.NavigateBackFromSettings) },
+                        onResetSettings = { viewModel.handleEvent(AppEvent.ResetSettings) },
+                        getLogContent = { viewModel.debugLogManager.getLastLines() },
+                        onShareLogs = { viewModel.shareDebugLogs() },
+                        modifier = Modifier.padding(paddingValues)
+                    )
+                } else {
+                    ErrorScreen(
+                        message = currentState.message,
+                        onRetry = { viewModel.handleEvent(AppEvent.RefreshApps) },
+                        modifier = Modifier.padding(paddingValues)
+                    )
+
+                    // Handle dialogs in error state too
+                    currentState.dialogState?.let { dialogState ->
+                        when (dialogState) {
+                            is DialogState.Confirmation -> {
+                                ConfirmationDialog(
+                                    title = dialogState.title,
+                                    message = dialogState.message,
+                                    onConfirm = { dialogState.onConfirmAction() },
+                                    onCancel = {
+                                        dialogState.onCancelAction?.invoke()
+                                            ?: viewModel.handleEvent(AppEvent.DismissDialog)
+                                    }
+                                )
+                            }
+                            is DialogState.Progress -> {
+                                ProgressDialog(
+                                    title = dialogState.title,
+                                    message = dialogState.message,
+                                    progress = dialogState.progress
+                                )
+                            }
                         }
                     }
                 }

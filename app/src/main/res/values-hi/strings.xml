@@ -5,13 +5,11 @@
     <string name="settings">सेटिंग्स</string>
     <string name="theme">थीम</string>
     <string name="language">भाषा</string>
+    <string name="compact_mode">कॉम्पैक्ट मोड</string>
     <string name="theme_light">हल्का</string>
     <string name="theme_dark">गहरा</string>
     <string name="theme_system">सिस्टम</string>
-    <string name="apply">लागू करें</string>
     <string name="cancel">रद्द करें</string>
-    <string name="restart_app">ऐप पुनः आरंभ करें</string>
-    <string name="restart_later">बाद में</string>
     <string name="select_language">भाषा चुनें</string>
     <string name="tap_to_change">बदलने के लिए टैप करें</string>
     
@@ -20,6 +18,7 @@
     <string name="retry">पुनः प्रयास करें</string>
     <string name="loading_apps_message">ऐप्स लोड हो रहे हैं...</string>
     <string name="error_prefix">त्रुटि: %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">ऐप्स खोजें…</string>
     <string name="no_apps_found">\"%1$s\" के लिए कोई ऐप नहीं मिला</string>
     <string name="no_apps_available">कोई ऐप उपलब्ध नहीं है</string>
@@ -29,13 +28,16 @@
     <string name="update">अपडेट</string>
     <string name="open">खोलें</string>
     <string name="uninstall">अनइंस्टॉल</string>
-    <string name="downloading">डाउनलोड कर रहे हैं</string>
+    <string name="reinstall">पुनः इंस्टॉल करें</string>
+    <string name="reinstall_started">पुनः इंस्टॉलेशन शुरू</string>
+    <string name="reinstall_failed">पुनः इंस्टॉलेशन असफल</string>
     <string name="installing">इंस्टॉल कर रहे हैं</string>
     <string name="uninstalling">अनइंस्टॉल कर रहे हैं</string>
     <string name="unknown">अज्ञात</string>
     <string name="installed_version">इंस्टॉल: v%1$s</string>
     <string name="latest_version">नवीनतम: v%1$s</string>
     <string name="downloading_progress">डाउनलोड कर रहे हैं %1$d%%</string>
+    <string name="show_less">कम दिखाएं</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">डाउनलोड शुरू हो रहा है...</string>
@@ -43,7 +45,6 @@
     <string name="download_failed">डाउनलोड असफल: %1$s</string>
     <string name="download_failed_memory">अपर्याप्त मेमोरी के कारण डाउनलोड असफल। अन्य ऐप्स बंद करें और पुनः प्रयास करें।</string>
     <string name="download_failed_storage">अपर्याप्त स्टोरेज स्पेस के कारण डाउनलोड असफल। स्थान खाली करें और पुनः प्रयास करें।</string>
-    <string name="insufficient_storage_error">अपर्याप्त स्टोरेज स्पेस। उपलब्ध: %1$d MB। स्थान खाली करें और पुनः प्रयास करें।</string>
     <string name="download_cancelled">डाउनलोड रद्द किया गया</string>
     <string name="installation_started">इंस्टॉलेशन शुरू</string>
     <string name="installation_completed">इंस्टॉलेशन सफलतापूर्वक पूरा</string>
@@ -52,6 +53,7 @@
     <string name="installation_pending_user_action">इंस्टॉल करने के लिए उपयोगकर्ता की पुष्टि का इंतजार</string>
     <string name="uninstallation_started">अनइंस्टॉलेशन शुरू</string>
     <string name="uninstallation_completed">अनइंस्टॉलेशन सफलतापूर्वक पूरा</string>
+    <string name="uninstallation_cancelled">उपयोगकर्ता द्वारा अनइंस्टॉलेशन रद्द किया गया</string>
     <string name="uninstallation_failed">अनइंस्टॉलेशन असफल: %1$s</string>
     <string name="failed_start_uninstallation">अनइंस्टॉलेशन शुरू करने में असफल</string>
     <string name="failed_open_app">ऐप खोलने में असफल</string>
@@ -59,57 +61,24 @@
     <string name="old_version_uninstalled">पुराना संस्करण अनइंस्टॉल किया गया, इंस्टॉलेशन फिर से कोशिश कर रहा है...</string>
     <string name="failed_uninstall_old_version">पुराना संस्करण अनइंस्टॉल करने में असफल</string>
     <string name="failed_uninstall_old_version_error">पुराना संस्करण अनइंस्टॉल करने में असफल: %1$s</string>
+    <string name="app_not_installed_proceeding">ऐप इंस्टॉल नहीं है, इंस्टॉलेशन जारी रखा जा रहा है...</string>
+    <string name="installation_cancelled_by_user">उपयोगकर्ता द्वारा इंस्टॉलेशन रद्द किया गया</string>
     <string name="app_status_updated">ऐप स्थिति अपडेट की गई</string>
+    <string name="apps_updated">ऐप्स अपडेट किए गए</string>
     <string name="configuration_saved">कॉन्फ़िगरेशन सहेजी गई</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">इंस्टॉलेशन असफल</string>
     <string name="uninstall_required_title">अनइंस्टॉल आवश्यक</string>
-    <string name="language_changed_title">भाषा बदली गई</string>
+    <string name="reinstall_confirmation_title">पुनः इंस्टॉल की पुष्टि करें</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">इंस्टॉलेशन असफल: %1$s\n\nक्या आप पुनः प्रयास करना चाहते हैं? यह पहले पुराने संस्करण को अनइंस्टॉल करेगा यदि मौजूद है।</string>
     <string name="uninstall_required_message">%1$s की इंस्टॉलेशन को फिर से कोशिश करने के लिए, पुराना संस्करण पहले अनइंस्टॉल करना होगा। जारी रखें?</string>
-    <string name="language_changed_message">भाषा %1$s में बदली गई है।\n\nपरिवर्तन लागू करने के लिए अभी ऐप को पुनः आरंभ करें?</string>
-    
-    <!-- Compact Mode -->
-    <string name="compact_mode">कॉम्पैक्ट मोड</string>
-    
-    <!-- Read More/Show Less -->
-    <string name="read_more">और पढ़ें</string>
-    <string name="show_less">कम दिखाएं</string>
-    
-    <!-- Reinstall Feature -->
-    <string name="reinstall">पुनः इंस्टॉल करें</string>
-    <string name="reinstall_started">पुनः इंस्टॉलेशन शुरू</string>
-    <string name="reinstall_completed">पुनः इंस्टॉलेशन पूरा</string>
-    <string name="reinstall_failed">पुनः इंस्टॉलेशन असफल</string>
-    <string name="app_not_installed_proceeding">ऐप इंस्टॉल नहीं है, इंस्टॉलेशन जारी रखा जा रहा है...</string>
-    <string name="installation_cancelled_by_user">उपयोगकर्ता द्वारा इंस्टॉलेशन रद्द किया गया</string>
-    <string name="apps_updated">ऐप्स अपडेट किए गए</string>
-    <string name="error_applying_language">भाषा लागू करने में त्रुटि: %1$s</string>
-    <string name="reinstall_confirmation_title">पुनः इंस्टॉल की पुष्टि करें</string>
     <string name="reinstall_confirmation_message">क्या आप वाकई %1$s को पुनः इंस्टॉल करना चाहते हैं? यह वर्तमान संस्करण को हटा देगा और नया इंस्टॉल करेगा।</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">डाउनलोड पूरा और इंस्टॉल के लिए तैयार</string>
-    <string name="auto_install_enabled">ऑटो इंस्टॉल सक्षम</string>
-    <string name="auto_install_disabled">ऑटो इंस्टॉल अक्षम</string>
-    <string name="pending_downloads_found">लंबित डाउनलोड मिले</string>
-    <string name="background_download_completed">बैकग्राउंड डाउनलोड पूरा</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">डाउनलोड पूरे</string>
-    <string name="downloads_complete_summary">%2$d में से %1$d ऐप्स सफलतापूर्वक डाउनलोड किए गए</string>
-    <string name="successfully_downloaded">सफलतापूर्वक डाउनलोड किए गए:</string>
-    <string name="failed_downloads">असफल डाउनलोड:</string>
-    <string name="install_all_button">सभी इंस्टॉल करें</string>
-    <string name="install_button">इंस्टॉल करें</string>
     <string name="close_button">बंद करें</string>
-    <string name="installing_multiple_apps">%1$d ऐप्स इंस्टॉल कर रहे हैं...</string>
-    <string name="installing_single_app">%1$s इंस्टॉल कर रहे हैं...</string>
-    <string name="downloads_in_progress">डाउनलोड प्रगति में</string>
-    <string name="concurrent_downloads_active">%1$d समानांतर डाउनलोड सक्रिय</string>
 
     <!-- Filter -->
     <string name="filter_label">फ़िल्टर</string>
@@ -118,6 +87,27 @@
     <string name="filter_not_installed">अस्थापित</string>
     <string name="filter_updates">अपडेट</string>
     <string name="no_apps_for_filter">इस फ़िल्टर से कोई ऐप मेल नहीं खाता</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">डीबग मोड</string>
+    <string name="debug_mode_description">समस्या निवारण के लिए लॉग सहेजें (अधिकतम 7 दिन)</string>
+    <string name="debug_view_logs">लॉग देखें</string>
+    <string name="debug_share_logs">लॉग साझा करें</string>
+    <string name="debug_logs_title">डीबग लॉग</string>
+    <string name="debug_no_logs_available">कोई लॉग नहीं।\nडीबग मोड चालू करें और समस्या दोहराएं।</string>
+    <string name="debug_no_logs_to_share">साझा करने के लिए कोई लॉग नहीं</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">वापस</string>
+    <string name="save">सहेजें</string>
+    <string name="settings_section_appearance">स्वरूप</string>
+    <string name="settings_section_display">प्रदर्शन</string>
+    <string name="settings_section_debug">डीबग</string>
+    <string name="settings_section_danger_zone">खतरनाक क्षेत्र</string>
+    <string name="settings_reset_button">सभी सेटिंग्स रीसेट करें</string>
+    <string name="settings_reset_confirm_title">सेटिंग्स रीसेट करें?</string>
+    <string name="settings_reset_confirm_message">सभी सेटिंग्स डिफ़ॉल्ट पर रीसेट होंगी। यह पूर्ववत नहीं किया जा सकता।</string>
+    <string name="settings_reset_to_defaults">सेटिंग्स रीसेट हो गई</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">पसंदीदा</string>

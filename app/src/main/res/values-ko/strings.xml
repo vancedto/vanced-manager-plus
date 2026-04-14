@@ -9,10 +9,7 @@
     <string name="theme_light">밝음</string>
     <string name="theme_dark">어둠</string>
     <string name="theme_system">시스템</string>
-    <string name="apply">적용</string>
     <string name="cancel">취소</string>
-    <string name="restart_app">앱 재시작</string>
-    <string name="restart_later">나중에</string>
     <string name="select_language">언어 선택</string>
     <string name="tap_to_change">탭하여 변경</string>
     
@@ -21,6 +18,7 @@
     <string name="retry">다시 시도</string>
     <string name="loading_apps_message">앱 로딩 중...</string>
     <string name="error_prefix">오류: %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">앱 검색…</string>
     <string name="no_apps_found">"%1$s"에 대한 앱을 찾을 수 없습니다</string>
     <string name="no_apps_available">사용 가능한 앱 없음</string>
@@ -30,19 +28,16 @@
     <string name="update">업데이트</string>
     <string name="open">열기</string>
     <string name="uninstall">제거</string>
-    <string name="downloading">다운로드 중</string>
+    <string name="reinstall">재설치</string>
+    <string name="reinstall_started">재설치 시작됨</string>
+    <string name="reinstall_failed">재설치 실패</string>
     <string name="installing">설치 중</string>
     <string name="uninstalling">제거 중</string>
     <string name="unknown">알 수 없음</string>
     <string name="installed_version">설치됨: v%1$s</string>
     <string name="latest_version">최신: v%1$s</string>
     <string name="downloading_progress">다운로드 %1$d%%</string>
-    <string name="read_more">더 읽기</string>
     <string name="show_less">접기</string>
-    <string name="reinstall">재설치</string>
-    <string name="reinstall_started">재설치 시작됨</string>
-    <string name="reinstall_completed">재설치 성공적으로 완료됨</string>
-    <string name="reinstall_failed">재설치 실패</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">다운로드 시작 중...</string>
@@ -50,7 +45,6 @@
     <string name="download_failed">다운로드 실패: %1$s</string>
     <string name="download_failed_memory">메모리 부족으로 다운로드 실패. 다른 앱을 종료하고 다시 시도하세요.</string>
     <string name="download_failed_storage">저장공간 부족으로 다운로드 실패. 공간을 확보하고 다시 시도하세요.</string>
-    <string name="insufficient_storage_error">저장공간 부족. 사용 가능: %1$d MB. 공간을 확보하고 다시 시도하세요.</string>
     <string name="download_cancelled">다운로드 취소됨</string>
     <string name="installation_started">설치 시작됨</string>
     <string name="installation_completed">설치 성공적으로 완료됨</string>
@@ -59,6 +53,7 @@
     <string name="installation_pending_user_action">설치 사용자 확인 대기 중</string>
     <string name="uninstallation_started">제거 시작됨</string>
     <string name="uninstallation_completed">제거 성공적으로 완료됨</string>
+    <string name="uninstallation_cancelled">사용자가 제거를 취소함</string>
     <string name="uninstallation_failed">제거 실패: %1$s</string>
     <string name="failed_start_uninstallation">제거 시작 실패</string>
     <string name="failed_open_app">앱 열기 실패</string>
@@ -71,39 +66,19 @@
     <string name="app_status_updated">앱 상태 업데이트됨</string>
     <string name="apps_updated">%1$d개 앱 업데이트됨</string>
     <string name="configuration_saved">설정 저장됨</string>
-    <string name="error_applying_language">언어 적용 실패</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">설치 실패</string>
     <string name="uninstall_required_title">제거 필요</string>
-    <string name="language_changed_title">언어 변경됨</string>
     <string name="reinstall_confirmation_title">애플리케이션 재설치</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">설치 실패: %1$s\n\n다시 시도하시겠습니까? 이전 버전이 있으면 먼저 제거됩니다.</string>
     <string name="uninstall_required_message">%1$s 설치를 다시 시도하려면 이전 버전을 먼저 제거해야 합니다. 계속하시겠습니까?</string>
-    <string name="language_changed_message">언어가 %1$s(으)로 변경되었습니다.\n\n변경사항을 적용하려면 지금 앱을 재시작하시겠습니까?</string>
     <string name="reinstall_confirmation_message">이것은 %1$s의 현재 버전을 제거하고 최신 버전을 다운로드하여 설치합니다.\n\n계속하시겠습니까?</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">%1$s 다운로드 완료 및 설치 준비됨</string>
-    <string name="auto_install_enabled">자동 설치 활성화됨</string>
-    <string name="auto_install_disabled">자동 설치 비활성화됨</string>
-    <string name="pending_downloads_found">%1$d개의 대기 중인 다운로드 발견</string>
-    <string name="background_download_completed">백그라운드 다운로드 완료</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">다운로드 완료</string>
-    <string name="downloads_complete_summary">%1$d개 완료, %2$d개 실패</string>
-    <string name="successfully_downloaded">성공적으로 다운로드됨 (%1$d)</string>
-    <string name="failed_downloads">실패한 다운로드 (%1$d)</string>
-    <string name="install_all_button">모두 설치 (%1$d)</string>
-    <string name="install_button">설치</string>
     <string name="close_button">닫기</string>
-    <string name="installing_multiple_apps">%1$d개 앱 설치 중...</string>
-    <string name="installing_single_app">%1$s 설치 중...</string>
-    <string name="downloads_in_progress">다운로드 진행 중</string>
-    <string name="concurrent_downloads_active">%1$d개 다운로드 활성</string>
 
     <!-- Filter -->
     <string name="filter_label">필터</string>
@@ -112,6 +87,27 @@
     <string name="filter_not_installed">미설치</string>
     <string name="filter_updates">업데이트</string>
     <string name="no_apps_for_filter">이 필터에 맞는 앱이 없습니다</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">디버그 모드</string>
+    <string name="debug_mode_description">문제 해결용 로그 저장 (최대 7일)</string>
+    <string name="debug_view_logs">로그 보기</string>
+    <string name="debug_share_logs">로그 공유</string>
+    <string name="debug_logs_title">디버그 로그</string>
+    <string name="debug_no_logs_available">로그 없음.\n디버그 모드 켜고 문제를 재현하세요.</string>
+    <string name="debug_no_logs_to_share">공유할 로그 없음</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">뒤로</string>
+    <string name="save">저장</string>
+    <string name="settings_section_appearance">외관</string>
+    <string name="settings_section_display">표시</string>
+    <string name="settings_section_debug">디버그</string>
+    <string name="settings_section_danger_zone">위험 구역</string>
+    <string name="settings_reset_button">모든 설정 초기화</string>
+    <string name="settings_reset_confirm_title">설정 초기화?</string>
+    <string name="settings_reset_confirm_message">모든 설정이 기본값으로 초기화됩니다. 되돌릴 수 없습니다.</string>
+    <string name="settings_reset_to_defaults">설정 초기화됨</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">즐겨찾기</string>

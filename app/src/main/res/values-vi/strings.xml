@@ -9,10 +9,7 @@
     <string name="theme_light">Sáng</string>
     <string name="theme_dark">Tối</string>
     <string name="theme_system">Theo hệ thống</string>
-    <string name="apply">Áp dụng</string>
     <string name="cancel">Hủy</string>
-    <string name="restart_app">Khởi động lại</string>
-    <string name="restart_later">Để sau</string>
     <string name="select_language">Chọn ngôn ngữ</string>
     <string name="tap_to_change">Chạm để thay đổi</string>
     
@@ -21,6 +18,7 @@
     <string name="retry">Thử lại</string>
     <string name="loading_apps_message">Đang tải ứng dụng...</string>
     <string name="error_prefix">Lỗi: %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">Tìm kiếm ứng dụng…</string>
     <string name="no_apps_found">Không tìm thấy ứng dụng nào cho \"%1$s\"</string>
     <string name="no_apps_available">Không có ứng dụng nào</string>
@@ -32,16 +30,13 @@
     <string name="uninstall">Gỡ cài đặt</string>
     <string name="reinstall">Cài lại</string>
     <string name="reinstall_started">Đã bắt đầu cài lại</string>
-    <string name="reinstall_completed">Cài lại thành công</string>
     <string name="reinstall_failed">Cài lại thất bại</string>
-    <string name="downloading">Đang tải</string>
     <string name="installing">Đang cài đặt</string>
     <string name="uninstalling">Đang gỡ cài đặt</string>
     <string name="unknown">Không xác định</string>
     <string name="installed_version">Đã cài: v%1$s</string>
     <string name="latest_version">Mới nhất: v%1$s</string>
     <string name="downloading_progress">Đang tải %1$d%%</string>
-    <string name="read_more">Đọc thêm</string>
     <string name="show_less">Thu gọn</string>
     
     <!-- Toast Messages -->
@@ -50,15 +45,15 @@
     <string name="download_failed">Tải về thất bại: %1$s</string>
     <string name="download_failed_memory">Tải về thất bại do không đủ bộ nhớ. Vui lòng đóng các ứng dụng khác và thử lại.</string>
     <string name="download_failed_storage">Tải về thất bại do không đủ dung lượng lưu trữ. Vui lòng giải phóng dung lượng và thử lại.</string>
-    <string name="insufficient_storage_error">Không đủ dung lượng lưu trữ. Còn lại: %1$d MB. Vui lòng giải phóng dung lượng và thử lại.</string>
     <string name="download_cancelled">Đã hủy tải xuống</string>
     <string name="installation_started">Bắt đầu cài đặt</string>
-    <string name="installation_completed">Cài đặt hoàn thành thành công</string>
+    <string name="installation_completed">Cài đặt thành công</string>
     <string name="installation_failed_start">Không thể bắt đầu cài đặt</string>
     <string name="installation_failed_apk_not_found">Cài đặt thất bại và không tìm thấy tệp APK</string>
     <string name="installation_pending_user_action">Đang chờ người dùng xác nhận cài đặt</string>
     <string name="uninstallation_started">Bắt đầu gỡ cài đặt</string>
-    <string name="uninstallation_completed">Gỡ cài đặt hoàn tất thành công</string>
+    <string name="uninstallation_completed">Gỡ cài đặt thành công</string>
+    <string name="uninstallation_cancelled">Đã hủy gỡ cài đặt</string>
     <string name="uninstallation_failed">Gỡ cài đặt thất bại: %1$s</string>
     <string name="failed_start_uninstallation">Không thể bắt đầu gỡ cài đặt</string>
     <string name="failed_open_app">Không thể mở ứng dụng</string>
@@ -70,40 +65,20 @@
     <string name="installation_cancelled_by_user">Người dùng đã hủy cài đặt</string>
     <string name="app_status_updated">Đã cập nhật trạng thái ứng dụng</string>
     <string name="apps_updated">Đã cập nhật %1$d ứng dụng</string>
-    <string name="configuration_saved">Cấu hình đã được lưu</string>
-    <string name="error_applying_language">Không thể áp dụng ngôn ngữ</string>
+    <string name="configuration_saved">Đã lưu cài đặt</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">Cài đặt thất bại</string>
     <string name="uninstall_required_title">Yêu cầu gỡ cài đặt</string>
-    <string name="language_changed_title">Đã thay đổi ngôn ngữ</string>
     <string name="reinstall_confirmation_title">Cài lại ứng dụng</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">Cài đặt thất bại: %1$s\n\nBạn có muốn thử lại không? Điều này sẽ gỡ phiên bản cũ trước nếu tồn tại.</string>
     <string name="uninstall_required_message">Để thử lại cài đặt %1$s, phiên bản cũ cần được gỡ trước. Tiếp tục?</string>
-    <string name="language_changed_message">Ngôn ngữ đã được thay đổi thành %1$s.\n\nKhởi động lại ứng dụng ngay bây giờ để áp dụng thay đổi?</string>
     <string name="reinstall_confirmation_message">Điều này sẽ gỡ cài đặt phiên bản hiện tại của %1$s và tải xuống cài đặt phiên bản mới nhất.\n\nBạn có muốn tiếp tục không?</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">%1$s đã tải xong và sẵn sàng cài đặt</string>
-    <string name="auto_install_enabled">Đã bật tự động cài đặt</string>
-    <string name="auto_install_disabled">Đã tắt tự động cài đặt</string>
-    <string name="pending_downloads_found">Tìm thấy %1$d tải xuống đang chờ</string>
-    <string name="background_download_completed">Tải xuống nền đã hoàn thành</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">Tải xuống hoàn thành</string>
-    <string name="downloads_complete_summary">%1$d thành công, %2$d thất bại</string>
-    <string name="successfully_downloaded">Tải thành công (%1$d)</string>
-    <string name="failed_downloads">Tải thất bại (%1$d)</string>
-    <string name="install_all_button">Cài tất cả (%1$d)</string>
-    <string name="install_button">Cài đặt</string>
     <string name="close_button">Đóng</string>
-    <string name="installing_multiple_apps">Đang cài %1$d ứng dụng...</string>
-    <string name="installing_single_app">Đang cài %1$s...</string>
-    <string name="downloads_in_progress">Đang tải xuống</string>
-    <string name="concurrent_downloads_active">%1$d tải xuống đang hoạt động</string>
 
     <!-- Filter -->
     <string name="filter_label">Lọc</string>
@@ -112,6 +87,27 @@
     <string name="filter_not_installed">Chưa cài đặt</string>
     <string name="filter_updates">Cập nhật</string>
     <string name="no_apps_for_filter">Không có ứng dụng nào phù hợp với bộ lọc</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">Chế độ Debug</string>
+    <string name="debug_mode_description">Lưu nhật ký chi tiết để gỡ lỗi (tối đa 7 ngày)</string>
+    <string name="debug_view_logs">Xem nhật ký</string>
+    <string name="debug_share_logs">Chia sẻ nhật ký</string>
+    <string name="debug_logs_title">Nhật ký Debug</string>
+    <string name="debug_no_logs_available">Chưa có nhật ký.\nBật chế độ Debug và tái hiện lỗi trước.</string>
+    <string name="debug_no_logs_to_share">Không có nhật ký để chia sẻ</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">Quay lại</string>
+    <string name="save">Lưu</string>
+    <string name="settings_section_appearance">Giao diện</string>
+    <string name="settings_section_display">Hiển thị</string>
+    <string name="settings_section_debug">Debug</string>
+    <string name="settings_section_danger_zone">Vùng nguy hiểm</string>
+    <string name="settings_reset_button">Đặt lại tất cả về mặc định</string>
+    <string name="settings_reset_confirm_title">Đặt lại cài đặt?</string>
+    <string name="settings_reset_confirm_message">Tất cả cài đặt sẽ về mặc định. Thao tác này không thể hoàn tác.</string>
+    <string name="settings_reset_to_defaults">Đã đặt lại cài đặt mặc định</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Yêu thích</string>

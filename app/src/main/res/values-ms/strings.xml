@@ -5,19 +5,20 @@
     <string name="settings">Tetapan</string>
     <string name="theme">Tema</string>
     <string name="language">Bahasa</string>
+    <string name="compact_mode">Mod Padat</string>
     <string name="theme_light">Terang</string>
     <string name="theme_dark">Gelap</string>
     <string name="theme_system">Sistem</string>
-    <string name="apply">Guna</string>
     <string name="cancel">Batal</string>
-    <string name="restart_app">Mula Semula App</string>
-    <string name="restart_later">Kemudian</string>
+    <string name="select_language">Pilih Bahasa</string>
+    <string name="tap_to_change">Ketik untuk menukar</string>
     
     <!-- Main Screen -->
     <string name="confirm">Sahkan</string>
     <string name="retry">Cuba Lagi</string>
     <string name="loading_apps_message">Memuatkan app...</string>
     <string name="error_prefix">Ralat: %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">Cari app…</string>
     <string name="no_apps_found">Tiada app dijumpai untuk \"%1$s\"</string>
     <string name="no_apps_available">Tiada app tersedia</string>
@@ -27,13 +28,16 @@
     <string name="update">Kemas Kini</string>
     <string name="open">Buka</string>
     <string name="uninstall">Nyah Pasang</string>
-    <string name="downloading">Memuat turun</string>
+    <string name="reinstall">Pasang Semula</string>
+    <string name="reinstall_started">Pemasangan semula dimulakan</string>
+    <string name="reinstall_failed">Pemasangan semula gagal</string>
     <string name="installing">Memasang</string>
     <string name="uninstalling">Menyah pasang</string>
     <string name="unknown">Tidak diketahui</string>
     <string name="installed_version">Dipasang: v%1$s</string>
     <string name="latest_version">Terkini: v%1$s</string>
     <string name="downloading_progress">Memuat turun %1$d%%</string>
+    <string name="show_less">Tunjuk Kurang</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Memulakan muat turun...</string>
@@ -41,7 +45,6 @@
     <string name="download_failed">Muat turun gagal: %1$s</string>
     <string name="download_failed_memory">Muat turun gagal kerana memori tidak mencukupi. Sila tutup app lain dan cuba lagi.</string>
     <string name="download_failed_storage">Muat turun gagal kerana ruang simpanan tidak mencukupi. Sila kosongkan ruang dan cuba lagi.</string>
-    <string name="insufficient_storage_error">Ruang simpanan tidak mencukupi. Tersedia: %1$d MB. Sila kosongkan ruang dan cuba lagi.</string>
     <string name="download_cancelled">Muat turun dibatalkan</string>
     <string name="installation_started">Pemasangan dimulakan</string>
     <string name="installation_completed">Pemasangan berjaya selesai</string>
@@ -50,6 +53,7 @@
     <string name="installation_pending_user_action">Menunggu pengesahan pengguna untuk memasang</string>
     <string name="uninstallation_started">Penyahpasangan dimulakan</string>
     <string name="uninstallation_completed">Penyahpasangan berjaya selesai</string>
+    <string name="uninstallation_cancelled">Penyahpasangan dibatalkan oleh pengguna</string>
     <string name="uninstallation_failed">Penyahpasangan gagal: %1$s</string>
     <string name="failed_start_uninstallation">Gagal memulakan penyahpasangan</string>
     <string name="failed_open_app">Gagal membuka app</string>
@@ -57,65 +61,24 @@
     <string name="old_version_uninstalled">Versi lama dinyah pasang, mencuba pemasangan semula...</string>
     <string name="failed_uninstall_old_version">Gagal menyah pasang versi lama</string>
     <string name="failed_uninstall_old_version_error">Gagal menyah pasang versi lama: %1$s</string>
+    <string name="app_not_installed_proceeding">App tidak dipasang, meneruskan dengan muat turun</string>
+    <string name="installation_cancelled_by_user">Pemasangan dibatalkan oleh pengguna</string>
     <string name="app_status_updated">Status app dikemas kini</string>
+    <string name="apps_updated">App dikemas kini</string>
     <string name="configuration_saved">Konfigurasi disimpan</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">Pemasangan Gagal</string>
     <string name="uninstall_required_title">Penyahpasangan Diperlukan</string>
-    <string name="language_changed_title">Bahasa Diubah</string>
+    <string name="reinstall_confirmation_title">Sahkan Pemasangan Semula</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">Pemasangan gagal: %1$s\n\nAdakah anda ingin cuba lagi? Ini akan menyah pasang versi lama dahulu jika wujud.</string>
     <string name="uninstall_required_message">Untuk mencuba pemasangan %1$s semula, versi lama perlu dinyah pasang dahulu. Teruskan?</string>
-    <string name="language_changed_message">Bahasa telah diubah kepada %1$s.\n\nMula semula app sekarang untuk melaksanakan perubahan?</string>
-    
-    <!-- Language Selection -->
-    <string name="select_language">Pilih Bahasa</string>
-    <string name="tap_to_change">Ketik untuk menukar</string>
-    
-    <!-- Compact Mode -->
-    <string name="compact_mode">Mod Padat</string>
-    
-    <!-- Reinstall Feature -->
-    <string name="reinstall">Pasang Semula</string>
-    <string name="reinstall_started">Pemasangan semula dimulakan</string>
-    <string name="reinstall_completed">Pemasangan semula selesai</string>
-    <string name="reinstall_failed">Pemasangan semula gagal</string>
-    
-    <!-- Read More/Show Less -->
-    <string name="read_more">Baca Lagi</string>
-    <string name="show_less">Tunjuk Kurang</string>
-    
-    <!-- Additional Installation Messages -->
-    <string name="app_not_installed_proceeding">App tidak dipasang, meneruskan dengan muat turun</string>
-    <string name="installation_cancelled_by_user">Pemasangan dibatalkan oleh pengguna</string>
-    <string name="apps_updated">App dikemas kini</string>
-    <string name="error_applying_language">Ralat menggunakan bahasa</string>
-    
-    <!-- Reinstall Confirmation Dialog -->
-    <string name="reinstall_confirmation_title">Sahkan Pemasangan Semula</string>
     <string name="reinstall_confirmation_message">Adakah anda pasti ingin memasang semula %1$s? Ini akan menyah pasang versi semasa dan memasang versi terbaru.</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">Muat turun selesai dan sedia untuk dipasang</string>
-    <string name="auto_install_enabled">Pemasangan automatik diaktifkan</string>
-    <string name="auto_install_disabled">Pemasangan automatik dinyahaktifkan</string>
-    <string name="pending_downloads_found">Muat turun tertunda dijumpai</string>
-    <string name="background_download_completed">Muat turun latar belakang selesai</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">Muat Turun Selesai</string>
-    <string name="downloads_complete_summary">%1$d daripada %2$d muat turun berjaya selesai</string>
-    <string name="successfully_downloaded">Berjaya dimuat turun</string>
-    <string name="failed_downloads">Muat turun gagal</string>
-    <string name="install_all_button">Pasang Semua</string>
-    <string name="install_button">Pasang</string>
     <string name="close_button">Tutup</string>
-    <string name="installing_multiple_apps">Memasang %1$d app</string>
-    <string name="installing_single_app">Memasang %1$s</string>
-    <string name="downloads_in_progress">Muat turun sedang berlangsung</string>
-    <string name="concurrent_downloads_active">%1$d muat turun serentak aktif</string>
 
     <!-- Filter -->
     <string name="filter_label">Tapis</string>
@@ -124,6 +87,27 @@
     <string name="filter_not_installed">Belum dipasang</string>
     <string name="filter_updates">Kemas kini</string>
     <string name="no_apps_for_filter">Tiada apl yang sepadan dengan penapis ini</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">Mod Debug</string>
+    <string name="debug_mode_description">Simpan log terperinci (maks. 7 hari)</string>
+    <string name="debug_view_logs">Lihat Log</string>
+    <string name="debug_share_logs">Kongsi Log</string>
+    <string name="debug_logs_title">Log Debug</string>
+    <string name="debug_no_logs_available">Tiada log.\nAktifkan mod debug dan reproduksi masalah.</string>
+    <string name="debug_no_logs_to_share">Tiada log untuk dikongsi</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">Kembali</string>
+    <string name="save">Simpan</string>
+    <string name="settings_section_appearance">Penampilan</string>
+    <string name="settings_section_display">Paparan</string>
+    <string name="settings_section_debug">Debug</string>
+    <string name="settings_section_danger_zone">Zon Berbahaya</string>
+    <string name="settings_reset_button">Tetapkan semula semua tetapan</string>
+    <string name="settings_reset_confirm_title">Tetapkan Semula?</string>
+    <string name="settings_reset_confirm_message">Semua tetapan akan dikembalikan ke asal. Ini tidak boleh dibatalkan.</string>
+    <string name="settings_reset_to_defaults">Tetapan telah ditetapkan semula</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Kegemaran</string>

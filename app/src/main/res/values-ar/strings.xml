@@ -5,13 +5,11 @@
     <string name="settings">الإعدادات</string>
     <string name="theme">المظهر</string>
     <string name="language">اللغة</string>
+    <string name="compact_mode">الوضع المضغوط</string>
     <string name="theme_light">فاتح</string>
     <string name="theme_dark">داكن</string>
     <string name="theme_system">النظام</string>
-    <string name="apply">تطبيق</string>
     <string name="cancel">إلغاء</string>
-    <string name="restart_app">إعادة تشغيل التطبيق</string>
-    <string name="restart_later">لاحقاً</string>
     <string name="select_language">اختر اللغة</string>
     <string name="tap_to_change">اضغط للتغيير</string>
     
@@ -20,6 +18,7 @@
     <string name="retry">إعادة المحاولة</string>
     <string name="loading_apps_message">جاري تحميل التطبيقات...</string>
     <string name="error_prefix">خطأ:  %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">البحث في التطبيقات…</string>
     <string name="no_apps_found">لم يتم العثور على تطبيقات لـ \"%1$s\"</string>
     <string name="no_apps_available">لا توجد تطبيقات متاحة</string>
@@ -29,20 +28,16 @@
     <string name="update">تحديث</string>
     <string name="open">فتح</string>
     <string name="uninstall">إلغاء التثبيت</string>
-    <string name="downloading">جاري التحميل</string>
+    <string name="reinstall">إعادة التثبيت</string>
+    <string name="reinstall_started">بدأت إعادة التثبيت</string>
+    <string name="reinstall_failed">فشلت إعادة التثبيت</string>
     <string name="installing">جاري التثبيت</string>
     <string name="uninstalling">جاري إلغاء التثبيت</string>
     <string name="unknown">غير معروف</string>
     <string name="installed_version">المثبت:  الإصدار  %1$s</string>
     <string name="latest_version">الأحدث:  الإصدار  %1$s</string>
     <string name="downloading_progress">جاري التحميل %1$d%%</string>
-    <string name="compact_mode">الوضع المضغوط</string>
-    <string name="read_more">قراءة المزيد</string>
     <string name="show_less">إظهار أقل</string>
-    <string name="reinstall">إعادة التثبيت</string>
-    <string name="reinstall_started">بدأت إعادة التثبيت</string>
-    <string name="reinstall_completed">اكتملت إعادة التثبيت بنجاح</string>
-    <string name="reinstall_failed">فشلت إعادة التثبيت</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">بدء التحميل...</string>
@@ -50,7 +45,6 @@
     <string name="download_failed">فشل التحميل:  %1$s</string>
     <string name="download_failed_memory">فشل التحميل بسبب عدم كفاية الذاكرة. يرجى إغلاق التطبيقات الأخرى والمحاولة مرة أخرى.</string>
     <string name="download_failed_storage">فشل التحميل بسبب عدم كفاية مساحة التخزين. يرجى تحرير بعض المساحة والمحاولة مرة أخرى.</string>
-    <string name="insufficient_storage_error">مساحة التخزين غير كافية. المتاح:  %1$d ميجابايت. يرجى تحرير مساحة والمحاولة مرة أخرى.</string>
     <string name="download_cancelled">تم إلغاء التحميل</string>
     <string name="installation_started">بدأ التثبيت</string>
     <string name="installation_completed">اكتمل التثبيت بنجاح</string>
@@ -59,6 +53,7 @@
     <string name="installation_pending_user_action">في انتظار تأكيد المستخدم للتثبيت</string>
     <string name="uninstallation_started">بدأ إلغاء التثبيت</string>
     <string name="uninstallation_completed">اكتمل إلغاء التثبيت بنجاح</string>
+    <string name="uninstallation_cancelled">تم إلغاء إلغاء التثبيت من قبل المستخدم</string>
     <string name="uninstallation_failed">فشل إلغاء التثبيت:  %1$s</string>
     <string name="failed_start_uninstallation">فشل في بدء إلغاء التثبيت</string>
     <string name="failed_open_app">فشل في فتح التطبيق</string>
@@ -71,39 +66,19 @@
     <string name="app_status_updated">تم تحديث حالة التطبيق</string>
     <string name="apps_updated">تم تحديث %1$d تطبيقات</string>
     <string name="configuration_saved">تم حفظ الإعدادات</string>
-    <string name="error_applying_language">فشل في تطبيق اللغة</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">فشل التثبيت</string>
     <string name="uninstall_required_title">مطلوب إلغاء التثبيت</string>
-    <string name="language_changed_title">تم تغيير اللغة</string>
     <string name="reinstall_confirmation_title">إعادة تثبيت التطبيق</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">فشل التثبيت:  %1$s\n\nهل تريد إعادة المحاولة؟ سيتم إلغاء تثبيت الإصدار القديم أولاً إذا كان موجوداً.</string>
     <string name="uninstall_required_message">لإعادة محاولة تثبيت %1$s، يجب إلغاء تثبيت الإصدار القديم أولاً. المتابعة؟</string>
-    <string name="language_changed_message">تم تغيير اللغة إلى %1$s.\n\nإعادة تشغيل التطبيق الآن لتطبيق التغييرات؟</string>
     <string name="reinstall_confirmation_message">سيؤدي هذا إلى إلغاء تثبيت الإصدار الحالي من %1$s وتحميل وتثبيت أحدث إصدار.\n\nهل تريد المتابعة؟</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">اكتمل تحميل %1$s وجاهز للتثبيت</string>
-    <string name="auto_install_enabled">تم تفعيل التثبيت التلقائي</string>
-    <string name="auto_install_disabled">تم إلغاء تفعيل التثبيت التلقائي</string>
-    <string name="pending_downloads_found">تم العثور على %1$d تحميلات معلقة</string>
-    <string name="background_download_completed">اكتمل التحميل في الخلفية</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">اكتملت التحميلات</string>
-    <string name="downloads_complete_summary">%1$d مكتمل، %2$d فشل</string>
-    <string name="successfully_downloaded">تم التحميل بنجاح (%1$d)</string>
-    <string name="failed_downloads">التحميلات الفاشلة (%1$d)</string>
-    <string name="install_all_button">تثبيت الكل (%1$d)</string>
-    <string name="install_button">تثبيت</string>
     <string name="close_button">إغلاق</string>
-    <string name="installing_multiple_apps">جاري تثبيت %1$d تطبيقات...</string>
-    <string name="installing_single_app">جاري تثبيت %1$s...</string>
-    <string name="downloads_in_progress">التحميلات قيد التقدم</string>
-    <string name="concurrent_downloads_active">%1$d تحميلات نشطة</string>
 
     <!-- Filter -->
     <string name="filter_label">تصفية</string>
@@ -112,6 +87,27 @@
     <string name="filter_not_installed">غير مثبت</string>
     <string name="filter_updates">تحديثات</string>
     <string name="no_apps_for_filter">لا توجد تطبيقات تطابق هذا الفلتر</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">وضع التصحيح</string>
+    <string name="debug_mode_description">حفظ سجلات مفصّلة لاستكشاف الأخطاء (7 أيام كحد أقصى)</string>
+    <string name="debug_view_logs">عرض السجلات</string>
+    <string name="debug_share_logs">مشاركة السجلات</string>
+    <string name="debug_logs_title">سجلات التصحيح</string>
+    <string name="debug_no_logs_available">لا توجد سجلات.\nفعّل وضع التصحيح وكرّر المشكلة أولاً.</string>
+    <string name="debug_no_logs_to_share">لا توجد سجلات للمشاركة</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">رجوع</string>
+    <string name="save">حفظ</string>
+    <string name="settings_section_appearance">المظهر</string>
+    <string name="settings_section_display">العرض</string>
+    <string name="settings_section_debug">التصحيح</string>
+    <string name="settings_section_danger_zone">منطقة خطرة</string>
+    <string name="settings_reset_button">إعادة ضبط جميع الإعدادات</string>
+    <string name="settings_reset_confirm_title">إعادة ضبط الإعدادات؟</string>
+    <string name="settings_reset_confirm_message">ستُعاد جميع الإعدادات إلى قيمها الافتراضية. لا يمكن التراجع عن هذا.</string>
+    <string name="settings_reset_to_defaults">تمت إعادة ضبط الإعدادات</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">المفضلة</string>

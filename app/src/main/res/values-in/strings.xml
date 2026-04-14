@@ -5,13 +5,11 @@
     <string name="settings">Pengaturan</string>
     <string name="theme">Tema</string>
     <string name="language">Bahasa</string>
+    <string name="compact_mode">Mode Kompak</string>
     <string name="theme_light">Terang</string>
     <string name="theme_dark">Gelap</string>
     <string name="theme_system">Sistem</string>
-    <string name="apply">Terapkan</string>
     <string name="cancel">Batal</string>
-    <string name="restart_app">Mulai Ulang Aplikasi</string>
-    <string name="restart_later">Nanti</string>
     <string name="select_language">Pilih Bahasa</string>
     <string name="tap_to_change">Ketuk untuk mengubah</string>
     
@@ -20,6 +18,7 @@
     <string name="retry">Coba Lagi</string>
     <string name="loading_apps_message">Memuat aplikasi...</string>
     <string name="error_prefix">Error: %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">Cari aplikasi…</string>
     <string name="no_apps_found">Tidak ada aplikasi untuk \"%1$s\"</string>
     <string name="no_apps_available">Tidak ada aplikasi tersedia</string>
@@ -29,13 +28,16 @@
     <string name="update">Perbarui</string>
     <string name="open">Buka</string>
     <string name="uninstall">Hapus</string>
-    <string name="downloading">Mengunduh</string>
+    <string name="reinstall">Instal Ulang</string>
+    <string name="reinstall_started">Instalasi ulang dimulai</string>
+    <string name="reinstall_failed">Instalasi ulang gagal</string>
     <string name="installing">Memasang</string>
     <string name="uninstalling">Menghapus</string>
     <string name="unknown">Tidak diketahui</string>
     <string name="installed_version">Terpasang: v%1$s</string>
     <string name="latest_version">Terbaru: v%1$s</string>
     <string name="downloading_progress">Mengunduh %1$d%%</string>
+    <string name="show_less">Tampilkan Lebih Sedikit</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Memulai unduhan...</string>
@@ -43,7 +45,6 @@
     <string name="download_failed">Unduhan gagal: %1$s</string>
     <string name="download_failed_memory">Unduhan gagal karena memori tidak cukup. Tutup aplikasi lain dan coba lagi.</string>
     <string name="download_failed_storage">Unduhan gagal karena ruang penyimpanan tidak cukup. Kosongkan ruang dan coba lagi.</string>
-    <string name="insufficient_storage_error">Ruang penyimpanan tidak cukup. Tersedia: %1$d MB. Kosongkan ruang dan coba lagi.</string>
     <string name="download_cancelled">Unduhan dibatalkan</string>
     <string name="installation_started">Instalasi dimulai</string>
     <string name="installation_completed">Instalasi berhasil</string>
@@ -52,6 +53,7 @@
     <string name="installation_pending_user_action">Menunggu konfirmasi pengguna untuk instalasi</string>
     <string name="uninstallation_started">Penghapusan dimulai</string>
     <string name="uninstallation_completed">Penghapusan berhasil</string>
+    <string name="uninstallation_cancelled">Penghapusan dibatalkan oleh pengguna</string>
     <string name="uninstallation_failed">Penghapusan gagal: %1$s</string>
     <string name="failed_start_uninstallation">Gagal memulai penghapusan</string>
     <string name="failed_open_app">Gagal membuka aplikasi</string>
@@ -59,19 +61,24 @@
     <string name="old_version_uninstalled">Versi lama dihapus, mencoba instalasi lagi...</string>
     <string name="failed_uninstall_old_version">Gagal menghapus versi lama</string>
     <string name="failed_uninstall_old_version_error">Gagal menghapus versi lama: %1$s</string>
+    <string name="app_not_installed_proceeding">Aplikasi tidak terpasang, melanjutkan instalasi...</string>
+    <string name="installation_cancelled_by_user">Instalasi dibatalkan oleh pengguna</string>
     <string name="app_status_updated">Status aplikasi diperbarui</string>
+    <string name="apps_updated">%1$d aplikasi diperbarui</string>
     <string name="configuration_saved">Konfigurasi tersimpan</string>
-    <string name="error_applying_language">Gagal menerapkan bahasa</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">Instalasi Gagal</string>
     <string name="uninstall_required_title">Penghapusan Diperlukan</string>
-    <string name="language_changed_title">Bahasa Diubah</string>
+    <string name="reinstall_confirmation_title">Konfirmasi Instalasi Ulang</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">Instalasi gagal: %1$s\n\nCoba lagi? Ini akan menghapus versi lama terlebih dahulu jika ada.</string>
     <string name="uninstall_required_message">Untuk mencoba instalasi %1$s lagi, versi lama perlu dihapus dulu. Lanjutkan?</string>
-    <string name="language_changed_message">Bahasa telah diubah ke %1$s.\n\nMulai ulang aplikasi sekarang untuk menerapkan perubahan?</string>
+    <string name="reinstall_confirmation_message">Apakah Anda yakin ingin menginstal ulang %1$s? Ini akan menghapus versi saat ini dan menginstal yang terbaru.\n\nLanjutkan?</string>
+    
+    <!-- Concurrent Downloads Dialog -->
+    <string name="close_button">Tutup</string>
 
     <!-- Filter -->
     <string name="filter_label">Filter</string>
@@ -81,6 +88,27 @@
     <string name="filter_updates">Pembaruan</string>
     <string name="no_apps_for_filter">Tidak ada aplikasi yang cocok dengan filter ini</string>
 
+    <!-- Debug Mode -->
+    <string name="debug_mode">Mode Debug</string>
+    <string name="debug_mode_description">Simpan log detail untuk pemecahan masalah (maks. 7 hari)</string>
+    <string name="debug_view_logs">Lihat Log</string>
+    <string name="debug_share_logs">Bagikan Log</string>
+    <string name="debug_logs_title">Log Debug</string>
+    <string name="debug_no_logs_available">Tidak ada log.\nAktifkan mode debug dan reproduksi masalah terlebih dahulu.</string>
+    <string name="debug_no_logs_to_share">Tidak ada log untuk dibagikan</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">Kembali</string>
+    <string name="save">Simpan</string>
+    <string name="settings_section_appearance">Tampilan</string>
+    <string name="settings_section_display">Layar</string>
+    <string name="settings_section_debug">Debug</string>
+    <string name="settings_section_danger_zone">Zona Berbahaya</string>
+    <string name="settings_reset_button">Reset semua pengaturan</string>
+    <string name="settings_reset_confirm_title">Reset Pengaturan?</string>
+    <string name="settings_reset_confirm_message">Semua pengaturan akan direset ke default. Ini tidak dapat dibatalkan.</string>
+    <string name="settings_reset_to_defaults">Pengaturan direset</string>
+
     <!-- Favorites -->
     <string name="filter_favorites">Favorit</string>
     <string name="favorite_add_title">Tambah ke favorit</string>
@@ -88,4 +116,4 @@
     <string name="favorite_added">Ditambahkan ke favorit</string>
     <string name="favorite_removed">Dihapus dari favorit</string>
     <string name="no_favorites_yet">Belum ada favorit. Ketuk bintang pada app untuk menambahkan.</string>
-</resources> 
+</resources>

@@ -1,3 +1,0 @@
-gradlew revancedDebug
-
-pause 

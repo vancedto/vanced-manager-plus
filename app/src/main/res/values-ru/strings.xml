@@ -5,19 +5,20 @@
     <string name="settings">Настройки</string>
     <string name="theme">Тема</string>
     <string name="language">Язык</string>
+    <string name="compact_mode">Компактный режим</string>
     <string name="theme_light">Светлая</string>
     <string name="theme_dark">Тёмная</string>
     <string name="theme_system">Системная</string>
-    <string name="apply">Применить</string>
     <string name="cancel">Отмена</string>
-    <string name="restart_app">Перезапустить</string>
-    <string name="restart_later">Позже</string>
+    <string name="select_language">Выберите язык</string>
+    <string name="tap_to_change">Нажмите, чтобы изменить</string>
     
     <!-- Main Screen -->
     <string name="confirm">Подтвердить</string>
     <string name="retry">Повторить</string>
     <string name="loading_apps_message">Загрузка приложений...</string>
     <string name="error_prefix">Ошибка: %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">Поиск приложений…</string>
     <string name="no_apps_found">Приложения для «%1$s» не найдены</string>
     <string name="no_apps_available">Нет доступных приложений</string>
@@ -27,13 +28,16 @@
     <string name="update">Обновить</string>
     <string name="open">Открыть</string>
     <string name="uninstall">Удалить</string>
-    <string name="downloading">Скачивание</string>
+    <string name="reinstall">Переустановить</string>
+    <string name="reinstall_started">Переустановка начата</string>
+    <string name="reinstall_failed">Переустановка не удалась</string>
     <string name="installing">Установка</string>
     <string name="uninstalling">Удаление</string>
     <string name="unknown">Неизвестно</string>
     <string name="installed_version">Установлено: v%1$s</string>
     <string name="latest_version">Последняя: v%1$s</string>
     <string name="downloading_progress">Скачивание %1$d%%</string>
+    <string name="show_less">Показать меньше</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Начинается скачивание...</string>
@@ -41,7 +45,6 @@
     <string name="download_failed">Скачивание не удалось: %1$s</string>
     <string name="download_failed_memory">Скачивание не удалось из-за нехватки памяти. Закройте другие приложения и попробуйте снова.</string>
     <string name="download_failed_storage">Скачивание не удалось из-за нехватки места. Освободите место и попробуйте снова.</string>
-    <string name="insufficient_storage_error">Недостаточно места. Доступно: %1$d МБ. Освободите место и попробуйте снова.</string>
     <string name="download_cancelled">Скачивание отменено</string>
     <string name="installation_started">Установка начата</string>
     <string name="installation_completed">Установка успешно завершена</string>
@@ -50,6 +53,7 @@
     <string name="installation_pending_user_action">Ожидание подтверждения пользователя для установки</string>
     <string name="uninstallation_started">Удаление начато</string>
     <string name="uninstallation_completed">Удаление успешно завершено</string>
+    <string name="uninstallation_cancelled">Удаление отменено пользователем</string>
     <string name="uninstallation_failed">Удаление не удалось: %1$s</string>
     <string name="failed_start_uninstallation">Не удалось начать удаление</string>
     <string name="failed_open_app">Не удалось открыть приложение</string>
@@ -57,61 +61,24 @@
     <string name="old_version_uninstalled">Старая версия удалена, повторная установка...</string>
     <string name="failed_uninstall_old_version">Не удалось удалить старую версию</string>
     <string name="failed_uninstall_old_version_error">Не удалось удалить старую версию: %1$s</string>
+    <string name="app_not_installed_proceeding">Приложение не установлено, продолжение установки...</string>
+    <string name="installation_cancelled_by_user">Установка отменена пользователем</string>
     <string name="app_status_updated">Статус приложения обновлён</string>
+    <string name="apps_updated">Приложения обновлены</string>
     <string name="configuration_saved">Конфигурация сохранена</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">Установка не удалась</string>
     <string name="uninstall_required_title">Требуется удаление</string>
-    <string name="language_changed_title">Язык изменён</string>
+    <string name="reinstall_confirmation_title">Подтвердить переустановку</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">Установка не удалась: %1$s\n\nПопробовать снова? Это сначала удалит старую версию, если она существует.</string>
     <string name="uninstall_required_message">Чтобы повторить установку %1$s, сначала нужно удалить старую версию. Продолжить?</string>
-    <string name="language_changed_message">Язык изменён на %1$s.\n\nПерезапустить приложение сейчас, чтобы применить изменения?</string>
-    
-    <!-- Language Selection -->
-    <string name="select_language">Выберите язык</string>
-    <string name="tap_to_change">Нажмите, чтобы изменить</string>
-    
-    <!-- Compact Mode -->
-    <string name="compact_mode">Компактный режим</string>
-    
-    <!-- Read More/Show Less -->
-    <string name="read_more">Читать далее</string>
-    <string name="show_less">Показать меньше</string>
-    
-    <!-- Reinstall Feature -->
-    <string name="reinstall">Переустановить</string>
-    <string name="reinstall_started">Переустановка начата</string>
-    <string name="reinstall_completed">Переустановка завершена</string>
-    <string name="reinstall_failed">Переустановка не удалась</string>
-    <string name="app_not_installed_proceeding">Приложение не установлено, продолжение установки...</string>
-    <string name="installation_cancelled_by_user">Установка отменена пользователем</string>
-    <string name="apps_updated">Приложения обновлены</string>
-    <string name="error_applying_language">Ошибка применения языка: %1$s</string>
-    <string name="reinstall_confirmation_title">Подтвердить переустановку</string>
     <string name="reinstall_confirmation_message">Вы уверены, что хотите переустановить %1$s? Это удалит текущую версию и установит новую.</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">Загрузка завершена и готова к установке</string>
-    <string name="auto_install_enabled">Автоустановка включена</string>
-    <string name="auto_install_disabled">Автоустановка отключена</string>
-    <string name="pending_downloads_found">Найдены ожидающие загрузки</string>
-    <string name="background_download_completed">Фоновая загрузка завершена</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">Загрузки завершены</string>
-    <string name="downloads_complete_summary">%1$d из %2$d приложений успешно загружены</string>
-    <string name="successfully_downloaded">Успешно загружено:</string>
-    <string name="failed_downloads">Неудачные загрузки:</string>
-    <string name="install_all_button">Установить все</string>
-    <string name="install_button">Установить</string>
     <string name="close_button">Закрыть</string>
-    <string name="installing_multiple_apps">Установка %1$d приложений...</string>
-    <string name="installing_single_app">Установка %1$s...</string>
-    <string name="downloads_in_progress">Загрузки в процессе</string>
-    <string name="concurrent_downloads_active">Активно %1$d одновременных загрузок</string>
 
     <!-- Filter -->
     <string name="filter_label">Фильтр</string>
@@ -120,6 +87,27 @@
     <string name="filter_not_installed">Не установленные</string>
     <string name="filter_updates">Обновления</string>
     <string name="no_apps_for_filter">Нет приложений по этому фильтру</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">Режим отладки</string>
+    <string name="debug_mode_description">Сохраняет подробные журналы (макс. 7 дней)</string>
+    <string name="debug_view_logs">Просмотр журналов</string>
+    <string name="debug_share_logs">Поделиться журналами</string>
+    <string name="debug_logs_title">Журналы отладки</string>
+    <string name="debug_no_logs_available">Журналов нет.\nВключите режим отладки и воспроизведите проблему.</string>
+    <string name="debug_no_logs_to_share">Нет журналов для отправки</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">Назад</string>
+    <string name="save">Сохранить</string>
+    <string name="settings_section_appearance">Внешний вид</string>
+    <string name="settings_section_display">Отображение</string>
+    <string name="settings_section_debug">Отладка</string>
+    <string name="settings_section_danger_zone">Опасная зона</string>
+    <string name="settings_reset_button">Сбросить все настройки</string>
+    <string name="settings_reset_confirm_title">Сбросить настройки?</string>
+    <string name="settings_reset_confirm_message">Все настройки вернутся к значениям по умолчанию. Это нельзя отменить.</string>
+    <string name="settings_reset_to_defaults">Настройки сброшены</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Избранное</string>

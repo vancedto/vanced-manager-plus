@@ -9,10 +9,7 @@
     <string name="theme_light">Clair</string>
     <string name="theme_dark">Sombre</string>
     <string name="theme_system">Système</string>
-    <string name="apply">Appliquer</string>
     <string name="cancel">Annuler</string>
-    <string name="restart_app">Redémarrer l\'app</string>
-    <string name="restart_later">Plus tard</string>
     <string name="select_language">Sélectionner la langue</string>
     <string name="tap_to_change">Appuyer pour changer</string>
     
@@ -21,6 +18,7 @@
     <string name="retry">Réessayer</string>
     <string name="loading_apps_message">Chargement des applications...</string>
     <string name="error_prefix">Erreur : %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">Rechercher des applications…</string>
     <string name="no_apps_found">Aucune app trouvée pour « %1$s »</string>
     <string name="no_apps_available">Aucune application disponible</string>
@@ -30,19 +28,16 @@
     <string name="update">Mettre à jour</string>
     <string name="open">Ouvrir</string>
     <string name="uninstall">Désinstaller</string>
-    <string name="downloading">Téléchargement</string>
+    <string name="reinstall">Réinstaller</string>
+    <string name="reinstall_started">Réinstallation démarrée</string>
+    <string name="reinstall_failed">Échec de la réinstallation</string>
     <string name="installing">Installation</string>
     <string name="uninstalling">Désinstallation</string>
     <string name="unknown">Inconnu</string>
     <string name="installed_version">Installé : v%1$s</string>
     <string name="latest_version">Dernière : v%1$s</string>
     <string name="downloading_progress">Téléchargement %1$d%%</string>
-    <string name="read_more">Lire plus</string>
     <string name="show_less">Afficher moins</string>
-    <string name="reinstall">Réinstaller</string>
-    <string name="reinstall_started">Réinstallation démarrée</string>
-    <string name="reinstall_completed">Réinstallation terminée avec succès</string>
-    <string name="reinstall_failed">Échec de la réinstallation</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Démarrage du téléchargement...</string>
@@ -50,7 +45,6 @@
     <string name="download_failed">Échec du téléchargement : %1$s</string>
     <string name="download_failed_memory">Échec du téléchargement en raison d\'une mémoire insuffisante. Fermez d\'autres applications et réessayez.</string>
     <string name="download_failed_storage">Échec du téléchargement en raison d\'un espace de stockage insuffisant. Libérez de l\'espace et réessayez.</string>
-    <string name="insufficient_storage_error">Espace de stockage insuffisant. Disponible : %1$d MB. Libérez de l\'espace et réessayez.</string>
     <string name="download_cancelled">Téléchargement annulé</string>
     <string name="installation_started">Installation démarrée</string>
     <string name="installation_completed">Installation terminée avec succès</string>
@@ -59,6 +53,7 @@
     <string name="installation_pending_user_action">En attente de confirmation utilisateur pour installer</string>
     <string name="uninstallation_started">Désinstallation démarrée</string>
     <string name="uninstallation_completed">Désinstallation terminée avec succès</string>
+    <string name="uninstallation_cancelled">Désinstallation annulée par l\'utilisateur</string>
     <string name="uninstallation_failed">Échec de la désinstallation : %1$s</string>
     <string name="failed_start_uninstallation">Échec du démarrage de la désinstallation</string>
     <string name="failed_open_app">Échec de l\'ouverture de l\'application</string>
@@ -71,39 +66,19 @@
     <string name="app_status_updated">Statut de l\'application mis à jour</string>
     <string name="apps_updated">%1$d applications mises à jour</string>
     <string name="configuration_saved">Configuration sauvegardée</string>
-    <string name="error_applying_language">Échec de l\'application de la langue</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">Installation échouée</string>
     <string name="uninstall_required_title">Désinstallation requise</string>
-    <string name="language_changed_title">Langue modifiée</string>
     <string name="reinstall_confirmation_title">Réinstaller l\'application</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">Installation échouée : %1$s\n\nVoulez-vous réessayer ? Cela désinstallera d\'abord l\'ancienne version si elle existe.</string>
     <string name="uninstall_required_message">Pour réessayer l\'installation de %1$s, l\'ancienne version doit d\'abord être désinstallée. Continuer ?</string>
-    <string name="language_changed_message">La langue a été changée pour %1$s.\n\nRedémarrer l\'application maintenant pour appliquer les modifications ?</string>
     <string name="reinstall_confirmation_message">Cela désinstallera la version actuelle de %1$s et téléchargera et installera la dernière version.\n\nVoulez-vous continuer ?</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">%1$s téléchargement terminé et prêt à installer</string>
-    <string name="auto_install_enabled">Installation automatique activée</string>
-    <string name="auto_install_disabled">Installation automatique désactivée</string>
-    <string name="pending_downloads_found">%1$d téléchargements en attente trouvés</string>
-    <string name="background_download_completed">Téléchargement en arrière-plan terminé</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">Téléchargements terminés</string>
-    <string name="downloads_complete_summary">%1$d terminés, %2$d échoués</string>
-    <string name="successfully_downloaded">Téléchargés avec succès (%1$d)</string>
-    <string name="failed_downloads">Téléchargements échoués (%1$d)</string>
-    <string name="install_all_button">Tout installer (%1$d)</string>
-    <string name="install_button">Installer</string>
     <string name="close_button">Fermer</string>
-    <string name="installing_multiple_apps">Installation de %1$d applications...</string>
-    <string name="installing_single_app">Installation de %1$s...</string>
-    <string name="downloads_in_progress">Téléchargements en cours</string>
-    <string name="concurrent_downloads_active">%1$d téléchargements actifs</string>
 
     <!-- Filter -->
     <string name="filter_label">Filtrer</string>
@@ -112,6 +87,27 @@
     <string name="filter_not_installed">Non installés</string>
     <string name="filter_updates">Mises à jour</string>
     <string name="no_apps_for_filter">Aucune app ne correspond à ce filtre</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">Mode débogage</string>
+    <string name="debug_mode_description">Enregistre les journaux détaillés (max 7 jours)</string>
+    <string name="debug_view_logs">Voir les journaux</string>
+    <string name="debug_share_logs">Partager les journaux</string>
+    <string name="debug_logs_title">Journaux de débogage</string>
+    <string name="debug_no_logs_available">Aucun journal.\nActivez le mode débogage et reproduisez le problème.</string>
+    <string name="debug_no_logs_to_share">Aucun journal à partager</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">Retour</string>
+    <string name="save">Enregistrer</string>
+    <string name="settings_section_appearance">Apparence</string>
+    <string name="settings_section_display">Affichage</string>
+    <string name="settings_section_debug">Débogage</string>
+    <string name="settings_section_danger_zone">Zone dangereuse</string>
+    <string name="settings_reset_button">Réinitialiser tous les paramètres</string>
+    <string name="settings_reset_confirm_title">Réinitialiser les paramètres ?</string>
+    <string name="settings_reset_confirm_message">Tous les paramètres seront réinitialisés. Cette action est irréversible.</string>
+    <string name="settings_reset_to_defaults">Paramètres réinitialisés</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favoris</string>

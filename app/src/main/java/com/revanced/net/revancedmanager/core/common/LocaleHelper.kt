@@ -21,13 +21,14 @@ class LocaleHelper {
         fun setLocale(context: Context, language: String): Context {
             val locale = Locale(language)
             Locale.setDefault(locale)
-            
-            val config = Configuration()
+
+            // Copy full configuration (density, screen size, night mode…) then override locale only
+            val config = Configuration(context.resources.configuration)
             config.setLocale(locale)
-            
+
             android.util.Log.d(TAG, "Setting locale to: $language")
             android.util.Log.d(TAG, "Default locale now: ${Locale.getDefault()}")
-            
+
             return context.createConfigurationContext(config)
         }
         

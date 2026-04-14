@@ -5,19 +5,20 @@
     <string name="settings">Mga Setting</string>
     <string name="theme">Tema</string>
     <string name="language">Wika</string>
+    <string name="compact_mode">Compact Mode</string>
     <string name="theme_light">Maliwanag</string>
     <string name="theme_dark">Madilim</string>
     <string name="theme_system">Sistema</string>
-    <string name="apply">Gamitin</string>
     <string name="cancel">Kanselahin</string>
-    <string name="restart_app">I-restart ang App</string>
-    <string name="restart_later">Mamaya</string>
+    <string name="select_language">Pumili ng Wika</string>
+    <string name="tap_to_change">I-tap para baguhin</string>
     
     <!-- Main Screen -->
     <string name="confirm">Kumpirmahin</string>
     <string name="retry">Subukan Ulit</string>
     <string name="loading_apps_message">Naglo-load ng mga app...</string>
     <string name="error_prefix">Error: %1$s</string>
+    <string name="app_subtitle">by vanced.to</string>
     <string name="search_apps">Maghanap ng apps…</string>
     <string name="no_apps_found">Walang nahanap na apps para sa \"%1$s\"</string>
     <string name="no_apps_available">Walang available na apps</string>
@@ -27,13 +28,16 @@
     <string name="update">I-update</string>
     <string name="open">Buksan</string>
     <string name="uninstall">I-uninstall</string>
-    <string name="downloading">Nagda-download</string>
+    <string name="reinstall">I-reinstall</string>
+    <string name="reinstall_started">Nagsimula ang pag-reinstall</string>
+    <string name="reinstall_failed">Nabigo ang pag-reinstall</string>
     <string name="installing">Nag-i-install</string>
     <string name="uninstalling">Nag-a-uninstall</string>
     <string name="unknown">Hindi alam</string>
     <string name="installed_version">Naka-install: v%1$s</string>
     <string name="latest_version">Pinakabago: v%1$s</string>
     <string name="downloading_progress">Nagda-download %1$d%%</string>
+    <string name="show_less">Ipakita ang mas kaunti</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Nagsisimula ang download...</string>
@@ -41,7 +45,6 @@
     <string name="download_failed">Nabigo ang download: %1$s</string>
     <string name="download_failed_memory">Nabigo ang download dahil kulang ang memory. Isara ang ibang apps at subukan ulit.</string>
     <string name="download_failed_storage">Nabigo ang download dahil kulang ang storage space. Mag-free up ng space at subukan ulit.</string>
-    <string name="insufficient_storage_error">Kulang ang storage space. Available: %1$d MB. Mag-free up ng space at subukan ulit.</string>
     <string name="download_cancelled">Kinansela ang download</string>
     <string name="installation_started">Nagsimula ang pag-install</string>
     <string name="installation_completed">Matagumpay na natapos ang pag-install</string>
@@ -50,6 +53,7 @@
     <string name="installation_pending_user_action">Naghihintay ng confirmation ng user para sa pag-install</string>
     <string name="uninstallation_started">Nagsimula ang pag-uninstall</string>
     <string name="uninstallation_completed">Matagumpay na natapos ang pag-uninstall</string>
+    <string name="uninstallation_cancelled">Kinansela ng user ang pag-uninstall</string>
     <string name="uninstallation_failed">Nabigo ang pag-uninstall: %1$s</string>
     <string name="failed_start_uninstallation">Hindi magsimula ang pag-uninstall</string>
     <string name="failed_open_app">Hindi mabuksan ang app</string>
@@ -57,65 +61,24 @@
     <string name="old_version_uninstalled">Na-uninstall ang lumang version, susubukan ulit ang pag-install...</string>
     <string name="failed_uninstall_old_version">Hindi ma-uninstall ang lumang version</string>
     <string name="failed_uninstall_old_version_error">Hindi ma-uninstall ang lumang version: %1$s</string>
+    <string name="app_not_installed_proceeding">Hindi naka-install ang app, magpapatuloy sa download</string>
+    <string name="installation_cancelled_by_user">Kinansela ng user ang pag-install</string>
     <string name="app_status_updated">Na-update ang status ng app</string>
+    <string name="apps_updated">Na-update ang mga app</string>
     <string name="configuration_saved">Na-save ang configuration</string>
     
     <!-- Dialog Titles -->
     <string name="installation_failed_title">Nabigo ang Pag-install</string>
     <string name="uninstall_required_title">Kailangan ng Pag-uninstall</string>
-    <string name="language_changed_title">Nabago ang Wika</string>
+    <string name="reinstall_confirmation_title">Kumpirmahin ang Pag-reinstall</string>
     
     <!-- Dialog Messages -->
     <string name="installation_failed_retry_message">Nabigo ang pag-install: %1$s\n\nGusto mo bang subukan ulit? Ito ay mag-u-uninstall muna ng lumang version kung meron.</string>
     <string name="uninstall_required_message">Para subukan ulit ang pag-install ng %1$s, kailangan muna i-uninstall ang lumang version. Magpatuloy?</string>
-    <string name="language_changed_message">Nabago na ang wika sa %1$s.\n\nI-restart ang app ngayon para ma-apply ang mga pagbabago?</string>
-    
-    <!-- Language Selection -->
-    <string name="select_language">Pumili ng Wika</string>
-    <string name="tap_to_change">I-tap para baguhin</string>
-    
-    <!-- Compact Mode -->
-    <string name="compact_mode">Compact Mode</string>
-    
-    <!-- Reinstall Feature -->
-    <string name="reinstall">I-reinstall</string>
-    <string name="reinstall_started">Nagsimula ang pag-reinstall</string>
-    <string name="reinstall_completed">Natapos ang pag-reinstall</string>
-    <string name="reinstall_failed">Nabigo ang pag-reinstall</string>
-    
-    <!-- Read More/Show Less -->
-    <string name="read_more">Basahin pa</string>
-    <string name="show_less">Ipakita ang mas kaunti</string>
-    
-    <!-- Additional Installation Messages -->
-    <string name="app_not_installed_proceeding">Hindi naka-install ang app, magpapatuloy sa download</string>
-    <string name="installation_cancelled_by_user">Kinansela ng user ang pag-install</string>
-    <string name="apps_updated">Na-update ang mga app</string>
-    <string name="error_applying_language">Error sa pag-apply ng wika</string>
-    
-    <!-- Reinstall Confirmation Dialog -->
-    <string name="reinstall_confirmation_title">Kumpirmahin ang Pag-reinstall</string>
     <string name="reinstall_confirmation_message">Sigurado ka bang gusto mong i-reinstall ang %1$s? Ito ay mag-u-uninstall ng kasalukuyang version at mag-i-install ng pinakabagong version.</string>
     
-    <!-- Auto-install and Background Download -->
-    <string name="download_completed_ready_to_install">Tapos na ang download at handa na para sa pag-install</string>
-    <string name="auto_install_enabled">Na-enable ang auto-install</string>
-    <string name="auto_install_disabled">Na-disable ang auto-install</string>
-    <string name="pending_downloads_found">May nahanap na pending downloads</string>
-    <string name="background_download_completed">Tapos na ang background download</string>
-    
     <!-- Concurrent Downloads Dialog -->
-    <string name="downloads_complete_title">Tapos na ang mga Download</string>
-    <string name="downloads_complete_summary">%1$d sa %2$d downloads ang matagumpay na natapos</string>
-    <string name="successfully_downloaded">Matagumpay na na-download</string>
-    <string name="failed_downloads">Nabigong downloads</string>
-    <string name="install_all_button">I-install Lahat</string>
-    <string name="install_button">I-install</string>
     <string name="close_button">Isara</string>
-    <string name="installing_multiple_apps">Nag-i-install ng %1$d apps</string>
-    <string name="installing_single_app">Nag-i-install ng %1$s</string>
-    <string name="downloads_in_progress">May mga download na tumatakbo</string>
-    <string name="concurrent_downloads_active">%1$d concurrent downloads na aktibo</string>
 
     <!-- Filter -->
     <string name="filter_label">I-filter</string>
@@ -124,6 +87,27 @@
     <string name="filter_not_installed">Hindi naka-install</string>
     <string name="filter_updates">Mga Update</string>
     <string name="no_apps_for_filter">Walang app na tumutugma sa filter na ito</string>
+
+    <!-- Debug Mode -->
+    <string name="debug_mode">Debug Mode</string>
+    <string name="debug_mode_description">Nag-iimbak ng detalyadong logs (max 7 araw)</string>
+    <string name="debug_view_logs">Tingnan ang Logs</string>
+    <string name="debug_share_logs">Ibahagi ang Logs</string>
+    <string name="debug_logs_title">Mga Debug Log</string>
+    <string name="debug_no_logs_available">Walang logs.\nI-enable ang debug mode at i-reproduce ang problema.</string>
+    <string name="debug_no_logs_to_share">Walang logs para ibahagi</string>
+
+    <!-- Settings Screen (full-screen) -->
+    <string name="back">Bumalik</string>
+    <string name="save">I-save</string>
+    <string name="settings_section_appearance">Hitsura</string>
+    <string name="settings_section_display">Display</string>
+    <string name="settings_section_debug">Debug</string>
+    <string name="settings_section_danger_zone">Danger Zone</string>
+    <string name="settings_reset_button">I-reset ang lahat ng settings</string>
+    <string name="settings_reset_confirm_title">I-reset ang Settings?</string>
+    <string name="settings_reset_confirm_message">Lahat ng settings ay ibabalik sa default. Hindi ito maibabalik.</string>
+    <string name="settings_reset_to_defaults">Nai-reset ang settings</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Mga Paborito</string>
