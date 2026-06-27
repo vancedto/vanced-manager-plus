@@ -3,8 +3,8 @@
 
     <style name="Theme.RevancedManager" parent="android:Theme.Material.Light.NoActionBar" />
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <!-- Set the splash screen background color to black -->
-        <item name="windowSplashScreenBackground">@color/black</item>
+        <!-- Splash background matches the dark theme app background for a seamless transition -->
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
 
         <!-- Use the app icon as the splash image -->
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>

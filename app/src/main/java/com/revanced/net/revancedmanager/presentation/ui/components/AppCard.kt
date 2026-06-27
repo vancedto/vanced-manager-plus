@@ -17,11 +17,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowCircleUp
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.InstallMobile
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
@@ -80,12 +84,16 @@ fun AppCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 4.dp),
-        shape = RoundedCornerShape(8.dp),
+            .padding(horizontal = 14.dp, vertical = 6.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = androidx.compose.foundation.BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
+        )
     ) {
         Column(
             modifier = Modifier
@@ -100,7 +108,9 @@ fun AppCard(
                 SubcomposeAsyncImage(
                     model = app.iconUrl,
                     contentDescription = "${app.title} icon",
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(10.dp)),
                     contentScale = ContentScale.Crop,
                     loading = {
                         CircularProgressIndicator(
@@ -346,7 +356,7 @@ fun AppCard(
                                     .size(26.dp)
                                     .background(
                                         color = MaterialTheme.colorScheme.uninstallColor,
-                                        shape = RoundedCornerShape(4.dp)
+                                        shape = RoundedCornerShape(8.dp)
                                     )
                                     .clickable { onUninstallClick() },
                                 contentAlignment = Alignment.Center
@@ -436,32 +446,34 @@ private fun AppStatusIndicator(
 ) {
     when (status) {
         AppStatus.UP_TO_DATE -> {
-            Text(
-                text = "✓",
-                color = Color(0xFF4CAF50),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = modifier
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = null,
+                tint = Color(0xFF10B981),
+                modifier = modifier.size(18.dp)
             )
         }
         AppStatus.UPDATE_AVAILABLE -> {
-            Text(
-                text = "↑",
-                color = Color(0xFFFF9800),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = modifier
+            Icon(
+                imageVector = Icons.Default.ArrowCircleUp,
+                contentDescription = null,
+                tint = Color(0xFFF59E0B),
+                modifier = modifier.size(18.dp)
             )
         }
         AppStatus.DOWNLOADING, AppStatus.INSTALLING, AppStatus.UNINSTALLING -> {
             CircularProgressIndicator(
-                modifier = modifier.size(16.dp),
-                strokeWidth = 1.5.dp
+                modifier = modifier.size(18.dp),
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.primary
             )
         }
         AppStatus.READY_TO_INSTALL -> {
-            Text(
-                text = "📦",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = modifier
+            Icon(
+                imageVector = Icons.Default.InstallMobile,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = modifier.size(18.dp)
             )
         }
         else -> {
@@ -492,7 +504,7 @@ private fun CompactActionButton(
             disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
             disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
-        shape = RoundedCornerShape(4.dp),
+        shape = RoundedCornerShape(8.dp),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(
             horizontal = 3.dp,
             vertical = 2.dp

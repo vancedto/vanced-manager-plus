@@ -26,8 +26,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Coffee
@@ -68,6 +69,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -81,6 +83,7 @@ import com.revanced.net.revancedmanager.presentation.bloc.AppState
 import com.revanced.net.revancedmanager.presentation.bloc.DialogState
 import com.revanced.net.revancedmanager.presentation.bloc.shareDebugLogs
 import com.revanced.net.revancedmanager.presentation.ui.components.AppCard
+import com.revanced.net.revancedmanager.presentation.ui.theme.noiseBackground
 import kotlinx.coroutines.delay
 
 /**
@@ -96,6 +99,8 @@ fun MainScreen(
     val toastMessage by viewModel.toastMessage.collectAsState()
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val background = MaterialTheme.colorScheme.background
+    val noiseAlpha = if (background.luminance() < 0.1f) 0.08f else 0.05f
 
     val showSettings = when (val s = state) {
         is AppState.Success -> s.showSettings
@@ -131,7 +136,10 @@ fun MainScreen(
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .noiseBackground(background, noiseAlpha)
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = Color.Transparent,
         topBar = {
             if (showSettings) {
                 TopAppBar(
@@ -145,11 +153,15 @@ fun MainScreen(
                     navigationIcon = {
                         IconButton(onClick = { viewModel.handleEvent(AppEvent.NavigateBackFromSettings) }) {
                             Icon(
-                                imageVector = Icons.Filled.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = stringResource(R.string.back)
                             )
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent,
+                    )
                 )
             } else {
                 TopAppBar(
@@ -181,7 +193,11 @@ fun MainScreen(
                             )
                         }
                     },
-                    scrollBehavior = scrollBehavior
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent,
+                    )
                 )
             }
         }
@@ -700,12 +716,14 @@ private fun SearchAndFilterBar(
                     }
                 },
                 singleLine = true,
-                shape = MaterialTheme.shapes.medium,
+                shape = RoundedCornerShape(12.dp),
                 colors = androidx.compose.material3.TextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                 ),
                 textStyle = MaterialTheme.typography.bodySmall
             )
@@ -753,55 +771,52 @@ private fun SearchAndFilterBar(
                     .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                val chipColors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+                    selectedLabelColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                val chipBorder = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = false,
+                    borderColor = MaterialTheme.colorScheme.outline,
+                    selectedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                )
                 FilterChip(
                     selected = filterOption == AppFilterOption.ALL,
                     onClick = { onFilterChange(AppFilterOption.ALL) },
-                    label = {
-                        Text(
-                            text = stringResource(R.string.filter_all),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
+                    label = { Text(text = stringResource(R.string.filter_all), style = MaterialTheme.typography.labelSmall) },
+                    colors = chipColors,
+                    border = chipBorder,
                 )
                 FilterChip(
                     selected = filterOption == AppFilterOption.INSTALLED,
                     onClick = { onFilterChange(AppFilterOption.INSTALLED) },
-                    label = {
-                        Text(
-                            text = stringResource(R.string.filter_installed),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
+                    label = { Text(text = stringResource(R.string.filter_installed), style = MaterialTheme.typography.labelSmall) },
+                    colors = chipColors,
+                    border = chipBorder,
                 )
                 FilterChip(
                     selected = filterOption == AppFilterOption.NOT_INSTALLED,
                     onClick = { onFilterChange(AppFilterOption.NOT_INSTALLED) },
-                    label = {
-                        Text(
-                            text = stringResource(R.string.filter_not_installed),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
+                    label = { Text(text = stringResource(R.string.filter_not_installed), style = MaterialTheme.typography.labelSmall) },
+                    colors = chipColors,
+                    border = chipBorder,
                 )
                 FilterChip(
                     selected = filterOption == AppFilterOption.UPDATES_AVAILABLE,
                     onClick = { onFilterChange(AppFilterOption.UPDATES_AVAILABLE) },
-                    label = {
-                        Text(
-                            text = stringResource(R.string.filter_updates),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
+                    label = { Text(text = stringResource(R.string.filter_updates), style = MaterialTheme.typography.labelSmall) },
+                    colors = chipColors,
+                    border = chipBorder,
                 )
                 FilterChip(
                     selected = filterOption == AppFilterOption.FAVORITES,
                     onClick = { onFilterChange(AppFilterOption.FAVORITES) },
-                    label = {
-                        Text(
-                            text = stringResource(R.string.filter_favorites),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
+                    label = { Text(text = stringResource(R.string.filter_favorites), style = MaterialTheme.typography.labelSmall) },
+                    colors = chipColors,
+                    border = chipBorder,
                 )
             }
         }

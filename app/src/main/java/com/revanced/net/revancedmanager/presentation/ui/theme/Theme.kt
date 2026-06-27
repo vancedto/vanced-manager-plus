@@ -11,116 +11,113 @@ import androidx.compose.ui.graphics.Color
 import com.revanced.net.revancedmanager.domain.model.ThemeMode
 import com.revanced.net.revancedmanager.ui.theme.Typography
 
-// Vibrant color palette for action buttons
-// Tailwind-inspired color palette
-// Light theme colors
+// ── Dark theme (bento-inspired) ──────────────────────────────────────────────
+private val DarkBackground    = Color(0xFF0C0E15)
+private val DarkSurface       = Color(0xFF13151F)
+private val DarkSurfaceVar    = Color(0xFF1B1E2C)
+private val DarkPrimary       = Color(0xFF7857FF)
+private val DarkSecondary     = Color(0xFFA3A8C0)
+private val DarkOnBackground  = Color(0xFFF0F2FF)
+private val DarkOnSurface     = Color(0xFFE2E6F8)
+private val DarkOnSurfaceVar  = Color(0xFF8890A8)
+private val DarkError         = Color(0xFFFF6B6B)
+private val DarkOnError       = Color(0xFF1A0A0A)
 
-// Primary colors - Blue variants
-private val Blue600 = Color(0xFF2563EB)
-private val Blue700 = Color(0xFF1D4ED8)
-private val Blue500 = Color(0xFF3B82F6)
-private val Blue400 = Color(0xFF60A5FA)
+// ── Light theme ───────────────────────────────────────────────────────────────
+private val LightBackground   = Color(0xFFF0F2F8)
+private val LightSurface      = Color(0xFFFFFFFF)
+private val LightSurfaceVar   = Color(0xFFE8ECF8)
+private val LightPrimary      = Color(0xFF5B3BF0)
+private val LightSecondary    = Color(0xFF64748B)
+private val LightOnBackground = Color(0xFF0F1226)
+private val LightOnSurface    = Color(0xFF1A1F3C)
+private val LightOnSurfaceVar = Color(0xFF475569)
+private val LightError        = Color(0xFFD32F2F)
+private val LightOnError      = Color(0xFFFFFFFF)
 
-// Success colors - Green variants
-private val Green600 = Color(0xFF059669)
-private val Green500 = Color(0xFF10B981)
-private val Green400 = Color(0xFF34D399)
-
-// Warning colors - Orange variants
-private val Orange600 = Color(0xFFEA580C)
-private val Orange500 = Color(0xFFF97316)
-private val Orange400 = Color(0xFFFB923C)
-
-// Error colors - Red variants
-private val Red600 = Color(0xFFDC2626)
-private val Red500 = Color(0xFFEF4444)
-private val Red400 = Color(0xFFF87171)
-
-// Neutral colors
-private val Slate100 = Color(0xFFF1F5F9)
-private val Slate200 = Color(0xFFE2E8F0)
-private val Slate600 = Color(0xFF475569)
-private val Slate700 = Color(0xFF334155)
-private val Slate800 = Color(0xFF1E293B)
-private val Slate900 = Color(0xFF0F172A)
-private val Gray50 = Color(0xFFF9FAFB)
-private val Gray100 = Color(0xFFF3F4F6)
-private val Gray900 = Color(0xFF111827)
-private val Zinc800 = Color(0xFF27272A)
-private val Zinc900 = Color(0xFF18181B)
-private val Zinc950 = Color(0xFF09090B)
+// ── Action button colors ──────────────────────────────────────────────────────
+private val DownloadDark   = Color(0xFF3B82F6)
+private val DownloadLight  = Color(0xFF2563EB)
+private val UpdateDark     = Color(0xFFF59E0B)
+private val UpdateLight    = Color(0xFFD97706)
+private val OpenDark       = Color(0xFF10B981)
+private val OpenLight      = Color(0xFF059669)
+private val UninstallDark  = Color(0xFFEF4444)
+private val UninstallLight = Color(0xFFDC2626)
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Blue500,
-    secondary = Slate600,
-    tertiary = Blue400,
-    background = Zinc950,
-    surface = Zinc900,
-    surfaceVariant = Zinc800,
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Gray100,
-    onSurface = Gray100,
-    onSurfaceVariant = Slate200,
+    primary            = DarkPrimary,
+    onPrimary          = Color.White,
+    primaryContainer   = DarkPrimary.copy(alpha = 0.18f),
+    onPrimaryContainer = DarkOnBackground,
+    secondary          = DarkSecondary,
+    onSecondary        = Color.White,
+    tertiary           = DownloadDark,
+    onTertiary         = Color.White,
+    background         = DarkBackground,
+    onBackground       = DarkOnBackground,
+    surface            = DarkSurface,
+    onSurface          = DarkOnSurface,
+    surfaceVariant     = DarkSurfaceVar,
+    onSurfaceVariant   = DarkOnSurfaceVar,
+    error              = DarkError,
+    onError            = DarkOnError,
+    outline            = DarkOnSurface.copy(alpha = 0.12f),
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Blue600,
-    secondary = Slate600,
-    tertiary = Blue700,
-    background = Gray50,
-    surface = Color.White,
-    surfaceVariant = Gray100,
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Gray900,
-    onSurface = Gray900,
-    onSurfaceVariant = Slate800,
+    primary            = LightPrimary,
+    onPrimary          = Color.White,
+    primaryContainer   = LightPrimary.copy(alpha = 0.12f),
+    onPrimaryContainer = LightOnBackground,
+    secondary          = LightSecondary,
+    onSecondary        = Color.White,
+    tertiary           = DownloadLight,
+    onTertiary         = Color.White,
+    background         = LightBackground,
+    onBackground       = LightOnBackground,
+    surface            = LightSurface,
+    onSurface          = LightOnSurface,
+    surfaceVariant     = LightSurfaceVar,
+    onSurfaceVariant   = LightOnSurfaceVar,
+    error              = LightError,
+    onError            = LightOnError,
+    outline            = LightOnSurface.copy(alpha = 0.12f),
 )
 
-/**
- * Main theme composable for ReVanced Manager
- * Supports dynamic theme switching
- */
 @Composable
 fun RevancedManagerTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
     content: @Composable () -> Unit
 ) {
     val darkTheme = when (themeMode) {
-        ThemeMode.LIGHT -> false
-        ThemeMode.DARK -> true
+        ThemeMode.LIGHT  -> false
+        ThemeMode.DARK   -> true
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
     }
-    
+
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
-        content = content
+        typography  = Typography,
+        content     = content
     )
 }
 
-// Extension properties for custom action button colors
+// ── Extension properties for action button colors ─────────────────────────────
 val ColorScheme.downloadColor: Color
-    @Composable
-    @ReadOnlyComposable
-    get() = if (isSystemInDarkTheme()) Blue400 else Blue600
+    @Composable @ReadOnlyComposable
+    get() = if (isSystemInDarkTheme()) DownloadDark else DownloadLight
 
 val ColorScheme.updateColor: Color
-    @Composable
-    @ReadOnlyComposable
-    get() = if (isSystemInDarkTheme()) Orange400 else Orange600
+    @Composable @ReadOnlyComposable
+    get() = if (isSystemInDarkTheme()) UpdateDark else UpdateLight
 
 val ColorScheme.openColor: Color
-    @Composable
-    @ReadOnlyComposable
-    get() = if (isSystemInDarkTheme()) Green400 else Green600
+    @Composable @ReadOnlyComposable
+    get() = if (isSystemInDarkTheme()) OpenDark else OpenLight
 
 val ColorScheme.uninstallColor: Color
-    @Composable
-    @ReadOnlyComposable
-    get() = if (isSystemInDarkTheme()) Red500 else Red600 
+    @Composable @ReadOnlyComposable
+    get() = if (isSystemInDarkTheme()) UninstallDark else UninstallLight

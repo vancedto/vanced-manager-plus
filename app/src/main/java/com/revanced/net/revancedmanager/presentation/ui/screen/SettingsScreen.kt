@@ -196,15 +196,16 @@ private fun SettingsSwitchRow(
     modifier: Modifier = Modifier
 ) {
     Card(
+        shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .fillMaxWidth()
             .border(
-                2.dp,
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
-                RoundedCornerShape(12.dp)
+                1.dp,
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
+                RoundedCornerShape(16.dp)
             ),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier
@@ -239,21 +240,22 @@ private fun DebugModeSection(
     var isLoadingLogs by remember { mutableStateOf(false) }
 
     Card(
+        shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .fillMaxWidth()
             .border(
-                2.dp,
+                1.dp,
                 if (debugMode) MaterialTheme.colorScheme.error.copy(alpha = 0.4f)
-                else MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
-                RoundedCornerShape(12.dp)
+                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
+                RoundedCornerShape(16.dp)
             ),
         colors = CardDefaults.cardColors(
             containerColor = if (debugMode)
                 MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
             else
-                MaterialTheme.colorScheme.surfaceVariant
+                MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
             Row(
@@ -362,11 +364,12 @@ private fun ThemeSelector(
 
     if (expanded) {
         Card(
+            shape = RoundedCornerShape(16.dp),
             modifier = modifier
                 .fillMaxWidth()
-                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp)),
+                .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f), RoundedCornerShape(16.dp)),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(modifier = Modifier.padding(4.dp)) {
                 Row(
@@ -414,11 +417,12 @@ private fun ThemeSelector(
     } else {
         Card(
             onClick = { expanded = true },
+            shape = RoundedCornerShape(16.dp),
             modifier = modifier
                 .fillMaxWidth()
-                .border(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), RoundedCornerShape(12.dp)),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f), RoundedCornerShape(16.dp)),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -508,11 +512,12 @@ private fun LanguageSelector(
 
     if (expanded) {
         Card(
+            shape = RoundedCornerShape(16.dp),
             modifier = modifier
                 .fillMaxWidth()
-                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp)),
+                .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f), RoundedCornerShape(16.dp)),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(modifier = Modifier.padding(4.dp)) {
                 Row(
@@ -567,11 +572,12 @@ private fun LanguageSelector(
     } else {
         Card(
             onClick = { expanded = true },
+            shape = RoundedCornerShape(16.dp),
             modifier = modifier
                 .fillMaxWidth()
-                .border(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), RoundedCornerShape(12.dp)),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f), RoundedCornerShape(16.dp)),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Row(
                 modifier = Modifier

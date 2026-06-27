@@ -8,4 +8,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <!-- Splash background matching the dark theme app background (#0C0E15) -->
+    <color name="splash_background">#FF0C0E15</color>
+
 </resources>

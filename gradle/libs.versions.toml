@@ -72,6 +72,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 # Material Icons Extended
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 
+
 # Core SplashScreen
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version = "1.0.1" }
 

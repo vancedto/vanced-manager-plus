@@ -6,13 +6,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
+import com.revanced.net.revancedmanager.domain.model.ThemeMode
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.revanced.net.revancedmanager.core.common.LocaleHelper
 import com.revanced.net.revancedmanager.data.local.preferences.PreferencesManager
@@ -41,9 +45,6 @@ class MainActivity : ComponentActivity() {
         // Edge-to-edge: transparent status bar + nav bar, correct icon colors per theme
         enableEdgeToEdge()
 
-        // Add smooth transition for activity recreation
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        
         setContent {
             val viewModel: AppBloc = hiltViewModel()
             val state by viewModel.state.collectAsState()
@@ -51,9 +52,22 @@ class MainActivity : ComponentActivity() {
             val themeMode = when (val currentState = state) {
                 is com.revanced.net.revancedmanager.presentation.bloc.AppState.Success -> currentState.config.themeMode
                 is com.revanced.net.revancedmanager.presentation.bloc.AppState.Error -> currentState.config.themeMode
-                else -> com.revanced.net.revancedmanager.domain.model.ThemeMode.SYSTEM
+                else -> ThemeMode.SYSTEM
             }
-            
+
+            // Keep system bar icons legible regardless of the app's chosen theme
+            // (the app can force LIGHT/DARK independently of the system setting).
+            val darkTheme = when (themeMode) {
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+                ThemeMode.SYSTEM -> isSystemInDarkTheme()
+            }
+            LaunchedEffect(darkTheme) {
+                val controller = WindowCompat.getInsetsController(window, window.decorView)
+                controller.isAppearanceLightStatusBars = !darkTheme
+                controller.isAppearanceLightNavigationBars = !darkTheme
+            }
+
             RevancedManagerTheme(themeMode = themeMode) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
