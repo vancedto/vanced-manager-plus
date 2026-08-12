@@ -9,6 +9,7 @@ import com.revanced.net.revancedmanager.domain.model.AppStatus
 sealed class AppEvent {
     data object LoadApps : AppEvent()
     data object RefreshApps : AppEvent()
+    data object PullToRefreshApps : AppEvent()
     
     // New improved UX events
     data object LoadAppsFromCacheFirst : AppEvent()
@@ -33,23 +34,8 @@ sealed class AppEvent {
     data object DismissDialog : AppEvent()
     data class DismissDialogAndUpdateStatus(val packageName: String, val status: AppStatus) : AppEvent()
 
-    data class DownloadCompleted(val packageName: String, val filePath: String) : AppEvent()
-    data class DownloadFailed(val packageName: String, val error: String) : AppEvent()
-    data class InstallationCompleted(val packageName: String, val success: Boolean) : AppEvent()
-    
-    // Concurrent downloads events - simplified for auto-install
-    data class AutoInstallAllCompleted(
-        val completedPackages: List<String>,
-        val completedNames: List<String>, 
-        val completedPaths: List<String>,
-        val failedPackages: List<String>,
-        val failedNames: List<String>,
-        val failedErrors: List<String>
-    ) : AppEvent()
-    
     // Configuration events
-    data object NavigateToSettings : AppEvent()
-    data object NavigateBackFromSettings : AppEvent()
+    // Navigating to and from settings is the navigation graph's job, not an event.
     data class SaveSettings(val config: AppConfig) : AppEvent()
     data object ResetSettings : AppEvent()
     data object LoadConfiguration : AppEvent()
@@ -61,6 +47,17 @@ sealed class AppEvent {
     // Filter events
     data class SetFilter(val filter: AppFilterOption) : AppEvent()
 
+    // Sort events
+    data class SetSort(val sort: AppSortOption) : AppEvent()
+
     // Favorites events
-    data class ToggleFavorite(val packageName: String) : AppEvent()
+    /** Keyed by catalog entry: several entries can share a package, and a star is about one of them. */
+    data class ToggleFavorite(val appId: String) : AppEvent()
+
+    // Update-all events (update prompt dialog / update notification)
+    data object UpdateAllApps : AppEvent()
+
+    // First-run suggestions events
+    data class InstallSuggestedApps(val appIds: List<String>) : AppEvent()
+    data object DismissSuggestions : AppEvent()
 }

@@ -22,4 +22,17 @@ object Config {
      * Log tag prefix for all debug logs
      */
     const val LOG_TAG = "RvMng"
+
+    /**
+     * Package names suggested for installation on the first app run.
+     * They are matched against the app list loaded from the API, so title,
+     * icon and download URL always come from live data; packages missing from
+     * the API response (or already installed) are simply not suggested.
+     */
+    val SUGGESTED_PACKAGES = listOf(
+        "app.morphe.android.youtube",             // YouTube Morphe
+        "app.morphe.android.apps.youtube.music",  // YouTube Music Morphe
+        "app.revanced.android.gms",                 // MicroG (required by the two above)
+        "app.morphe.android.apps.photos"            // Google Photos Morphe
+    )
 }

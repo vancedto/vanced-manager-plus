@@ -7,7 +7,10 @@ data class AppConfig(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val language: Language = Language.ENGLISH,
     val compactMode: Boolean = true, // Default to compact mode enabled
-    val debugModeEnabled: Boolean = false
+    val debugModeEnabled: Boolean = false,
+    val autoDeleteApkEnabled: Boolean = true, // Delete the downloaded APK after a successful install
+    val autoUpdateCheckEnabled: Boolean = true, // Daily background update check + notification
+    val showUpdatePromptEnabled: Boolean = true // "N updates available" popup after launch refresh
 )
 
 /**

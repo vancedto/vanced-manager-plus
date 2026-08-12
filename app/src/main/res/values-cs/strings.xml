@@ -34,10 +34,9 @@
     <string name="installing">Instalace</string>
     <string name="uninstalling">Odinstalace</string>
     <string name="unknown">Neznámý</string>
-    <string name="installed_version">Nainstalováno: v%1$s</string>
-    <string name="latest_version">Nejnovější: v%1$s</string>
+    <string name="installed_version">Nainstalováno: %1$s</string>
+    <string name="latest_version">Nejnovější: %1$s</string>
     <string name="downloading_progress">Stahování %1$d%%</string>
-    <string name="show_less">Zobrazit méně</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Zahajování stahování...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">Zobrazení</string>
     <string name="settings_section_debug">Ladění</string>
     <string name="settings_section_danger_zone">Nebezpečná zóna</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">Úložiště</string>
+    <string name="auto_delete_apk">Po instalaci automaticky smazat APK</string>
+    <string name="auto_delete_apk_description">Smazat stažený soubor APK po úspěšné instalaci</string>
+    <string name="settings_clear_cache_button">Vymazat mezipaměť APK (%1$d souborů · %2$s)</string>
+    <string name="settings_clear_cache_calculating">Vymazat mezipaměť APK (výpočet…)</string>
+    <string name="settings_clear_cache_empty">Žádné soubory APK v mezipaměti</string>
+    <string name="settings_clear_cache_confirm_title">Vymazat mezipaměť APK?</string>
+    <string name="settings_clear_cache_confirm_message">Všechny stažené soubory APK (%1$s) budou smazány. V případě potřeby budou staženy znovu.</string>
+    <string name="settings_cache_cleared">Vymazáno %1$d souborů APK</string>
     <string name="settings_reset_button">Obnovit vše na výchozí</string>
     <string name="settings_reset_confirm_title">Obnovit nastavení?</string>
     <string name="settings_reset_confirm_message">Vše bude obnoveno na výchozí hodnoty. Tuto akci nelze vrátit zpět.</string>
     <string name="settings_reset_to_defaults">Nastavení obnoveno</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">Zpracování (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">Aktualizovat vše</string>
+    <string name="update_all_started">Aktualizuji %1$d aplikací…</string>
+    <string name="update_prompt_title">Dostupné aktualizace</string>
+    <string name="update_prompt_message">%1$d aplikací má dostupné aktualizace. Chcete je nyní aktualizovat?</string>
+    <string name="skip_today">Přeskočit dnes</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">Aktualizace</string>
+    <string name="auto_update_check">Kontrolovat aktualizace denně</string>
+    <string name="auto_update_check_description">Kontrolovat aktualizace aplikací na pozadí jednou denně a upozornit vás</string>
+    <string name="show_update_prompt">Vyskakovací okno při spuštění</string>
+    <string name="show_update_prompt_description">Nabídnout aktualizaci všech aplikací, když jsou po otevření nalezeny aktualizace</string>
+    <string name="update_notification_channel_name">Aktualizace aplikací</string>
+    <string name="update_notification_title">%1$d dostupných aktualizací aplikací</string>
+    <string name="update_notification_text">Klepnutím otevřete a aktualizujete aplikace</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">Doporučené aplikace</string>
+    <string name="suggestions_message">Začněte s těmito oblíbenými aplikacemi — odškrtněte ty, které nechcete:</string>
+    <string name="suggestions_install">Instalovat (%1$d)</string>
+    <string name="suggestions_skip">Přeskočit</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Oblíbené</string>

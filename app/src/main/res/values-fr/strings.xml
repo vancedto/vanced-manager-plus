@@ -34,10 +34,9 @@
     <string name="installing">Installation</string>
     <string name="uninstalling">Désinstallation</string>
     <string name="unknown">Inconnu</string>
-    <string name="installed_version">Installé : v%1$s</string>
-    <string name="latest_version">Dernière : v%1$s</string>
+    <string name="installed_version">Installé : %1$s</string>
+    <string name="latest_version">Dernière : %1$s</string>
     <string name="downloading_progress">Téléchargement %1$d%%</string>
-    <string name="show_less">Afficher moins</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Démarrage du téléchargement...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">Affichage</string>
     <string name="settings_section_debug">Débogage</string>
     <string name="settings_section_danger_zone">Zone dangereuse</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">Stockage</string>
+    <string name="auto_delete_apk">Supprimer l\'APK automatiquement après l\'installation</string>
+    <string name="auto_delete_apk_description">Supprimer le fichier APK téléchargé une fois l\'installation réussie</string>
+    <string name="settings_clear_cache_button">Vider le cache APK (%1$d fichiers · %2$s)</string>
+    <string name="settings_clear_cache_calculating">Vider le cache APK (calcul en cours…)</string>
+    <string name="settings_clear_cache_empty">Aucun fichier APK en cache</string>
+    <string name="settings_clear_cache_confirm_title">Vider le cache APK ?</string>
+    <string name="settings_clear_cache_confirm_message">Tous les fichiers APK téléchargés (%1$s) seront supprimés. Ils seront téléchargés à nouveau si nécessaire.</string>
+    <string name="settings_cache_cleared">%1$d fichier(s) APK supprimé(s)</string>
     <string name="settings_reset_button">Réinitialiser tous les paramètres</string>
     <string name="settings_reset_confirm_title">Réinitialiser les paramètres ?</string>
     <string name="settings_reset_confirm_message">Tous les paramètres seront réinitialisés. Cette action est irréversible.</string>
     <string name="settings_reset_to_defaults">Paramètres réinitialisés</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">Traitement (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">Tout mettre à jour</string>
+    <string name="update_all_started">Mise à jour de %1$d application(s)…</string>
+    <string name="update_prompt_title">Mises à jour disponibles</string>
+    <string name="update_prompt_message">%1$d application(s) ont des mises à jour disponibles. Voulez-vous les mettre à jour maintenant ?</string>
+    <string name="skip_today">Ignorer aujourd\'hui</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">Mises à jour</string>
+    <string name="auto_update_check">Vérifier les mises à jour chaque jour</string>
+    <string name="auto_update_check_description">Vérifier les mises à jour des applications en arrière-plan une fois par jour et vous avertir</string>
+    <string name="show_update_prompt">Fenêtre de mise à jour au démarrage</string>
+    <string name="show_update_prompt_description">Proposer de mettre à jour toutes les applications lorsque des mises à jour sont trouvées après l\'ouverture</string>
+    <string name="update_notification_channel_name">Mises à jour des applications</string>
+    <string name="update_notification_title">%1$d mise(s) à jour d\'application disponibles</string>
+    <string name="update_notification_text">Appuyez pour ouvrir et mettre à jour vos applications</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">Applications suggérées</string>
+    <string name="suggestions_message">Commencez avec ces applications populaires — décochez celles que vous ne voulez pas :</string>
+    <string name="suggestions_install">Installer (%1$d)</string>
+    <string name="suggestions_skip">Ignorer</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favoris</string>

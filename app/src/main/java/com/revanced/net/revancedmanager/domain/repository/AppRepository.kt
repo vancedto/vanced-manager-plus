@@ -1,7 +1,6 @@
 package com.revanced.net.revancedmanager.domain.repository
 
 import com.revanced.net.revancedmanager.core.common.Result
-import com.revanced.net.revancedmanager.domain.model.AppDownload
 import com.revanced.net.revancedmanager.domain.model.RevancedApp
 import kotlinx.coroutines.flow.Flow
 
@@ -44,14 +43,6 @@ interface AppRepository {
      * @return Installed version string or null if not installed
      */
     suspend fun getInstalledVersion(packageName: String): String?
-    
-    /**
-     * Download an app APK
-     * @param packageName Package name of the app
-     * @param downloadUrl URL to download the APK
-     * @return Flow of download progress
-     */
-    fun downloadApp(packageName: String, downloadUrl: String): Flow<AppDownload>
     
     /**
      * Install an APK file

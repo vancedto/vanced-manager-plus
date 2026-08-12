@@ -1,12 +1,9 @@
 package com.revanced.net.revancedmanager.core.di
 
 import android.content.Context
-import androidx.room.Room
 import androidx.work.WorkManager
 import com.revanced.net.revancedmanager.core.common.StringProvider
 import com.revanced.net.revancedmanager.core.common.StringProviderImpl
-import com.revanced.net.revancedmanager.data.local.database.DownloadStateDao
-import com.revanced.net.revancedmanager.data.local.database.RevancedDatabase
 import com.revanced.net.revancedmanager.data.remote.api.RevancedApiService
 import com.revanced.net.revancedmanager.data.repository.AppRepositoryImpl
 import com.revanced.net.revancedmanager.domain.repository.AppRepository
@@ -36,21 +33,6 @@ object ProviderModule {
     @Singleton
     fun provideRevancedApiService(retrofit: Retrofit): RevancedApiService {
         return retrofit.create(RevancedApiService::class.java)
-    }
-    
-    @Provides
-    @Singleton
-    fun provideRevancedDatabase(@ApplicationContext context: Context): RevancedDatabase {
-        return Room.databaseBuilder(
-            context,
-            RevancedDatabase::class.java,
-            RevancedDatabase.DATABASE_NAME
-        ).build()
-    }
-    
-    @Provides
-    fun provideDownloadStateDao(database: RevancedDatabase): DownloadStateDao {
-        return database.downloadStateDao()
     }
 }
 

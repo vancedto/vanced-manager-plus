@@ -34,10 +34,9 @@
     <string name="installing">Memasang</string>
     <string name="uninstalling">Menghapus</string>
     <string name="unknown">Tidak diketahui</string>
-    <string name="installed_version">Terpasang: v%1$s</string>
-    <string name="latest_version">Terbaru: v%1$s</string>
+    <string name="installed_version">Terpasang: %1$s</string>
+    <string name="latest_version">Terbaru: %1$s</string>
     <string name="downloading_progress">Mengunduh %1$d%%</string>
-    <string name="show_less">Tampilkan Lebih Sedikit</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Memulai unduhan...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">Layar</string>
     <string name="settings_section_debug">Debug</string>
     <string name="settings_section_danger_zone">Zona Berbahaya</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">Penyimpanan</string>
+    <string name="auto_delete_apk">Hapus otomatis APK setelah dipasang</string>
+    <string name="auto_delete_apk_description">Hapus berkas APK yang diunduh setelah pemasangan berhasil</string>
+    <string name="settings_clear_cache_button">Bersihkan cache APK (%1$d berkas · %2$s)</string>
+    <string name="settings_clear_cache_calculating">Bersihkan cache APK (menghitung…)</string>
+    <string name="settings_clear_cache_empty">Tidak ada berkas APK di cache</string>
+    <string name="settings_clear_cache_confirm_title">Bersihkan cache APK?</string>
+    <string name="settings_clear_cache_confirm_message">Semua berkas APK yang diunduh (%1$s) akan dihapus. Berkas akan diunduh lagi saat diperlukan.</string>
+    <string name="settings_cache_cleared">%1$d berkas APK dibersihkan</string>
     <string name="settings_reset_button">Reset semua pengaturan</string>
     <string name="settings_reset_confirm_title">Reset Pengaturan?</string>
     <string name="settings_reset_confirm_message">Semua pengaturan akan direset ke default. Ini tidak dapat dibatalkan.</string>
     <string name="settings_reset_to_defaults">Pengaturan direset</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">Memproses (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">Perbarui semua</string>
+    <string name="update_all_started">Memperbarui %1$d aplikasi…</string>
+    <string name="update_prompt_title">Pembaruan tersedia</string>
+    <string name="update_prompt_message">%1$d aplikasi memiliki pembaruan. Perbarui sekarang?</string>
+    <string name="skip_today">Lewati hari ini</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">Pembaruan</string>
+    <string name="auto_update_check">Periksa pembaruan setiap hari</string>
+    <string name="auto_update_check_description">Periksa pembaruan aplikasi di latar belakang sekali sehari dan beri tahu Anda</string>
+    <string name="show_update_prompt">Popup pembaruan saat dibuka</string>
+    <string name="show_update_prompt_description">Tanyakan untuk memperbarui semua aplikasi saat pembaruan ditemukan setelah membuka aplikasi</string>
+    <string name="update_notification_channel_name">Pembaruan Aplikasi</string>
+    <string name="update_notification_title">%1$d pembaruan aplikasi tersedia</string>
+    <string name="update_notification_text">Ketuk untuk membuka dan memperbarui aplikasi Anda</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">Aplikasi yang disarankan</string>
+    <string name="suggestions_message">Mulai dengan aplikasi populer ini — hapus centang yang tidak Anda inginkan:</string>
+    <string name="suggestions_install">Pasang (%1$d)</string>
+    <string name="suggestions_skip">Lewati</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favorit</string>

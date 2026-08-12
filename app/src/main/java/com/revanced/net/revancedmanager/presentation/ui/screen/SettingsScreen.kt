@@ -14,6 +14,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -22,6 +23,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -31,13 +34,19 @@ import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.domain.model.AppConfig
 import com.revanced.net.revancedmanager.domain.model.Language
 import com.revanced.net.revancedmanager.domain.model.ThemeMode
+import com.revanced.net.revancedmanager.presentation.bloc.ApkCacheInfo
+import com.revanced.net.revancedmanager.presentation.ui.components.tvFocusBorder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Full-screen settings view. No own Scaffold — TopAppBar is owned by MainScreen.
+ * Full-screen settings view.
+ *
+ * Owns its own Scaffold and top bar: settings is a navigation destination now, not a mode the
+ * list screen switches into, so nothing above it is drawing an app bar on its behalf.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     currentConfig: AppConfig,
@@ -46,98 +55,183 @@ fun SettingsScreen(
     onResetSettings: () -> Unit,
     getLogContent: () -> String,
     onShareLogs: () -> Unit,
+    getApkCacheInfo: () -> ApkCacheInfo,
+    onClearApkCache: () -> ApkCacheInfo,
     modifier: Modifier = Modifier
 ) {
     var selectedTheme by remember(currentConfig) { mutableStateOf(currentConfig.themeMode) }
     var selectedLanguage by remember(currentConfig) { mutableStateOf(currentConfig.language) }
     var compactMode by remember(currentConfig) { mutableStateOf(currentConfig.compactMode) }
     var debugMode by remember(currentConfig) { mutableStateOf(currentConfig.debugModeEnabled) }
+    var autoDeleteApk by remember(currentConfig) { mutableStateOf(currentConfig.autoDeleteApkEnabled) }
+    var autoUpdateCheck by remember(currentConfig) { mutableStateOf(currentConfig.autoUpdateCheckEnabled) }
+    var showUpdatePrompt by remember(currentConfig) { mutableStateOf(currentConfig.showUpdatePromptEnabled) }
     var showResetConfirm by remember { mutableStateOf(false) }
 
-    Column(modifier = modifier.fillMaxSize()) {
-        // Scrollable content
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-        ) {
-            // Appearance section
-            SettingsSectionHeader(stringResource(R.string.settings_section_appearance))
-            ThemeSelector(
-                selectedTheme = selectedTheme,
-                onThemeSelected = { selectedTheme = it },
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = Color.Transparent,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.settings),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = onCancel,
+                        modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = Color.Transparent
+                )
             )
+        }
+    ) { paddingValues ->
+        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            // Scrollable content
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // Appearance section
+                SettingsSectionHeader(stringResource(R.string.settings_section_appearance))
+                ThemeSelector(
+                    selectedTheme = selectedTheme,
+                    onThemeSelected = { selectedTheme = it },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
-            // Language section
-            SettingsSectionHeader(stringResource(R.string.language))
-            LanguageSelector(
-                selectedLanguage = selectedLanguage,
-                onLanguageSelected = { selectedLanguage = it },
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+                // Language section
+                SettingsSectionHeader(stringResource(R.string.language))
+                LanguageSelector(
+                    selectedLanguage = selectedLanguage,
+                    onLanguageSelected = { selectedLanguage = it },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
-            // Display section
-            SettingsSectionHeader(stringResource(R.string.settings_section_display))
-            SettingsSwitchRow(
-                title = stringResource(R.string.compact_mode),
-                checked = compactMode,
-                onCheckedChange = { compactMode = it },
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+                // Display section
+                SettingsSectionHeader(stringResource(R.string.settings_section_display))
+                SettingsSwitchRow(
+                    title = stringResource(R.string.compact_mode),
+                    checked = compactMode,
+                    onCheckedChange = { compactMode = it },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
-            // Debug section
-            SettingsSectionHeader(stringResource(R.string.settings_section_debug))
-            DebugModeSection(
-                debugMode = debugMode,
-                onDebugModeChange = { debugMode = it },
-                getLogContent = getLogContent,
-                onShareLogs = onShareLogs,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+                // Updates section
+                SettingsSectionHeader(stringResource(R.string.settings_section_updates))
+                SettingsSwitchRow(
+                    title = stringResource(R.string.auto_update_check),
+                    subtitle = stringResource(R.string.auto_update_check_description),
+                    checked = autoUpdateCheck,
+                    onCheckedChange = { autoUpdateCheck = it },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+                SettingsSwitchRow(
+                    title = stringResource(R.string.show_update_prompt),
+                    subtitle = stringResource(R.string.show_update_prompt_description),
+                    checked = showUpdatePrompt,
+                    onCheckedChange = { showUpdatePrompt = it },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
-            // Danger Zone
-            SettingsSectionHeader(stringResource(R.string.settings_section_danger_zone))
-            OutlinedButton(
-                onClick = { showResetConfirm = true },
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.error
-                ),
-                border = androidx.compose.foundation.BorderStroke(
-                    1.dp,
-                    MaterialTheme.colorScheme.error.copy(alpha = 0.6f)
-                ),
+                // Storage section
+                SettingsSectionHeader(stringResource(R.string.settings_section_storage))
+                SettingsSwitchRow(
+                    title = stringResource(R.string.auto_delete_apk),
+                    subtitle = stringResource(R.string.auto_delete_apk_description),
+                    checked = autoDeleteApk,
+                    onCheckedChange = { autoDeleteApk = it },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+
+                // Debug section
+                SettingsSectionHeader(stringResource(R.string.settings_section_debug))
+                DebugModeSection(
+                    debugMode = debugMode,
+                    onDebugModeChange = { debugMode = it },
+                    getLogContent = getLogContent,
+                    onShareLogs = onShareLogs,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+
+                // Danger Zone
+                SettingsSectionHeader(stringResource(R.string.settings_section_danger_zone))
+                ApkCacheCleanupButton(
+                    getApkCacheInfo = getApkCacheInfo,
+                    onClearApkCache = onClearApkCache,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+                OutlinedButton(
+                    onClick = { showResetConfirm = true },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.error.copy(alpha = 0.6f)
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .tvFocusBorder(shape = RoundedCornerShape(50))
+                ) {
+                    Text(stringResource(R.string.settings_reset_button))
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // Sticky bottom action bar
+            HorizontalDivider()
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(stringResource(R.string.settings_reset_button))
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        // Sticky bottom action bar
-        HorizontalDivider()
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            OutlinedButton(
-                onClick = onCancel,
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(stringResource(R.string.cancel))
-            }
-            Button(
-                onClick = {
-                    onSave(AppConfig(selectedTheme, selectedLanguage, compactMode, debugMode))
-                },
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(stringResource(R.string.save))
+                OutlinedButton(
+                    onClick = onCancel,
+                    modifier = Modifier
+                        .weight(1f)
+                        .tvFocusBorder(shape = RoundedCornerShape(50))
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+                Button(
+                    onClick = {
+                        onSave(
+                            AppConfig(
+                                themeMode = selectedTheme,
+                                language = selectedLanguage,
+                                compactMode = compactMode,
+                                debugModeEnabled = debugMode,
+                                autoDeleteApkEnabled = autoDeleteApk,
+                                autoUpdateCheckEnabled = autoUpdateCheck,
+                                showUpdatePromptEnabled = showUpdatePrompt
+                            )
+                        )
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .tvFocusBorder(shape = RoundedCornerShape(50))
+                ) {
+                    Text(stringResource(R.string.save))
+                }
             }
         }
     }
@@ -193,7 +287,8 @@ private fun SettingsSwitchRow(
     title: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    subtitle: String? = null
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -214,13 +309,120 @@ private fun SettingsSwitchRow(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+                modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
             )
-            Switch(checked = checked, onCheckedChange = onCheckedChange)
         }
+    }
+}
+
+// ---- APK cache cleanup ----
+
+@Composable
+private fun ApkCacheCleanupButton(
+    getApkCacheInfo: () -> ApkCacheInfo,
+    onClearApkCache: () -> ApkCacheInfo,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    // null = still calculating
+    var cacheInfo by remember { mutableStateOf<ApkCacheInfo?>(null) }
+    var isClearing by remember { mutableStateOf(false) }
+    var showConfirm by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        cacheInfo = withContext(Dispatchers.IO) { getApkCacheInfo() }
+    }
+
+    val info = cacheInfo
+    val sizeText = info?.let {
+        android.text.format.Formatter.formatShortFileSize(context, it.totalBytes)
+    }
+    val isEmpty = info != null && info.fileCount == 0
+
+    val label = when {
+        info == null -> stringResource(R.string.settings_clear_cache_calculating)
+        isEmpty -> stringResource(R.string.settings_clear_cache_empty)
+        else -> stringResource(R.string.settings_clear_cache_button, info.fileCount, sizeText ?: "")
+    }
+
+    OutlinedButton(
+        onClick = { showConfirm = true },
+        enabled = info != null && !isEmpty && !isClearing,
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = MaterialTheme.colorScheme.error
+        ),
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.error.copy(alpha = 0.6f)
+        ),
+        modifier = modifier.tvFocusBorder(shape = RoundedCornerShape(50))
+    ) {
+        if (isClearing) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.error
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+        Text(label)
+    }
+
+    if (showConfirm) {
+        AlertDialog(
+            onDismissRequest = { showConfirm = false },
+            title = { Text(stringResource(R.string.settings_clear_cache_confirm_title)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.settings_clear_cache_confirm_message,
+                        sizeText ?: ""
+                    )
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showConfirm = false
+                        isClearing = true
+                        coroutineScope.launch {
+                            val updated = withContext(Dispatchers.IO) { onClearApkCache() }
+                            cacheInfo = updated
+                            isClearing = false
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text(stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirm = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 }
 
@@ -275,7 +477,11 @@ private fun DebugModeSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Switch(checked = debugMode, onCheckedChange = onDebugModeChange)
+                Switch(
+                    checked = debugMode,
+                    onCheckedChange = onDebugModeChange,
+                    modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
+                )
             }
 
             if (debugMode) {
@@ -294,7 +500,8 @@ private fun DebugModeSection(
                                 logViewerContent = withContext(Dispatchers.IO) { getLogContent() }
                                 isLoadingLogs = false
                             }
-                        }
+                        },
+                        modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
                     ) {
                         Icon(
                             imageVector = Icons.Default.Description,
@@ -302,7 +509,10 @@ private fun DebugModeSection(
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    IconButton(onClick = onShareLogs) {
+                    IconButton(
+                        onClick = onShareLogs,
+                        modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Share,
                             contentDescription = stringResource(R.string.debug_share_logs),
@@ -420,6 +630,7 @@ private fun ThemeSelector(
             shape = RoundedCornerShape(16.dp),
             modifier = modifier
                 .fillMaxWidth()
+                .tvFocusBorder(shape = RoundedCornerShape(16.dp))
                 .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f), RoundedCornerShape(16.dp)),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -464,6 +675,7 @@ private fun ThemeItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .tvFocusBorder(shape = RoundedCornerShape(8.dp))
             .selectable(selected = isSelected, onClick = onSelect)
             .then(
                 if (isSelected) Modifier.background(
@@ -575,6 +787,7 @@ private fun LanguageSelector(
             shape = RoundedCornerShape(16.dp),
             modifier = modifier
                 .fillMaxWidth()
+                .tvFocusBorder(shape = RoundedCornerShape(16.dp))
                 .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f), RoundedCornerShape(16.dp)),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -626,6 +839,7 @@ private fun LanguageItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .tvFocusBorder(shape = RoundedCornerShape(8.dp))
             .selectable(selected = isSelected, onClick = onSelect)
             .then(
                 if (isSelected) Modifier.background(

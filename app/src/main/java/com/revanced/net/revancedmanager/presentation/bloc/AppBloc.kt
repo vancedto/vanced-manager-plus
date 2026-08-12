@@ -1,10 +1,6 @@
 package com.revanced.net.revancedmanager.presentation.bloc
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.os.Build
 import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -14,20 +10,18 @@ import androidx.lifecycle.viewModelScope
 import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.core.common.StringProvider
 import com.revanced.net.revancedmanager.data.local.preferences.PreferencesManager
+import com.revanced.net.revancedmanager.data.manager.AppDownloadManager
 import com.revanced.net.revancedmanager.data.manager.AppManager
-import com.revanced.net.revancedmanager.data.manager.DownloadService
-import com.revanced.net.revancedmanager.data.manager.InstallationResult
+import com.revanced.net.revancedmanager.data.manager.DebugLogManager
 import com.revanced.net.revancedmanager.data.manager.PackageChangedReceiver
 import com.revanced.net.revancedmanager.data.manager.PackageEvent
 import com.revanced.net.revancedmanager.data.manager.RevancedPackageInstaller
-import com.revanced.net.revancedmanager.data.manager.DebugLogManager
 import com.revanced.net.revancedmanager.data.manager.UninstallationResult
-import com.revanced.net.revancedmanager.data.manager.SimpleDownloadManager
-import com.revanced.net.revancedmanager.data.repository.DownloadStateRepository
 import com.revanced.net.revancedmanager.domain.model.AppStatus
 import com.revanced.net.revancedmanager.domain.usecase.AppManagementUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,6 +29,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.UUID
 import javax.inject.Inject
 
 /** Tag used by all AppBloc extension files. */
@@ -44,17 +39,21 @@ internal const val TAG_BLOC = "AppBloc"
  * Core ViewModel — owns state, routes events, and manages lifecycle.
  * Domain logic lives in the companion extension files:
  *   AppBlocDownload.kt, AppBlocInstall.kt, AppBlocAppList.kt, AppBlocConfig.kt
+ *
+ * Downloads run as WorkManager work ([AppDownloadManager]); their progress and
+ * results arrive through a single WorkInfo flow collected in [observeDownloads].
+ * Installations run sequentially through [installRequests], processed by
+ * [startInstallationProcessor].
  */
 @HiltViewModel
 class AppBloc @Inject constructor(
     @ApplicationContext internal val context: Context,
     internal val useCases: AppManagementUseCases,
-    internal val simpleDownloadManager: SimpleDownloadManager,
+    internal val downloadManager: AppDownloadManager,
     internal val appManager: AppManager,
     internal val preferencesManager: PreferencesManager,
     internal val stringProvider: StringProvider,
     internal val packageInstaller: RevancedPackageInstaller,
-    internal val downloadStateRepository: DownloadStateRepository,
     internal val packageChangedReceiver: PackageChangedReceiver,
     val debugLogManager: DebugLogManager
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -67,16 +66,33 @@ class AppBloc @Inject constructor(
     val toastMessage: StateFlow<String?> = _toastMessage.asStateFlow()
 
     // ---- Download tracking ----
-    internal val activeDownloads = mutableMapOf<String, kotlinx.coroutines.Job>()
-    internal val completedDownloads = mutableSetOf<String>()
+    /** Work IDs whose terminal state (success/failure/cancel) was already processed. */
+    internal val handledDownloads = mutableSetOf<UUID>()
+
+    /**
+     * Packages whose download the user asked for during this session.
+     *
+     * Tells a deliberate download apart from a WorkManager record replayed after a restart, which
+     * is the only thing the "already up to date" guard in handleDownloadCompleted is meant to
+     * catch. Without it, choosing a different architecture for an app that is already up to date
+     * downloads the file and then silently discards it.
+     */
+    internal val userRequestedDownloads = mutableSetOf<String>()
 
     // ---- Install queue ----
+    internal val installRequests = Channel<PendingInstallation>(Channel.UNLIMITED)
+    /** Packages queued for install or currently installing. */
+    internal val pendingInstalls = mutableSetOf<String>()
     internal val installationRetries = mutableMapOf<String, Int>()
-    internal val installationQueue = mutableListOf<PendingInstallation>()
-    internal var isInstallationInProgress = false
 
     // ---- Lifecycle ----
     internal var wasAppBackgrounded = false
+
+    // ---- Launch prompts ----
+    /** The "updates available" prompt is asked at most once per app session. */
+    internal var updatePromptShownThisSession = false
+    /** Set when the update notification's "Update all" action opened the app. */
+    internal var pendingUpdateAllRequest = false
 
     // ---- Uninstall / reinstall tracking ----
     internal val pendingReinstalls = mutableMapOf<String, String>()         // packageName -> apkPath (retry flow)
@@ -89,45 +105,16 @@ class AppBloc @Inject constructor(
         val appName: String
     )
 
-    // ---- Broadcast receiver for download completion ----
-    private val downloadCompleteBroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            when (intent?.action) {
-                DownloadService.ACTION_DOWNLOAD_COMPLETE -> {
-                    val packageName = intent.getStringExtra(DownloadService.EXTRA_PACKAGE_NAME)
-                    val filePath = intent.getStringExtra(DownloadService.EXTRA_FILE_PATH)
-                    if (packageName != null && filePath != null) {
-                        Log.i(TAG_BLOC, "Individual download complete broadcast: $packageName")
-                        handleEvent(AppEvent.DownloadCompleted(packageName, filePath))
-                    }
-                }
-                DownloadService.ACTION_ALL_DOWNLOADS_COMPLETE -> {
-                    Log.i(TAG_BLOC, "All downloads complete broadcast received")
-                    handleEvent(
-                        AppEvent.AutoInstallAllCompleted(
-                            completedPackages = intent.getStringArrayListExtra("completed_packages") ?: arrayListOf(),
-                            completedNames = intent.getStringArrayListExtra("completed_names") ?: arrayListOf(),
-                            completedPaths = intent.getStringArrayListExtra("completed_paths") ?: arrayListOf(),
-                            failedPackages = intent.getStringArrayListExtra("failed_packages") ?: arrayListOf(),
-                            failedNames = intent.getStringArrayListExtra("failed_names") ?: arrayListOf(),
-                            failedErrors = intent.getStringArrayListExtra("failed_errors") ?: arrayListOf()
-                        )
-                    )
-                }
-            }
-        }
-    }
-
     init {
         Log.i(TAG_BLOC, "AppBloc initialized")
         handleEvent(AppEvent.LoadConfiguration)
         handleEvent(AppEvent.LoadAppsFromCacheFirst)
-        setupPackageInstallerListener()
+        startInstallationProcessor()
+        observeDownloads()
         setupUninstallListener()
         packageChangedReceiver.register()
         setupPackageChangedListener()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        registerDownloadBroadcastReceiver()
     }
 
     // ---- Lifecycle ----
@@ -136,10 +123,7 @@ class AppBloc @Inject constructor(
         super.onStart(owner)
         Log.i(TAG_BLOC, "APP MOVED TO FOREGROUND — was backgrounded: $wasAppBackgrounded")
         if (wasAppBackgrounded) {
-            checkPendingDownloadsOnForeground()
             checkPendingUninstallsOnForeground()
-        } else {
-            resetAllQueuesAndPendingDownloads()
         }
         wasAppBackgrounded = false
     }
@@ -153,11 +137,6 @@ class AppBloc @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
-        try {
-            context.unregisterReceiver(downloadCompleteBroadcastReceiver)
-        } catch (e: Exception) {
-            Log.w(TAG_BLOC, "Failed to unregister broadcast receiver", e)
-        }
         packageChangedReceiver.unregister()
     }
 
@@ -181,64 +160,7 @@ class AppBloc @Inject constructor(
                     is PackageEvent.Uninstalled -> {
                         Log.i(TAG_BLOC, "System event: Package uninstalled: ${event.packageName}")
                         pendingUninstallChecks.remove(event.packageName)
-                        val pendingApkPath = pendingReinstalls.remove(event.packageName)
-                        val pendingDownloadUrl = pendingReinstallDownloads.remove(event.packageName)
-                        when {
-                            pendingApkPath != null -> {
-                                // Retry flow: reinstall from already-downloaded APK
-                                installApp(event.packageName, pendingApkPath)
-                            }
-                            pendingDownloadUrl != null -> {
-                                // Reinstall flow: fetch latest version from network
-                                Log.i(TAG_BLOC, "Starting reinstall download for: ${event.packageName}")
-                                completedDownloads.remove(event.packageName)
-                                updateAppStatus(event.packageName, AppStatus.DOWNLOADING)
-                                downloadApp(event.packageName, pendingDownloadUrl)
-                            }
-                            else -> {
-                                updateAppStatus(event.packageName, AppStatus.NOT_INSTALLED)
-                                showToast(stringProvider.getString(R.string.uninstallation_completed))
-                            }
-                        }
-                    }
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    private fun setupPackageInstallerListener() {
-        packageInstaller.installationResults
-            .onEach { result ->
-                when (result) {
-                    is InstallationResult.Success -> {
-                        Log.i(TAG_BLOC, "Installation successful: ${result.packageName}")
-                        handleInstallationSuccess(
-                            result.packageName,
-                            appManager.getInstalledVersion(result.packageName) ?: "Unknown"
-                        )
-                        processNextInstallation()
-                    }
-                    is InstallationResult.Failed -> {
-                        Log.i(TAG_BLOC, "Installation failed: ${result.packageName}, error: ${result.error}")
-                        val isUserAbort = result.error.contains("aborted", ignoreCase = true) ||
-                                         result.error.contains("cancelled", ignoreCase = true) ||
-                                         result.error.contains("user denied", ignoreCase = true) ||
-                                         result.statusCode == android.content.pm.PackageInstaller.STATUS_FAILURE_ABORTED
-                        if (isUserAbort) handleInstallationAborted(result.packageName, result.error)
-                        else handleInstallationFailedWithRetry(result.packageName, result.error)
-                        processNextInstallation()
-                    }
-                    is InstallationResult.PendingUserAction -> {
-                        Log.i(TAG_BLOC, "User action required for: ${result.packageName}")
-                        showToast(stringProvider.getString(R.string.installation_pending_user_action))
-                        viewModelScope.launch {
-                            kotlinx.coroutines.delay(30_000)
-                            if (!wasAppBackgrounded && installationQueue.any { it.packageName == result.packageName }) {
-                                Log.w(TAG_BLOC, "Installation timeout for: ${result.packageName}")
-                                handleInstallationAborted(result.packageName, "User cancelled or timeout")
-                                processNextInstallation()
-                            }
-                        }
+                        handlePendingReinstall(event.packageName)
                     }
                 }
             }
@@ -251,17 +173,13 @@ class AppBloc @Inject constructor(
                 when (result) {
                     is UninstallationResult.Cancelled -> {
                         Log.i(TAG_BLOC, "Uninstall cancelled by user: ${result.packageName}")
-                        pendingReinstalls.remove(result.packageName)
-                        pendingReinstallDownloads.remove(result.packageName)
-                        pendingUninstallChecks.remove(result.packageName)
+                        clearPendingReinstall(result.packageName)
                         viewModelScope.launch { updateSingleAppStatus(result.packageName) }
                         showToast(stringProvider.getString(R.string.uninstallation_cancelled))
                     }
                     is UninstallationResult.Failed -> {
                         Log.w(TAG_BLOC, "Uninstall failed: ${result.packageName}, code=${result.statusCode}")
-                        pendingReinstalls.remove(result.packageName)
-                        pendingReinstallDownloads.remove(result.packageName)
-                        pendingUninstallChecks.remove(result.packageName)
+                        clearPendingReinstall(result.packageName)
                         viewModelScope.launch { updateSingleAppStatus(result.packageName) }
                         showError(stringProvider.getString(R.string.uninstallation_failed, result.message))
                     }
@@ -274,16 +192,31 @@ class AppBloc @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private fun registerDownloadBroadcastReceiver() {
-        val filter = IntentFilter().apply {
-            addAction(DownloadService.ACTION_DOWNLOAD_COMPLETE)
-            addAction(DownloadService.ACTION_ALL_DOWNLOADS_COMPLETE)
+    /**
+     * After an uninstall completes, continue whichever flow requested it:
+     * retry-install from an existing APK, reinstall via a fresh download, or
+     * plain uninstall.
+     */
+    internal fun handlePendingReinstall(packageName: String) {
+        val pendingApkPath = pendingReinstalls.remove(packageName)
+        val pendingDownloadUrl = pendingReinstallDownloads.remove(packageName)
+        when {
+            pendingApkPath != null -> installApp(packageName, pendingApkPath)
+            pendingDownloadUrl != null -> {
+                Log.i(TAG_BLOC, "Starting reinstall download for: $packageName")
+                downloadApp(packageName, pendingDownloadUrl)
+            }
+            else -> {
+                updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
+                showToast(stringProvider.getString(R.string.uninstallation_completed))
+            }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(downloadCompleteBroadcastReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-        } else {
-            context.registerReceiver(downloadCompleteBroadcastReceiver, filter)
-        }
+    }
+
+    internal fun clearPendingReinstall(packageName: String) {
+        pendingReinstalls.remove(packageName)
+        pendingReinstallDownloads.remove(packageName)
+        pendingUninstallChecks.remove(packageName)
     }
 
     // ---- Lifecycle helpers (background/foreground) ----
@@ -294,53 +227,8 @@ class AppBloc @Inject constructor(
                 if (!appManager.isAppInstalled(packageName)) {
                     Log.i(TAG_BLOC, "Background uninstall detected: $packageName")
                     pendingUninstallChecks.remove(packageName)
-                    val pendingApkPath = pendingReinstalls.remove(packageName)
-                    val pendingDownloadUrl = pendingReinstallDownloads.remove(packageName)
-                    when {
-                        pendingApkPath != null -> installApp(packageName, pendingApkPath)
-                        pendingDownloadUrl != null -> {
-                            completedDownloads.remove(packageName)
-                            updateAppStatus(packageName, AppStatus.DOWNLOADING)
-                            downloadApp(packageName, pendingDownloadUrl)
-                        }
-                        else -> {
-                            updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-                            showToast(stringProvider.getString(R.string.uninstallation_completed))
-                        }
-                    }
+                    handlePendingReinstall(packageName)
                 }
-            }
-        }
-    }
-
-    private fun resetAllQueuesAndPendingDownloads() {
-        viewModelScope.launch {
-            try {
-                // Clear all in-memory tracking state
-                clearInstallationQueue()
-                activeDownloads.values.forEach { it.cancel() }
-                activeDownloads.clear()
-                completedDownloads.clear()
-                pendingReinstalls.clear()
-                pendingReinstallDownloads.clear()
-                pendingUninstallChecks.clear()
-                installationRetries.clear()
-
-                // Clear persisted download state so stale entries can't interfere
-                downloadStateRepository.clearAllDownloadStates()
-
-                // Re-resolve every app's status from device state — don't trust what was in memory
-                val currentState = _state.value
-                if (currentState is AppState.Success) {
-                    _state.value = currentState.copy(
-                        apps = currentState.apps.map { app ->
-                            val actual = resolveActualStatus(app.packageName)
-                            app.copy(status = actual, downloadProgress = 0f)
-                        }
-                    )
-                }
-            } catch (e: Exception) {
-                Log.e(TAG_BLOC, "Error resetting queues and pending downloads", e)
             }
         }
     }
@@ -351,16 +239,14 @@ class AppBloc @Inject constructor(
         when (event) {
             is AppEvent.LoadApps -> loadApps(forceRefresh = false)
             is AppEvent.RefreshApps -> loadApps(forceRefresh = true)
+            is AppEvent.PullToRefreshApps -> pullToRefreshApps()
             is AppEvent.LoadAppsFromCacheFirst -> loadAppsFromCacheFirst()
             is AppEvent.BackgroundRefreshApps -> backgroundRefreshApps()
             is AppEvent.UpdateSingleApp -> updateSingleApp(event.app)
             is AppEvent.DownloadApp -> downloadApp(event.packageName, event.downloadUrl)
             is AppEvent.CancelDownload -> cancelDownload(event.packageName)
-            is AppEvent.DownloadCompleted -> handleDownloadCompleted(event.packageName, event.filePath)
-            is AppEvent.DownloadFailed -> handleDownloadFailed(event.packageName, event.error)
             is AppEvent.InstallApp -> installApp(event.packageName, event.apkFilePath)
             is AppEvent.RetryInstallation -> retryInstallation(event.packageName, event.apkFilePath, event.shouldUninstallFirst)
-            is AppEvent.InstallationCompleted -> handleInstallationCompleted(event.packageName, event.success)
             is AppEvent.ConfirmUninstallBeforeReinstall -> confirmUninstallBeforeReinstall(event.packageName, event.apkFilePath)
             is AppEvent.UninstallApp -> uninstallApp(event.packageName)
             is AppEvent.ShowReinstallConfirmation -> showReinstallConfirmation(event.packageName)
@@ -372,19 +258,31 @@ class AppBloc @Inject constructor(
             is AppEvent.ShowConfirmationDialog -> showConfirmationDialog(event.title, event.message, event.onConfirm, event.onCancel)
             is AppEvent.DismissDialog -> dismissDialog()
             is AppEvent.DismissDialogAndUpdateStatus -> { dismissDialog(); updateAppStatus(event.packageName, event.status) }
-            is AppEvent.AutoInstallAllCompleted -> autoInstallAllCompleted(
-                event.completedPackages, event.completedNames, event.completedPaths,
-                event.failedPackages, event.failedNames, event.failedErrors
-            )
-            is AppEvent.NavigateToSettings -> navigateToSettings()
-            is AppEvent.NavigateBackFromSettings -> navigateBackFromSettings()
             is AppEvent.SaveSettings -> saveSettings(event.config)
             is AppEvent.ResetSettings -> resetSettings()
             is AppEvent.LoadConfiguration -> loadConfiguration()
             is AppEvent.SearchApps -> searchApps(event.query)
             is AppEvent.ClearSearch -> clearSearch()
             is AppEvent.SetFilter -> setFilter(event.filter)
-            is AppEvent.ToggleFavorite -> toggleFavorite(event.packageName)
+            is AppEvent.SetSort -> setSort(event.sort)
+            is AppEvent.ToggleFavorite -> toggleFavorite(event.appId)
+            is AppEvent.UpdateAllApps -> updateAllApps()
+            is AppEvent.InstallSuggestedApps -> installSuggestedApps(event.appIds)
+            is AppEvent.DismissSuggestions -> dismissSuggestions()
+        }
+    }
+
+    /**
+     * Called when the app was opened from the update notification's
+     * "Update all" action. If the list is already on screen the update starts
+     * immediately; otherwise it runs as soon as the list finishes loading
+     * (consumed in [onAppListLoaded]).
+     */
+    fun requestUpdateAll() {
+        if (_state.value is AppState.Success) {
+            updateAllApps()
+        } else {
+            pendingUpdateAllRequest = true
         }
     }
 
@@ -426,7 +324,8 @@ class AppBloc @Inject constructor(
     }
 
     internal fun getDownloadPath(packageName: String): String? {
-        val apkFile = File(File(context.getExternalFilesDir(null), "downloads"), "$packageName.apk")
+        val baseDir = context.getExternalFilesDir(null) ?: return null
+        val apkFile = File(File(baseDir, "downloads"), "$packageName.apk")
         return if (apkFile.exists()) apkFile.absolutePath else null
     }
 

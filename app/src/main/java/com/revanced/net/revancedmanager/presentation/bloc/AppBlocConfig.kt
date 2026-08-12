@@ -1,28 +1,14 @@
 package com.revanced.net.revancedmanager.presentation.bloc
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.core.common.LocaleHelper
 import com.revanced.net.revancedmanager.domain.model.AppConfig
 import com.revanced.net.revancedmanager.domain.model.Language
 import com.revanced.net.revancedmanager.domain.model.ThemeMode
-import kotlinx.coroutines.launch
+import java.io.File
 
 // ============= CONFIGURATION =============
-
-internal fun AppBloc.navigateToSettings() {
-    val config = loadConfigSafely()
-    when (val s = _state.value) {
-        is AppState.Success -> _state.value = s.copy(showSettings = true, config = config)
-        is AppState.Error   -> _state.value = s.copy(showSettings = true, config = config)
-        is AppState.Loading -> _state.value = AppState.Success(apps = emptyList(), showSettings = true, config = config)
-    }
-}
-
-internal fun AppBloc.navigateBackFromSettings() {
-    setShowSettings(false)
-}
 
 internal fun AppBloc.saveSettings(config: AppConfig) {
     Log.i(TAG_BLOC, "=== SAVE SETTINGS START ===")
@@ -31,8 +17,8 @@ internal fun AppBloc.saveSettings(config: AppConfig) {
     preferencesManager.saveAppConfig(config)
 
     when (val s = _state.value) {
-        is AppState.Success -> _state.value = s.copy(config = config, showSettings = false)
-        is AppState.Error   -> _state.value = s.copy(config = config, showSettings = false)
+        is AppState.Success -> _state.value = s.copy(config = config)
+        is AppState.Error   -> _state.value = s.copy(config = config)
         is AppState.Loading -> Unit
     }
 
@@ -63,8 +49,8 @@ internal fun AppBloc.resetSettings() {
     preferencesManager.saveAppConfig(defaults)
 
     when (val s = _state.value) {
-        is AppState.Success -> _state.value = s.copy(config = defaults, showSettings = false)
-        is AppState.Error   -> _state.value = s.copy(config = defaults, showSettings = false)
+        is AppState.Success -> _state.value = s.copy(config = defaults)
+        is AppState.Error   -> _state.value = s.copy(config = defaults)
         is AppState.Loading -> Unit
     }
 
@@ -105,10 +91,49 @@ internal fun AppBloc.loadConfiguration() {
     }
 }
 
-private fun AppBloc.setShowSettings(show: Boolean) {
-    when (val s = _state.value) {
-        is AppState.Success -> _state.value = s.copy(showSettings = show)
-        is AppState.Error   -> _state.value = s.copy(showSettings = show)
-        is AppState.Loading -> Unit
+// ============= APK CACHE =============
+
+/**
+ * Snapshot of the downloaded-APK cache: how many APK files are stored and their total size.
+ */
+data class ApkCacheInfo(val fileCount: Int, val totalBytes: Long)
+
+private fun AppBloc.apkCacheDir(): File =
+    File(context.getExternalFilesDir(null), "downloads")
+
+/**
+ * Compute the number of cached APK files and their combined size on disk.
+ * Performs file I/O — call from a background dispatcher.
+ */
+internal fun AppBloc.getApkCacheInfo(): ApkCacheInfo {
+    return try {
+        val files = apkCacheDir().listFiles()?.filter { it.isFile } ?: emptyList()
+        ApkCacheInfo(files.size, files.sumOf { it.length() })
+    } catch (e: Exception) {
+        Log.w(TAG_BLOC, "Failed to compute APK cache info", e)
+        ApkCacheInfo(0, 0L)
     }
+}
+
+/**
+ * Delete every cached APK file and the finished download work records, then return
+ * the refreshed (post-deletion) cache info. Performs file I/O — call from a background dispatcher.
+ */
+internal fun AppBloc.clearApkCache(): ApkCacheInfo {
+    val deleted = try {
+        val files = apkCacheDir().listFiles()?.filter { it.isFile } ?: emptyList()
+        files.count { it.delete() }
+    } catch (e: Exception) {
+        Log.e(TAG_BLOC, "Failed to clear APK cache", e)
+        0
+    }
+
+    Log.i(TAG_BLOC, "Cleared APK cache — deleted $deleted file(s)")
+
+    // Drop finished download work records so removed files aren't replayed as
+    // completed downloads on the next app start
+    downloadManager.pruneFinishedWork()
+
+    showToast(stringProvider.getString(R.string.settings_cache_cleared, deleted))
+    return getApkCacheInfo()
 }

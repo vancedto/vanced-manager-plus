@@ -34,10 +34,9 @@
     <string name="installing">इंस्टॉल कर रहे हैं</string>
     <string name="uninstalling">अनइंस्टॉल कर रहे हैं</string>
     <string name="unknown">अज्ञात</string>
-    <string name="installed_version">इंस्टॉल: v%1$s</string>
-    <string name="latest_version">नवीनतम: v%1$s</string>
+    <string name="installed_version">इंस्टॉल: %1$s</string>
+    <string name="latest_version">नवीनतम: %1$s</string>
     <string name="downloading_progress">डाउनलोड कर रहे हैं %1$d%%</string>
-    <string name="show_less">कम दिखाएं</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">डाउनलोड शुरू हो रहा है...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">प्रदर्शन</string>
     <string name="settings_section_debug">डीबग</string>
     <string name="settings_section_danger_zone">खतरनाक क्षेत्र</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">स्टोरेज</string>
+    <string name="auto_delete_apk">इंस्टॉल के बाद APK स्वतः हटाएँ</string>
+    <string name="auto_delete_apk_description">इंस्टॉल सफल होने पर डाउनलोड की गई APK फ़ाइल हटाएँ</string>
+    <string name="settings_clear_cache_button">APK कैश साफ़ करें (%1$d फ़ाइलें · %2$s)</string>
+    <string name="settings_clear_cache_calculating">APK कैश साफ़ करें (गणना हो रही है…)</string>
+    <string name="settings_clear_cache_empty">कोई कैश की गई APK फ़ाइल नहीं</string>
+    <string name="settings_clear_cache_confirm_title">APK कैश साफ़ करें?</string>
+    <string name="settings_clear_cache_confirm_message">सभी डाउनलोड की गई APK फ़ाइलें (%1$s) हटा दी जाएँगी। आवश्यकता होने पर उन्हें फिर से डाउनलोड किया जाएगा।</string>
+    <string name="settings_cache_cleared">%1$d APK फ़ाइल(ें) साफ़ की गईं</string>
     <string name="settings_reset_button">सभी सेटिंग्स रीसेट करें</string>
     <string name="settings_reset_confirm_title">सेटिंग्स रीसेट करें?</string>
     <string name="settings_reset_confirm_message">सभी सेटिंग्स डिफ़ॉल्ट पर रीसेट होंगी। यह पूर्ववत नहीं किया जा सकता।</string>
     <string name="settings_reset_to_defaults">सेटिंग्स रीसेट हो गई</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">प्रोसेस हो रहा है (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">सभी अपडेट करें</string>
+    <string name="update_all_started">%1$d ऐप अपडेट हो रहे हैं…</string>
+    <string name="update_prompt_title">अपडेट उपलब्ध</string>
+    <string name="update_prompt_message">%1$d ऐप के अपडेट उपलब्ध हैं। क्या आप उन्हें अभी अपडेट करना चाहते हैं?</string>
+    <string name="skip_today">आज छोड़ें</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">अपडेट</string>
+    <string name="auto_update_check">रोज़ अपडेट जांचें</string>
+    <string name="auto_update_check_description">दिन में एक बार बैकग्राउंड में ऐप अपडेट जांचें और आपको सूचित करें</string>
+    <string name="show_update_prompt">लॉन्च पर अपडेट पॉपअप</string>
+    <string name="show_update_prompt_description">ऐप खोलने के बाद अपडेट मिलने पर सभी ऐप अपडेट करने के लिए पूछें</string>
+    <string name="update_notification_channel_name">ऐप अपडेट</string>
+    <string name="update_notification_title">%1$d ऐप अपडेट उपलब्ध</string>
+    <string name="update_notification_text">अपने ऐप खोलने और अपडेट करने के लिए टैप करें</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">सुझाए गए ऐप</string>
+    <string name="suggestions_message">इन लोकप्रिय ऐप से शुरू करें — जो नहीं चाहिए उन्हें अनचेक करें:</string>
+    <string name="suggestions_install">इंस्टॉल करें (%1$d)</string>
+    <string name="suggestions_skip">छोड़ें</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">पसंदीदा</string>

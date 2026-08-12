@@ -34,10 +34,9 @@
     <string name="installing">Nag-i-install</string>
     <string name="uninstalling">Nag-a-uninstall</string>
     <string name="unknown">Hindi alam</string>
-    <string name="installed_version">Naka-install: v%1$s</string>
-    <string name="latest_version">Pinakabago: v%1$s</string>
+    <string name="installed_version">Naka-install: %1$s</string>
+    <string name="latest_version">Pinakabago: %1$s</string>
     <string name="downloading_progress">Nagda-download %1$d%%</string>
-    <string name="show_less">Ipakita ang mas kaunti</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Nagsisimula ang download...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">Display</string>
     <string name="settings_section_debug">Debug</string>
     <string name="settings_section_danger_zone">Danger Zone</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">Storage</string>
+    <string name="auto_delete_apk">Awtomatikong burahin ang APK pagkatapos i-install</string>
+    <string name="auto_delete_apk_description">Burahin ang na-download na APK file kapag matagumpay ang pag-install</string>
+    <string name="settings_clear_cache_button">I-clear ang APK cache (%1$d na file · %2$s)</string>
+    <string name="settings_clear_cache_calculating">I-clear ang APK cache (kinakalkula…)</string>
+    <string name="settings_clear_cache_empty">Walang naka-cache na APK file</string>
+    <string name="settings_clear_cache_confirm_title">I-clear ang APK cache?</string>
+    <string name="settings_clear_cache_confirm_message">Buburahin ang lahat ng na-download na APK file (%1$s). Muli itong ida-download kapag kailangan.</string>
+    <string name="settings_cache_cleared">Na-clear ang %1$d APK file</string>
     <string name="settings_reset_button">I-reset ang lahat ng settings</string>
     <string name="settings_reset_confirm_title">I-reset ang Settings?</string>
     <string name="settings_reset_confirm_message">Lahat ng settings ay ibabalik sa default. Hindi ito maibabalik.</string>
     <string name="settings_reset_to_defaults">Nai-reset ang settings</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">Pinoproseso (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">I-update lahat</string>
+    <string name="update_all_started">Ina-update ang %1$d (na) app…</string>
+    <string name="update_prompt_title">May available na update</string>
+    <string name="update_prompt_message">May available na update ang %1$d (na) app. Gusto mo ba silang i-update ngayon?</string>
+    <string name="skip_today">Laktawan ngayon</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">Mga Update</string>
+    <string name="auto_update_check">Mag-check ng update araw-araw</string>
+    <string name="auto_update_check_description">Mag-check ng mga update ng app sa background isang beses sa isang araw at abisuhan ka</string>
+    <string name="show_update_prompt">Update popup sa pagbukas</string>
+    <string name="show_update_prompt_description">Magtanong na i-update ang lahat ng app kapag may nakitang update pagkatapos buksan ang app</string>
+    <string name="update_notification_channel_name">Mga Update ng App</string>
+    <string name="update_notification_title">%1$d (na) update ng app ang available</string>
+    <string name="update_notification_text">I-tap para buksan at i-update ang iyong mga app</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">Mga iminungkahing app</string>
+    <string name="suggestions_message">Magsimula sa mga sikat na app na ito — alisin sa check ang ayaw mo:</string>
+    <string name="suggestions_install">I-install (%1$d)</string>
+    <string name="suggestions_skip">Laktawan</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Mga Paborito</string>

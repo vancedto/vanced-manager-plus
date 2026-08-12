@@ -34,10 +34,9 @@
     <string name="installing">Kuruluyor</string>
     <string name="uninstalling">Kaldırılıyor</string>
     <string name="unknown">Bilinmiyor</string>
-    <string name="installed_version">Kurulu: v%1$s</string>
-    <string name="latest_version">Son sürüm: v%1$s</string>
+    <string name="installed_version">Kurulu: %1$s</string>
+    <string name="latest_version">Son sürüm: %1$s</string>
     <string name="downloading_progress">İndiriliyor %1$d%%</string>
-    <string name="show_less">Daha az göster</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">İndirme başlatılıyor...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">Ekran</string>
     <string name="settings_section_debug">Hata Ayıklama</string>
     <string name="settings_section_danger_zone">Tehlikeli Bölge</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">Depolama</string>
+    <string name="auto_delete_apk">Kurulumdan sonra APK\'yi otomatik sil</string>
+    <string name="auto_delete_apk_description">Kurulum başarılı olduğunda indirilen APK dosyasını sil</string>
+    <string name="settings_clear_cache_button">APK önbelleğini temizle (%1$d dosya · %2$s)</string>
+    <string name="settings_clear_cache_calculating">APK önbelleğini temizle (hesaplanıyor…)</string>
+    <string name="settings_clear_cache_empty">Önbellekte APK dosyası yok</string>
+    <string name="settings_clear_cache_confirm_title">APK önbelleği temizlensin mi?</string>
+    <string name="settings_clear_cache_confirm_message">İndirilen tüm APK dosyaları (%1$s) silinecek. Gerektiğinde yeniden indirilecekler.</string>
+    <string name="settings_cache_cleared">%1$d APK dosyası temizlendi</string>
     <string name="settings_reset_button">Tüm ayarları sıfırla</string>
     <string name="settings_reset_confirm_title">Ayarlar sıfırlansın mı?</string>
     <string name="settings_reset_confirm_message">Tüm ayarlar varsayılan değerlerine sıfırlanacak. Bu işlem geri alınamaz.</string>
     <string name="settings_reset_to_defaults">Ayarlar sıfırlandı</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">İşleniyor (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">Tümünü güncelle</string>
+    <string name="update_all_started">%1$d uygulama güncelleniyor…</string>
+    <string name="update_prompt_title">Güncellemeler mevcut</string>
+    <string name="update_prompt_message">%1$d uygulama için güncelleme mevcut. Şimdi güncellemek ister misiniz?</string>
+    <string name="skip_today">Bugün atla</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">Güncellemeler</string>
+    <string name="auto_update_check">Güncellemeleri her gün denetle</string>
+    <string name="auto_update_check_description">Uygulama güncellemelerini günde bir kez arka planda denetle ve seni bilgilendir</string>
+    <string name="show_update_prompt">Açılışta güncelleme penceresi</string>
+    <string name="show_update_prompt_description">Uygulama açıldıktan sonra güncelleme bulunduğunda tüm uygulamaların güncellenmesini iste</string>
+    <string name="update_notification_channel_name">Uygulama Güncellemeleri</string>
+    <string name="update_notification_title">%1$d uygulama güncellemesi mevcut</string>
+    <string name="update_notification_text">Uygulamalarını açmak ve güncellemek için dokun</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">Önerilen uygulamalar</string>
+    <string name="suggestions_message">Bu popüler uygulamalarla başla — istemediklerinin işaretini kaldır:</string>
+    <string name="suggestions_install">Yükle (%1$d)</string>
+    <string name="suggestions_skip">Atla</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favoriler</string>

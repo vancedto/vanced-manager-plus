@@ -34,10 +34,9 @@
     <string name="installing">ইনস্টল হচ্ছে</string>
     <string name="uninstalling">আনইনস্টল হচ্ছে</string>
     <string name="unknown">অজানা</string>
-    <string name="installed_version">ইনস্টল: v%1$s</string>
-    <string name="latest_version">সর্বশেষ: v%1$s</string>
+    <string name="installed_version">ইনস্টল: %1$s</string>
+    <string name="latest_version">সর্বশেষ: %1$s</string>
     <string name="downloading_progress">ডাউনলোড %1$d%%</string>
-    <string name="show_less">কম দেখান</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">ডাউনলোড শুরু হচ্ছে...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">প্রদর্শন</string>
     <string name="settings_section_debug">ডিবাগ</string>
     <string name="settings_section_danger_zone">বিপদজনক এলাকা</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">স্টোরেজ</string>
+    <string name="auto_delete_apk">ইনস্টলের পরে APK স্বয়ংক্রিয়ভাবে মুছুন</string>
+    <string name="auto_delete_apk_description">ইনস্টল সফল হলে ডাউনলোড করা APK ফাইল মুছে ফেলুন</string>
+    <string name="settings_clear_cache_button">APK ক্যাশে সাফ করুন (%1$d ফাইল · %2$s)</string>
+    <string name="settings_clear_cache_calculating">APK ক্যাশে সাফ করুন (গণনা করা হচ্ছে…)</string>
+    <string name="settings_clear_cache_empty">ক্যাশে কোনো APK ফাইল নেই</string>
+    <string name="settings_clear_cache_confirm_title">APK ক্যাশে সাফ করবেন?</string>
+    <string name="settings_clear_cache_confirm_message">ডাউনলোড করা সব APK ফাইল (%1$s) মুছে ফেলা হবে। প্রয়োজনে এগুলি আবার ডাউনলোড করা হবে।</string>
+    <string name="settings_cache_cleared">%1$d টি APK ফাইল সাফ করা হয়েছে</string>
     <string name="settings_reset_button">সমস্ত সেটিংস রিসেট করুন</string>
     <string name="settings_reset_confirm_title">সেটিংস রিসেট করবেন?</string>
     <string name="settings_reset_confirm_message">সব সেটিংস ডিফল্টে ফিরে যাবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
     <string name="settings_reset_to_defaults">সেটিংস রিসেট করা হয়েছে</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">প্রসেস করা হচ্ছে (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">সব আপডেট করুন</string>
+    <string name="update_all_started">%1$dটি অ্যাপ আপডেট হচ্ছে…</string>
+    <string name="update_prompt_title">আপডেট উপলব্ধ</string>
+    <string name="update_prompt_message">%1$dটি অ্যাপের আপডেট উপলব্ধ। এখনই আপডেট করতে চান?</string>
+    <string name="skip_today">আজ বাদ দিন</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">আপডেট</string>
+    <string name="auto_update_check">প্রতিদিন আপডেট পরীক্ষা করুন</string>
+    <string name="auto_update_check_description">দিনে একবার ব্যাকগ্রাউন্ডে অ্যাপ আপডেট পরীক্ষা করে আপনাকে জানাবে</string>
+    <string name="show_update_prompt">চালু করার সময় আপডেট পপআপ</string>
+    <string name="show_update_prompt_description">অ্যাপ খোলার পর আপডেট পাওয়া গেলে সব অ্যাপ আপডেট করতে বলুন</string>
+    <string name="update_notification_channel_name">অ্যাপ আপডেট</string>
+    <string name="update_notification_title">%1$dটি অ্যাপ আপডেট উপলব্ধ</string>
+    <string name="update_notification_text">অ্যাপ খুলতে এবং আপডেট করতে ট্যাপ করুন</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">প্রস্তাবিত অ্যাপ</string>
+    <string name="suggestions_message">এই জনপ্রিয় অ্যাপগুলো দিয়ে শুরু করুন — যেগুলো চান না সেগুলোর টিক তুলে দিন:</string>
+    <string name="suggestions_install">ইনস্টল করুন (%1$d)</string>
+    <string name="suggestions_skip">বাদ দিন</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">প্রিয়</string>

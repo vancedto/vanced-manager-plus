@@ -2,84 +2,127 @@ package com.revanced.net.revancedmanager.presentation.bloc
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkInfo
 import com.revanced.net.revancedmanager.R
+import com.revanced.net.revancedmanager.data.manager.DownloadState
 import com.revanced.net.revancedmanager.domain.model.AppStatus
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import java.io.File
 
 // ============= DOWNLOAD LOGIC =============
+//
+// Downloads are WorkManager work. The single collector below is the only
+// signal path: progress, completion, failure, and cancellation all arrive as
+// WorkInfo updates — including work that survived a process death or reboot.
+
+internal fun AppBloc.observeDownloads() {
+    downloadManager.downloads
+        .onEach { downloads -> downloads.forEach { handleDownloadUpdate(it) } }
+        .launchIn(viewModelScope)
+}
+
+private fun AppBloc.handleDownloadUpdate(download: DownloadState) {
+    when (download.state) {
+        WorkInfo.State.ENQUEUED,
+        WorkInfo.State.BLOCKED,
+        WorkInfo.State.RUNNING -> {
+            val currentStatus = (_state.value as? AppState.Success)
+                ?.apps?.find { it.packageName == download.packageName }?.status
+            if (currentStatus != null && currentStatus != AppStatus.DOWNLOADING) {
+                updateAppStatus(download.packageName, AppStatus.DOWNLOADING)
+            }
+            updateAppProgress(download.packageName, download.progress)
+        }
+
+        WorkInfo.State.SUCCEEDED -> if (handledDownloads.add(download.id)) {
+            val filePath = download.filePath
+            if (filePath != null && File(filePath).exists()) {
+                handleDownloadCompleted(download.packageName, filePath)
+            } else {
+                Log.w(TAG_BLOC, "Completed download has no file, dropping: ${download.packageName}")
+                downloadManager.pruneFinishedWork()
+            }
+        }
+
+        WorkInfo.State.FAILED -> if (handledDownloads.add(download.id)) {
+            handleDownloadFailed(download.packageName, buildDownloadErrorMessage(download.error))
+        }
+
+        WorkInfo.State.CANCELLED -> if (handledDownloads.add(download.id)) {
+            // Feedback is handled where the cancel was requested (cancelDownload
+            // or a REPLACE re-enqueue) — nothing to do here.
+        }
+    }
+}
 
 internal fun AppBloc.downloadApp(packageName: String, downloadUrl: String) {
     Log.i(TAG_BLOC, "Starting download: $packageName")
 
-    cancelDownload(packageName)
-    completedDownloads.remove(packageName)
-    installationQueue.removeAll { it.packageName == packageName }
+    // Drop any install still queued for a stale APK of this package
+    pendingInstalls.remove(packageName)
 
-    val downloadJob = viewModelScope.launch {
-        try {
-            updateAppStatus(packageName, AppStatus.DOWNLOADING)
-            updateAppProgress(packageName, 0f)
-            showToast(stringProvider.getString(R.string.download_starting))
+    // Remember that this one was asked for, so completing it installs even when the app is
+    // already up to date — which is exactly what choosing another architecture means.
+    userRequestedDownloads.add(packageName)
 
-            simpleDownloadManager.downloadApp(packageName, downloadUrl)
-                .catch { error ->
-                    Log.e(TAG_BLOC, "Download failed for $packageName", error)
-                    handleDownloadFailed(packageName, buildDownloadErrorMessage(error.message))
-                }
-                .onEach { download ->
-                    updateAppProgress(packageName, download.progress)
-                    if (download.isComplete && download.filePath != null) {
-                        Log.i(TAG_BLOC, "Download completed for $packageName: ${download.filePath}")
-                        handleDownloadCompleted(packageName, download.filePath)
-                        return@onEach
-                    }
-                }
-                .launchIn(this)
+    updateAppStatus(packageName, AppStatus.DOWNLOADING)
+    updateAppProgress(packageName, 0f)
+    showToast(stringProvider.getString(R.string.download_starting))
 
-        } catch (e: Exception) {
-            Log.e(TAG_BLOC, "Download error for $packageName", e)
-            handleDownloadFailed(packageName, buildDownloadErrorMessage(e.message))
-        }
-    }
+    val appName = (_state.value as? AppState.Success)
+        ?.apps?.find { it.packageName == packageName }?.title ?: packageName
+    downloadManager.download(packageName, downloadUrl, appName)
+}
 
-    activeDownloads[packageName] = downloadJob
+/**
+ * Download every app that has an update available. Downloads run in parallel
+ * through WorkManager; completed downloads feed the sequential install queue,
+ * so no extra coordination is needed here.
+ */
+internal fun AppBloc.updateAllApps() {
+    val appsToUpdate = (_state.value as? AppState.Success)
+        ?.apps?.filter { it.status == AppStatus.UPDATE_AVAILABLE }
+        ?: return
+    if (appsToUpdate.isEmpty()) return
+
+    Log.i(TAG_BLOC, "Updating all apps: ${appsToUpdate.size} update(s)")
+    showToast(stringProvider.getString(R.string.update_all_started, appsToUpdate.size))
+    appsToUpdate.forEach { downloadApp(it.packageName, it.downloadUrl) }
 }
 
 internal fun AppBloc.handleDownloadCompleted(packageName: String, filePath: String) {
-    if (completedDownloads.contains(packageName)) {
-        Log.w(TAG_BLOC, "Download completion already handled for: $packageName")
+    val app = (_state.value as? AppState.Success)?.apps?.find { it.packageName == packageName }
+    val wasRequestedByUser = userRequestedDownloads.remove(packageName)
+
+    // Work records replayed after a restart can point at an app that has since
+    // been installed — don't install the same version again. A download the user just started is
+    // never a replay, and skipping it there would silently swallow a deliberate choice of a
+    // different architecture for an app that is already up to date.
+    if (!wasRequestedByUser && app != null && resolveActualStatus(packageName) == AppStatus.UP_TO_DATE) {
+        Log.i(TAG_BLOC, "Replayed download for an up-to-date app, skipping install: $packageName")
+        downloadManager.pruneFinishedWork()
         return
     }
 
     Log.i(TAG_BLOC, "Download completed, queueing for installation: $packageName -> $filePath")
-    completedDownloads.add(packageName)
-    activeDownloads.remove(packageName)
-
-    val appName = (_state.value as? AppState.Success)
-        ?.apps?.find { it.packageName == packageName }?.title ?: packageName
-
-    queueInstallation(packageName, filePath, appName)
+    queueInstallation(packageName, filePath, app?.title ?: packageName)
     showToast(stringProvider.getString(R.string.download_completed_installing))
 }
 
 internal fun AppBloc.handleDownloadFailed(packageName: String, error: String) {
     Log.e(TAG_BLOC, "Download failed: $packageName - $error")
-    activeDownloads.remove(packageName)
-    val restoredStatus = resolveActualStatus(packageName)
-    updateAppStatus(packageName, restoredStatus)
+    userRequestedDownloads.remove(packageName)
+    updateAppStatus(packageName, resolveActualStatus(packageName))
     updateAppProgress(packageName, 0f)
     showError(error)
+    downloadManager.pruneFinishedWork()
 }
 
 internal fun AppBloc.cancelDownload(packageName: String) {
     Log.i(TAG_BLOC, "Cancelling download: $packageName")
-    activeDownloads[packageName]?.cancel()
-    activeDownloads.remove(packageName)
-    simpleDownloadManager.cancelDownload(packageName)
+    userRequestedDownloads.remove(packageName)
+    downloadManager.cancel(packageName)
 
     val restoredStatus = resolveActualStatus(packageName)
     updateAppStatus(packageName, restoredStatus)
@@ -87,71 +130,6 @@ internal fun AppBloc.cancelDownload(packageName: String) {
 
     if (restoredStatus != AppStatus.DOWNLOADING) {
         showToast(stringProvider.getString(R.string.download_cancelled))
-    }
-}
-
-internal fun AppBloc.checkDownloadServiceProgress() {
-    try {
-        val activeMap = simpleDownloadManager.getActiveDownloads()
-        Log.i(TAG_BLOC, "SimpleDownloadManager reports ${activeMap.size} active downloads")
-
-        activeMap.forEach { (packageName, download) ->
-            if (download.isComplete && download.filePath != null) {
-                val currentStatus = (_state.value as? AppState.Success)
-                    ?.apps?.find { it.packageName == packageName }?.status
-                if (currentStatus == AppStatus.UP_TO_DATE ||
-                    currentStatus == AppStatus.INSTALLING ||
-                    installationQueue.any { it.packageName == packageName }
-                ) {
-                    Log.i(TAG_BLOC, "Skipping already handled package: $packageName (status=$currentStatus)")
-                } else {
-                    handleEvent(AppEvent.DownloadCompleted(packageName, download.filePath!!))
-                }
-            } else if (!download.isComplete) {
-                updateAppProgress(packageName, download.progress)
-                updateAppStatus(packageName, AppStatus.DOWNLOADING)
-            }
-        }
-    } catch (e: Exception) {
-        Log.w(TAG_BLOC, "Error checking download service progress", e)
-    }
-}
-
-internal fun AppBloc.checkPendingDownloadsOnForeground() {
-    Log.i(TAG_BLOC, "=== CHECKING PENDING DOWNLOADS ON FOREGROUND ===")
-
-    viewModelScope.launch {
-        try {
-            checkDownloadServiceProgress()
-            kotlinx.coroutines.delay(1000)
-
-            val completed = downloadStateRepository.getCompletedDownloads()
-            val active = downloadStateRepository.getActiveDownloads()
-            Log.i(TAG_BLOC, "Found ${completed.size} completed, ${active.size} active downloads")
-
-            if (completed.isNotEmpty()) {
-                completed.forEach { dl ->
-                    queueInstallation(dl.packageName, dl.filePath!!, dl.appName)
-                }
-            }
-
-            active.forEach { dl ->
-                val filePath = dl.filePath
-                if (filePath != null && File(filePath).exists()) {
-                    downloadStateRepository.markDownloadCompleted(dl.packageName, filePath)
-                    queueInstallation(dl.packageName, filePath, dl.appName)
-                } else {
-                    // File missing — resolve actual device state, don't assume UPDATE_AVAILABLE
-                    updateAppStatus(dl.packageName, resolveActualStatus(dl.packageName))
-                    downloadStateRepository.removeDownloadState(dl.packageName)
-                }
-            }
-
-            downloadStateRepository.cleanupOldFailedDownloads()
-
-        } catch (e: Exception) {
-            Log.e(TAG_BLOC, "Error checking pending downloads", e)
-        }
     }
 }
 

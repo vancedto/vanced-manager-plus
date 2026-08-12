@@ -45,7 +45,7 @@ android {
 
     defaultConfig {
         applicationId = "com.revanced.net.revancedmanager"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
 
         // Use version properties
@@ -89,6 +89,14 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    testOptions {
+        unitTests {
+            // AppMapper logs through android.util.Log, which is a stub that throws in plain JVM
+            // tests. Returning defaults instead lets the mapping itself be tested without pulling
+            // in Robolectric or wrapping every log call.
+            isReturnDefaultValues = true
+        }
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.8"
@@ -401,6 +409,7 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation(libs.hilt.work)
     ksp(libs.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
 
     // Lifecycle & ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -426,11 +435,6 @@ dependencies {
 
     // Work Manager
     implementation(libs.androidx.work.runtime.ktx)
-
-    // Room Database
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
 
     // Testing
     testImplementation(libs.junit)

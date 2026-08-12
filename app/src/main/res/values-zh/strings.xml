@@ -34,10 +34,9 @@
     <string name="installing">正在安装</string>
     <string name="uninstalling">正在卸载</string>
     <string name="unknown">未知</string>
-    <string name="installed_version">已安装: v%1$s</string>
-    <string name="latest_version">最新版: v%1$s</string>
+    <string name="installed_version">已安装: %1$s</string>
+    <string name="latest_version">最新版: %1$s</string>
     <string name="downloading_progress">正在下载 %1$d%%</string>
-    <string name="show_less">收起</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">开始下载...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">显示</string>
     <string name="settings_section_debug">调试</string>
     <string name="settings_section_danger_zone">危险区域</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">存储</string>
+    <string name="auto_delete_apk">安装后自动删除 APK</string>
+    <string name="auto_delete_apk_description">安装成功后删除已下载的 APK 文件</string>
+    <string name="settings_clear_cache_button">清除 APK 缓存（%1$d 个文件 · %2$s）</string>
+    <string name="settings_clear_cache_calculating">清除 APK 缓存（正在计算…）</string>
+    <string name="settings_clear_cache_empty">没有缓存的 APK 文件</string>
+    <string name="settings_clear_cache_confirm_title">清除 APK 缓存？</string>
+    <string name="settings_clear_cache_confirm_message">所有已下载的 APK 文件（%1$s）将被删除。需要时会重新下载。</string>
+    <string name="settings_cache_cleared">已清除 %1$d 个 APK 文件</string>
     <string name="settings_reset_button">恢复所有默认设置</string>
     <string name="settings_reset_confirm_title">重置设置？</string>
     <string name="settings_reset_confirm_message">所有设置将恢复为默认值，此操作不可撤销。</string>
     <string name="settings_reset_to_defaults">设置已重置</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">处理中 (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">全部更新</string>
+    <string name="update_all_started">正在更新 %1$d 个应用…</string>
+    <string name="update_prompt_title">有可用更新</string>
+    <string name="update_prompt_message">%1$d 个应用有可用更新。是否立即更新？</string>
+    <string name="skip_today">今天跳过</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">更新</string>
+    <string name="auto_update_check">每天检查更新</string>
+    <string name="auto_update_check_description">每天在后台检查一次应用更新并通知你</string>
+    <string name="show_update_prompt">启动时显示更新弹窗</string>
+    <string name="show_update_prompt_description">打开应用后发现更新时询问是否更新所有应用</string>
+    <string name="update_notification_channel_name">应用更新</string>
+    <string name="update_notification_title">%1$d 个应用有更新</string>
+    <string name="update_notification_text">点按以打开并更新你的应用</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">推荐应用</string>
+    <string name="suggestions_message">从这些热门应用开始 — 取消勾选你不想要的：</string>
+    <string name="suggestions_install">安装 (%1$d)</string>
+    <string name="suggestions_skip">跳过</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">收藏</string>

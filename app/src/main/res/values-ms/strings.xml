@@ -34,10 +34,9 @@
     <string name="installing">Memasang</string>
     <string name="uninstalling">Menyah pasang</string>
     <string name="unknown">Tidak diketahui</string>
-    <string name="installed_version">Dipasang: v%1$s</string>
-    <string name="latest_version">Terkini: v%1$s</string>
+    <string name="installed_version">Dipasang: %1$s</string>
+    <string name="latest_version">Terkini: %1$s</string>
     <string name="downloading_progress">Memuat turun %1$d%%</string>
-    <string name="show_less">Tunjuk Kurang</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Memulakan muat turun...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">Paparan</string>
     <string name="settings_section_debug">Debug</string>
     <string name="settings_section_danger_zone">Zon Berbahaya</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">Storan</string>
+    <string name="auto_delete_apk">Auto padam APK selepas pemasangan</string>
+    <string name="auto_delete_apk_description">Padam fail APK yang dimuat turun setelah pemasangan berjaya</string>
+    <string name="settings_clear_cache_button">Kosongkan cache APK (%1$d fail · %2$s)</string>
+    <string name="settings_clear_cache_calculating">Kosongkan cache APK (mengira…)</string>
+    <string name="settings_clear_cache_empty">Tiada fail APK dalam cache</string>
+    <string name="settings_clear_cache_confirm_title">Kosongkan cache APK?</string>
+    <string name="settings_clear_cache_confirm_message">Semua fail APK yang dimuat turun (%1$s) akan dipadam. Ia akan dimuat turun semula apabila diperlukan.</string>
+    <string name="settings_cache_cleared">%1$d fail APK dikosongkan</string>
     <string name="settings_reset_button">Tetapkan semula semua tetapan</string>
     <string name="settings_reset_confirm_title">Tetapkan Semula?</string>
     <string name="settings_reset_confirm_message">Semua tetapan akan dikembalikan ke asal. Ini tidak boleh dibatalkan.</string>
     <string name="settings_reset_to_defaults">Tetapan telah ditetapkan semula</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">Memproses (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">Kemas kini semua</string>
+    <string name="update_all_started">Mengemas kini %1$d apl…</string>
+    <string name="update_prompt_title">Kemas kini tersedia</string>
+    <string name="update_prompt_message">%1$d apl mempunyai kemas kini. Kemas kini sekarang?</string>
+    <string name="skip_today">Langkau hari ini</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">Kemas kini</string>
+    <string name="auto_update_check">Semak kemas kini setiap hari</string>
+    <string name="auto_update_check_description">Semak kemas kini apl di latar belakang sekali sehari dan beritahu anda</string>
+    <string name="show_update_prompt">Popup kemas kini semasa dibuka</string>
+    <string name="show_update_prompt_description">Tanya untuk mengemas kini semua apl apabila kemas kini ditemui selepas membuka apl</string>
+    <string name="update_notification_channel_name">Kemas Kini Apl</string>
+    <string name="update_notification_title">%1$d kemas kini apl tersedia</string>
+    <string name="update_notification_text">Ketik untuk membuka dan mengemas kini apl anda</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">Apl dicadangkan</string>
+    <string name="suggestions_message">Mulakan dengan apl popular ini — nyahtanda yang anda tidak mahu:</string>
+    <string name="suggestions_install">Pasang (%1$d)</string>
+    <string name="suggestions_skip">Langkau</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Kegemaran</string>

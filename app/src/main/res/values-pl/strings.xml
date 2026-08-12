@@ -34,10 +34,9 @@
     <string name="installing">Instalowanie</string>
     <string name="uninstalling">Odinstalowywanie</string>
     <string name="unknown">Nieznany</string>
-    <string name="installed_version">Zainstalowana: v%1$s</string>
-    <string name="latest_version">Najnowsza: v%1$s</string>
+    <string name="installed_version">Zainstalowana: %1$s</string>
+    <string name="latest_version">Najnowsza: %1$s</string>
     <string name="downloading_progress">Pobieranie %1$d%%</string>
-    <string name="show_less">Pokaż mniej</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Rozpoczynanie pobierania...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">Wyświetlanie</string>
     <string name="settings_section_debug">Debugowanie</string>
     <string name="settings_section_danger_zone">Strefa niebezpieczna</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">Pamięć</string>
+    <string name="auto_delete_apk">Automatycznie usuwaj APK po instalacji</string>
+    <string name="auto_delete_apk_description">Usuń pobrany plik APK po udanej instalacji</string>
+    <string name="settings_clear_cache_button">Wyczyść pamięć podręczną APK (%1$d plików · %2$s)</string>
+    <string name="settings_clear_cache_calculating">Wyczyść pamięć podręczną APK (obliczanie…)</string>
+    <string name="settings_clear_cache_empty">Brak plików APK w pamięci podręcznej</string>
+    <string name="settings_clear_cache_confirm_title">Wyczyścić pamięć podręczną APK?</string>
+    <string name="settings_clear_cache_confirm_message">Wszystkie pobrane pliki APK (%1$s) zostaną usunięte. Zostaną pobrane ponownie w razie potrzeby.</string>
+    <string name="settings_cache_cleared">Wyczyszczono %1$d plik(ów) APK</string>
     <string name="settings_reset_button">Przywróć ustawienia domyślne</string>
     <string name="settings_reset_confirm_title">Przywrócić ustawienia?</string>
     <string name="settings_reset_confirm_message">Wszystkie ustawienia zostaną przywrócone do wartości domyślnych. Nie można cofnąć.</string>
     <string name="settings_reset_to_defaults">Ustawienia przywrócone</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">Przetwarzanie (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">Zaktualizuj wszystko</string>
+    <string name="update_all_started">Aktualizowanie %1$d aplikacji…</string>
+    <string name="update_prompt_title">Dostępne aktualizacje</string>
+    <string name="update_prompt_message">%1$d aplikacji ma dostępne aktualizacje. Czy chcesz je teraz zaktualizować?</string>
+    <string name="skip_today">Pomiń dzisiaj</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">Aktualizacje</string>
+    <string name="auto_update_check">Codziennie sprawdzaj aktualizacje</string>
+    <string name="auto_update_check_description">Sprawdzaj aktualizacje aplikacji w tle raz dziennie i powiadamiaj</string>
+    <string name="show_update_prompt">Wyskakujące okno przy uruchomieniu</string>
+    <string name="show_update_prompt_description">Pytaj o aktualizację wszystkich aplikacji, gdy po otwarciu zostaną znalezione aktualizacje</string>
+    <string name="update_notification_channel_name">Aktualizacje aplikacji</string>
+    <string name="update_notification_title">Dostępne aktualizacje %1$d aplikacji</string>
+    <string name="update_notification_text">Dotknij, aby otworzyć i zaktualizować aplikacje</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">Sugerowane aplikacje</string>
+    <string name="suggestions_message">Zacznij od tych popularnych aplikacji — odznacz te, których nie chcesz:</string>
+    <string name="suggestions_install">Zainstaluj (%1$d)</string>
+    <string name="suggestions_skip">Pomiń</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Ulubione</string>

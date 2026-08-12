@@ -12,7 +12,6 @@ import javax.inject.Singleton
 @Singleton
 data class AppManagementUseCases @Inject constructor(
     val getAppsUseCase: GetAppsUseCase,
-    val downloadAppUseCase: DownloadAppUseCase,
     val installAppUseCase: InstallAppUseCase,
     val uninstallAppUseCase: UninstallAppUseCase,
     val openAppUseCase: OpenAppUseCase,

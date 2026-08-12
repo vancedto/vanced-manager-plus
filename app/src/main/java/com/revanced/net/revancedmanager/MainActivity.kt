@@ -1,11 +1,17 @@
 package com.revanced.net.revancedmanager
 
+import android.Manifest
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -13,6 +19,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
@@ -21,7 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.revanced.net.revancedmanager.core.common.LocaleHelper
 import com.revanced.net.revancedmanager.data.local.preferences.PreferencesManager
 import com.revanced.net.revancedmanager.presentation.bloc.AppBloc
-import com.revanced.net.revancedmanager.presentation.ui.screen.MainScreen
+import com.revanced.net.revancedmanager.presentation.navigation.AppNavHost
 import com.revanced.net.revancedmanager.presentation.ui.theme.RevancedManagerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -32,23 +40,53 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    
+
+    companion object {
+        /** Intent action fired by the update notification's "Update all" button. */
+        const val ACTION_UPDATE_ALL = "com.revanced.net.revancedmanager.action.UPDATE_ALL"
+    }
+
     @Inject
     lateinit var preferencesManager: PreferencesManager
-    
+
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* optional feature — no action needed */ }
+
+    /** Set when opened via [ACTION_UPDATE_ALL]; consumed once the UI is up. */
+    private var pendingUpdateAll by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
+        pendingUpdateAll = intent?.action == ACTION_UPDATE_ALL
+
         // Install splash screen
         installSplashScreen()
 
         // Edge-to-edge: transparent status bar + nav bar, correct icon colors per theme
         enableEdgeToEdge()
 
+        // Android 13+: notifications (download progress, install confirmations)
+        // are invisible without this runtime permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
         setContent {
             val viewModel: AppBloc = hiltViewModel()
             val state by viewModel.state.collectAsState()
-            
+
+            // "Update all" tapped on the update notification
+            LaunchedEffect(pendingUpdateAll) {
+                if (pendingUpdateAll) {
+                    pendingUpdateAll = false
+                    viewModel.requestUpdateAll()
+                }
+            }
+
             val themeMode = when (val currentState = state) {
                 is com.revanced.net.revancedmanager.presentation.bloc.AppState.Success -> currentState.config.themeMode
                 is com.revanced.net.revancedmanager.presentation.bloc.AppState.Error -> currentState.config.themeMode
@@ -73,12 +111,19 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen()
+                    AppNavHost()
                 }
             }
         }
     }
     
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.action == ACTION_UPDATE_ALL) {
+            pendingUpdateAll = true
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         // Activity cleanup - no special handling needed for the new approach

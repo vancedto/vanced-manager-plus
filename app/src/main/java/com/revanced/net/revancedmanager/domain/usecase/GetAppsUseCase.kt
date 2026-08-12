@@ -1,6 +1,7 @@
 package com.revanced.net.revancedmanager.domain.usecase
 
 import com.revanced.net.revancedmanager.core.common.Result
+import com.revanced.net.revancedmanager.core.common.VersionComparator
 import com.revanced.net.revancedmanager.domain.model.AppStatus
 import com.revanced.net.revancedmanager.domain.model.RevancedApp
 import com.revanced.net.revancedmanager.domain.repository.AppRepository
@@ -48,43 +49,10 @@ class GetAppsUseCase @Inject constructor(
         }
     }
     
-    /**
-     * Compare two version strings
-     * @param installedVersion Currently installed version
-     * @param latestVersion Latest available version
-     * @return Positive if installedVersion > latestVersion, negative if less, zero if equal
-     */
-    private fun compareVersions(installedVersion: String, latestVersion: String): Int {
-        if (installedVersion.isEmpty() || latestVersion.isEmpty()) {
-            return 0
-        }
-        
-        return try {
-            val installedParts = installedVersion.split(".").map { part ->
-                part.takeWhile { it.isDigit() }.ifEmpty { "0" }
-            }
-            val latestParts = latestVersion.split(".").map { part ->
-                part.takeWhile { it.isDigit() }.ifEmpty { "0" }
-            }
-            
-            val length = minOf(installedParts.size, latestParts.size)
-            
-            for (i in 0 until length) {
-                val installedNum = installedParts[i].toLongOrNull() ?: 0L
-                val latestNum = latestParts[i].toLongOrNull() ?: 0L
-                
-                when {
-                    installedNum > latestNum -> return 1
-                    installedNum < latestNum -> return -1
-                }
-            }
-            
-            installedParts.size.compareTo(latestParts.size)
-        } catch (e: Exception) {
-            0
-        }
-    }
-    
+    private fun compareVersions(installedVersion: String, latestVersion: String): Int =
+        VersionComparator.compare(installedVersion, latestVersion)
+
+
     /**
      * Determine the status of an app based on its installed and latest versions
      * @param app The RevancedApp to check

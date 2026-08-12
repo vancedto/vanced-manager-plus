@@ -34,10 +34,10 @@
     <string name="installing">Đang cài đặt</string>
     <string name="uninstalling">Đang gỡ cài đặt</string>
     <string name="unknown">Không xác định</string>
-    <string name="installed_version">Đã cài: v%1$s</string>
-    <string name="latest_version">Mới nhất: v%1$s</string>
+    <string name="installed_version">Đã cài: %1$s</string>
+    <string name="latest_version">Mới nhất: %1$s</string>
     <string name="downloading_progress">Đang tải %1$d%%</string>
-    <string name="show_less">Thu gọn</string>
+    <string name="downloading_cancel">Huỷ · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Đang bắt đầu tải xuống...</string>
@@ -104,10 +104,46 @@
     <string name="settings_section_display">Hiển thị</string>
     <string name="settings_section_debug">Debug</string>
     <string name="settings_section_danger_zone">Vùng nguy hiểm</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">Bộ nhớ</string>
+    <string name="auto_delete_apk">Tự động xóa APK sau khi cài đặt</string>
+    <string name="auto_delete_apk_description">Xóa tệp APK đã tải sau khi cài đặt thành công</string>
+    <string name="settings_clear_cache_button">Xóa bộ nhớ đệm APK (%1$d tệp · %2$s)</string>
+    <string name="settings_clear_cache_calculating">Xóa bộ nhớ đệm APK (đang tính…)</string>
+    <string name="settings_clear_cache_empty">Không có tệp APK nào trong bộ nhớ đệm</string>
+    <string name="settings_clear_cache_confirm_title">Xóa bộ nhớ đệm APK?</string>
+    <string name="settings_clear_cache_confirm_message">Tất cả tệp APK đã tải (%1$s) sẽ bị xóa. Chúng sẽ được tải lại khi cần.</string>
+    <string name="settings_cache_cleared">Đã xóa %1$d tệp APK</string>
     <string name="settings_reset_button">Đặt lại tất cả về mặc định</string>
     <string name="settings_reset_confirm_title">Đặt lại cài đặt?</string>
     <string name="settings_reset_confirm_message">Tất cả cài đặt sẽ về mặc định. Thao tác này không thể hoàn tác.</string>
     <string name="settings_reset_to_defaults">Đã đặt lại cài đặt mặc định</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">Đang xử lý (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">Cập nhật tất cả</string>
+    <string name="update_all_started">Đang cập nhật %1$d ứng dụng…</string>
+    <string name="update_prompt_title">Có bản cập nhật</string>
+    <string name="update_prompt_message">Có %1$d ứng dụng có bản cập nhật. Bạn có muốn cập nhật ngay không?</string>
+    <string name="skip_today">Bỏ qua hôm nay</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">Cập nhật</string>
+    <string name="auto_update_check">Kiểm tra cập nhật hằng ngày</string>
+    <string name="auto_update_check_description">Tự kiểm tra bản cập nhật ngầm mỗi ngày một lần và thông báo cho bạn</string>
+    <string name="show_update_prompt">Hỏi cập nhật khi mở app</string>
+    <string name="show_update_prompt_description">Hiện hộp thoại cập nhật tất cả khi phát hiện bản mới lúc mở ứng dụng</string>
+    <string name="update_notification_channel_name">Cập nhật ứng dụng</string>
+    <string name="update_notification_title">Có %1$d bản cập nhật ứng dụng</string>
+    <string name="update_notification_text">Nhấn để mở và cập nhật ứng dụng</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">Ứng dụng gợi ý</string>
+    <string name="suggestions_message">Bắt đầu với các ứng dụng phổ biến sau — bỏ chọn nếu không muốn:</string>
+    <string name="suggestions_install">Cài đặt (%1$d)</string>
+    <string name="suggestions_skip">Bỏ qua</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Yêu thích</string>
@@ -116,4 +152,32 @@
     <string name="favorite_added">Đã thêm vào yêu thích</string>
     <string name="favorite_removed">Đã xóa khỏi yêu thích</string>
     <string name="no_favorites_yet">Chưa có yêu thích. Nhấn ngôi sao trên ứng dụng để thêm.</string>
+    <string name="favorite_remove_title">Xóa khỏi yêu thích</string>
+
+    <!-- App detail screen -->
+    <string name="app_details">Chi tiết</string>
+    <string name="app_not_found">Ứng dụng này không còn trong danh sách.</string>
+    <string name="app_details_about">Giới thiệu</string>
+    <string name="app_details_features">Có gì bên trong</string>
+    <string name="app_details_variants">Các bản đã phát hành</string>
+    <string name="app_details_variants_auto">Tự động chọn theo máy của bạn — bạn không cần chọn gì.</string>
+    <string name="app_details_variant_selected">Đã chọn cho máy này</string>
+    <string name="app_details_by">bởi %1$s</string>
+    <string name="app_details_updated">Cập nhật %1$s</string>
+    <string name="app_details_size">Dung lượng</string>
+    <string name="app_details_more">Thêm</string>
+    <string name="app_details_requires_microg">Ứng dụng này cần cài MicroG để đăng nhập và phát nội dung.</string>
+    <string name="copy_package_name">Sao chép tên package</string>
+    <string name="package_name_copied">Đã sao chép tên package</string>
+    <string name="share_app">Chia sẻ</string>
+    <string name="open_website">Mở trang chủ</string>
+    <string name="open_app_page">Xem trên vanced.to</string>
+    <string name="app_details_incompatible">Không dành cho máy này</string>
+    <string name="app_details_variant_best_effort">Không có bản nào cho %1$s. Sẽ thử bản %2$s — có thể cài không được.</string>
+    <!-- Sort -->
+    <string name="sort_label">Sắp xếp</string>
+    <string name="sort_catalog">Đề xuất</string>
+    <string name="sort_recently_updated">Mới cập nhật</string>
+    <string name="sort_name_asc">Tên (A-Z)</string>
+    <string name="card_updated">Cập nhật %1$s</string>
 </resources>

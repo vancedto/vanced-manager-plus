@@ -34,10 +34,9 @@
     <string name="installing">Se instalează</string>
     <string name="uninstalling">Se dezinstalează</string>
     <string name="unknown">Necunoscut</string>
-    <string name="installed_version">Instalată: v%1$s</string>
-    <string name="latest_version">Cea mai recentă: v%1$s</string>
+    <string name="installed_version">Instalată: %1$s</string>
+    <string name="latest_version">Cea mai recentă: %1$s</string>
     <string name="downloading_progress">Se descarcă %1$d%%</string>
-    <string name="show_less">Arată mai puțin</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Se începe descărcarea...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">Afișaj</string>
     <string name="settings_section_debug">Depanare</string>
     <string name="settings_section_danger_zone">Zonă periculoasă</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">Stocare</string>
+    <string name="auto_delete_apk">Șterge automat APK după instalare</string>
+    <string name="auto_delete_apk_description">Șterge fișierul APK descărcat după instalarea reușită</string>
+    <string name="settings_clear_cache_button">Golește cache-ul APK (%1$d fișiere · %2$s)</string>
+    <string name="settings_clear_cache_calculating">Golește cache-ul APK (se calculează…)</string>
+    <string name="settings_clear_cache_empty">Niciun fișier APK în cache</string>
+    <string name="settings_clear_cache_confirm_title">Golești cache-ul APK?</string>
+    <string name="settings_clear_cache_confirm_message">Toate fișierele APK descărcate (%1$s) vor fi șterse. Vor fi descărcate din nou când va fi nevoie.</string>
+    <string name="settings_cache_cleared">%1$d fișier(e) APK șterse</string>
     <string name="settings_reset_button">Resetare la valori implicite</string>
     <string name="settings_reset_confirm_title">Resetare setări?</string>
     <string name="settings_reset_confirm_message">Toate setările vor fi resetate. Aceasta nu poate fi anulată.</string>
     <string name="settings_reset_to_defaults">Setări resetate</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">Se procesează (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">Actualizează tot</string>
+    <string name="update_all_started">Se actualizează %1$d aplicații…</string>
+    <string name="update_prompt_title">Actualizări disponibile</string>
+    <string name="update_prompt_message">%1$d aplicații au actualizări disponibile. Vrei să le actualizezi acum?</string>
+    <string name="skip_today">Sari peste azi</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">Actualizări</string>
+    <string name="auto_update_check">Verifică zilnic actualizările</string>
+    <string name="auto_update_check_description">Verifică actualizările aplicațiilor în fundal o dată pe zi și te anunță</string>
+    <string name="show_update_prompt">Fereastră de actualizare la pornire</string>
+    <string name="show_update_prompt_description">Întreabă dacă să actualizezi toate aplicațiile când se găsesc actualizări după deschidere</string>
+    <string name="update_notification_channel_name">Actualizări aplicații</string>
+    <string name="update_notification_title">%1$d actualizări de aplicații disponibile</string>
+    <string name="update_notification_text">Atinge pentru a deschide și actualiza aplicațiile</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">Aplicații sugerate</string>
+    <string name="suggestions_message">Începe cu aceste aplicații populare — debifează cele pe care nu le vrei:</string>
+    <string name="suggestions_install">Instalează (%1$d)</string>
+    <string name="suggestions_skip">Sari peste</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favorite</string>

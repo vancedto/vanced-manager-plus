@@ -34,10 +34,9 @@
     <string name="installing">Установка</string>
     <string name="uninstalling">Удаление</string>
     <string name="unknown">Неизвестно</string>
-    <string name="installed_version">Установлено: v%1$s</string>
-    <string name="latest_version">Последняя: v%1$s</string>
+    <string name="installed_version">Установлено: %1$s</string>
+    <string name="latest_version">Последняя: %1$s</string>
     <string name="downloading_progress">Скачивание %1$d%%</string>
-    <string name="show_less">Показать меньше</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Начинается скачивание...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">Отображение</string>
     <string name="settings_section_debug">Отладка</string>
     <string name="settings_section_danger_zone">Опасная зона</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">Хранилище</string>
+    <string name="auto_delete_apk">Удалять APK после установки</string>
+    <string name="auto_delete_apk_description">Удалять загруженный APK-файл после успешной установки</string>
+    <string name="settings_clear_cache_button">Очистить кэш APK (%1$d файлов · %2$s)</string>
+    <string name="settings_clear_cache_calculating">Очистить кэш APK (подсчёт…)</string>
+    <string name="settings_clear_cache_empty">Нет кэшированных APK-файлов</string>
+    <string name="settings_clear_cache_confirm_title">Очистить кэш APK?</string>
+    <string name="settings_clear_cache_confirm_message">Все загруженные APK-файлы (%1$s) будут удалены. При необходимости они будут загружены снова.</string>
+    <string name="settings_cache_cleared">Очищено APK-файлов: %1$d</string>
     <string name="settings_reset_button">Сбросить все настройки</string>
     <string name="settings_reset_confirm_title">Сбросить настройки?</string>
     <string name="settings_reset_confirm_message">Все настройки вернутся к значениям по умолчанию. Это нельзя отменить.</string>
     <string name="settings_reset_to_defaults">Настройки сброшены</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">Обработка (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">Обновить все</string>
+    <string name="update_all_started">Обновление %1$d приложений…</string>
+    <string name="update_prompt_title">Доступны обновления</string>
+    <string name="update_prompt_message">Для %1$d приложений доступны обновления. Обновить их сейчас?</string>
+    <string name="skip_today">Пропустить сегодня</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">Обновления</string>
+    <string name="auto_update_check">Проверять обновления ежедневно</string>
+    <string name="auto_update_check_description">Проверять обновления приложений в фоне раз в день и уведомлять вас</string>
+    <string name="show_update_prompt">Всплывающее окно обновления при запуске</string>
+    <string name="show_update_prompt_description">Предлагать обновить все приложения, когда после открытия найдены обновления</string>
+    <string name="update_notification_channel_name">Обновления приложений</string>
+    <string name="update_notification_title">Доступно обновлений приложений: %1$d</string>
+    <string name="update_notification_text">Нажмите, чтобы открыть и обновить приложения</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">Рекомендуемые приложения</string>
+    <string name="suggestions_message">Начните с этих популярных приложений — снимите отметку с ненужных:</string>
+    <string name="suggestions_install">Установить (%1$d)</string>
+    <string name="suggestions_skip">Пропустить</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Избранное</string>

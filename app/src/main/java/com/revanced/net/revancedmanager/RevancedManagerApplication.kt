@@ -9,6 +9,7 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.revanced.net.revancedmanager.core.common.LocaleHelper
 import com.revanced.net.revancedmanager.data.local.preferences.PreferencesManager
+import com.revanced.net.revancedmanager.data.manager.UpdateCheckWorker
 import dagger.hilt.android.HiltAndroidApp
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -107,6 +108,9 @@ class RevancedManagerApplication : Application(), Configuration.Provider {
         val locale = java.util.Locale(languageCode)
         java.util.Locale.setDefault(locale)
         android.util.Log.d("RevancedApp", "Set default locale to: ${java.util.Locale.getDefault()}")
+
+        // Daily background update check (the worker no-ops when disabled in settings)
+        UpdateCheckWorker.schedule(WorkManager.getInstance(this))
     }
     
     override val workManagerConfiguration: Configuration

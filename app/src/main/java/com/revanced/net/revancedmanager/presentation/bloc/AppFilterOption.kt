@@ -5,5 +5,8 @@ enum class AppFilterOption {
     INSTALLED,
     NOT_INSTALLED,
     UPDATES_AVAILABLE,
-    FAVORITES
+    FAVORITES,
+
+    /** Apps currently being downloaded, installed or uninstalled. */
+    PROCESSING
 }

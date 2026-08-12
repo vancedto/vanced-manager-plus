@@ -34,10 +34,10 @@
     <string name="installing">Installing</string>
     <string name="uninstalling">Uninstalling</string>
     <string name="unknown">Unknown</string>
-    <string name="installed_version">Installed: v%1$s</string>
-    <string name="latest_version">Latest: v%1$s</string>
+    <string name="installed_version">Installed: %1$s</string>
+    <string name="latest_version">Latest: %1$s</string>
     <string name="downloading_progress">Downloading %1$d%%</string>
-    <string name="show_less">Show less</string>
+    <string name="downloading_cancel">Cancel · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Starting download...</string>
@@ -103,11 +103,46 @@
     <string name="settings_section_appearance">Appearance</string>
     <string name="settings_section_display">Display</string>
     <string name="settings_section_debug">Debug</string>
+    <string name="settings_section_storage">Storage</string>
+    <string name="auto_delete_apk">Auto-delete APK after install</string>
+    <string name="auto_delete_apk_description">Delete the downloaded APK file once installation succeeds</string>
     <string name="settings_section_danger_zone">Danger Zone</string>
+    <string name="settings_clear_cache_button">Clear APK cache (%1$d files · %2$s)</string>
+    <string name="settings_clear_cache_calculating">Clear APK cache (calculating…)</string>
+    <string name="settings_clear_cache_empty">No cached APK files</string>
+    <string name="settings_clear_cache_confirm_title">Clear APK cache?</string>
+    <string name="settings_clear_cache_confirm_message">All downloaded APK files (%1$s) will be deleted. They will be downloaded again when needed.</string>
+    <string name="settings_cache_cleared">Cleared %1$d APK file(s)</string>
     <string name="settings_reset_button">Reset all settings to defaults</string>
     <string name="settings_reset_confirm_title">Reset Settings?</string>
     <string name="settings_reset_confirm_message">All settings will be reset to their default values. This cannot be undone.</string>
     <string name="settings_reset_to_defaults">Settings reset to defaults</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">Processing (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">Update all</string>
+    <string name="update_all_started">Updating %1$d app(s)…</string>
+    <string name="update_prompt_title">Updates available</string>
+    <string name="update_prompt_message">%1$d app(s) have updates available. Do you want to update them now?</string>
+    <string name="skip_today">Skip today</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">Updates</string>
+    <string name="auto_update_check">Check for updates daily</string>
+    <string name="auto_update_check_description">Check for app updates in the background once a day and notify you</string>
+    <string name="show_update_prompt">Update popup on launch</string>
+    <string name="show_update_prompt_description">Ask to update all apps when updates are found after opening the app</string>
+    <string name="update_notification_channel_name">App Updates</string>
+    <string name="update_notification_title">%1$d app update(s) available</string>
+    <string name="update_notification_text">Tap to open and update your apps</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">Suggested apps</string>
+    <string name="suggestions_message">Get started with these popular apps — untick any you don\'t want:</string>
+    <string name="suggestions_install">Install (%1$d)</string>
+    <string name="suggestions_skip">Skip</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favorites</string>
@@ -116,4 +151,32 @@
     <string name="favorite_added">Added to favorites</string>
     <string name="favorite_removed">Removed from favorites</string>
     <string name="no_favorites_yet">No favorites yet. Tap the star on any app to add it.</string>
+    <string name="favorite_remove_title">Remove from Favorites</string>
+
+    <!-- App detail screen -->
+    <string name="app_details">Details</string>
+    <string name="app_not_found">This app is no longer in the list.</string>
+    <string name="app_details_about">About</string>
+    <string name="app_details_features">What\'s included</string>
+    <string name="app_details_variants">Available builds</string>
+    <string name="app_details_variants_auto">Chosen automatically for your device — nothing to pick.</string>
+    <string name="app_details_variant_selected">Chosen for this device</string>
+    <string name="app_details_by">by %1$s</string>
+    <string name="app_details_updated">Updated %1$s</string>
+    <string name="app_details_size">Size</string>
+    <string name="app_details_more">More</string>
+    <string name="app_details_requires_microg">This app needs MicroG installed to sign in and play content.</string>
+    <string name="copy_package_name">Copy package name</string>
+    <string name="package_name_copied">Package name copied</string>
+    <string name="share_app">Share</string>
+    <string name="open_website">Open website</string>
+    <string name="open_app_page">View on vanced.to</string>
+    <string name="app_details_incompatible">Not built for this device</string>
+    <string name="app_details_variant_best_effort">No build for %1$s was published. The %2$s build will be tried instead — it may not install.</string>
+    <!-- Sort -->
+    <string name="sort_label">Sort</string>
+    <string name="sort_catalog">Recommended</string>
+    <string name="sort_recently_updated">Recently updated</string>
+    <string name="sort_name_asc">Name (A-Z)</string>
+    <string name="card_updated">Updated %1$s</string>
 </resources>

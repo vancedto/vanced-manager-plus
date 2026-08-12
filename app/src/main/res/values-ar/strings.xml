@@ -37,7 +37,6 @@
     <string name="installed_version">المثبت:  الإصدار  %1$s</string>
     <string name="latest_version">الأحدث:  الإصدار  %1$s</string>
     <string name="downloading_progress">جاري التحميل %1$d%%</string>
-    <string name="show_less">إظهار أقل</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">بدء التحميل...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">العرض</string>
     <string name="settings_section_debug">التصحيح</string>
     <string name="settings_section_danger_zone">منطقة خطرة</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">التخزين</string>
+    <string name="auto_delete_apk">حذف APK تلقائيًا بعد التثبيت</string>
+    <string name="auto_delete_apk_description">حذف ملف APK الذي تم تنزيله بعد نجاح التثبيت</string>
+    <string name="settings_clear_cache_button">مسح ذاكرة APK المؤقتة (%1$d ملفات · %2$s)</string>
+    <string name="settings_clear_cache_calculating">مسح ذاكرة APK المؤقتة (جارٍ الحساب…)</string>
+    <string name="settings_clear_cache_empty">لا توجد ملفات APK مخزَّنة مؤقتًا</string>
+    <string name="settings_clear_cache_confirm_title">مسح ذاكرة APK المؤقتة؟</string>
+    <string name="settings_clear_cache_confirm_message">سيتم حذف جميع ملفات APK التي تم تنزيلها (%1$s). وسيتم تنزيلها مرة أخرى عند الحاجة.</string>
+    <string name="settings_cache_cleared">تم مسح %1$d ملف APK</string>
     <string name="settings_reset_button">إعادة ضبط جميع الإعدادات</string>
     <string name="settings_reset_confirm_title">إعادة ضبط الإعدادات؟</string>
     <string name="settings_reset_confirm_message">ستُعاد جميع الإعدادات إلى قيمها الافتراضية. لا يمكن التراجع عن هذا.</string>
     <string name="settings_reset_to_defaults">تمت إعادة ضبط الإعدادات</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">جارٍ المعالجة (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">تحديث الكل</string>
+    <string name="update_all_started">جارٍ تحديث %1$d تطبيق…</string>
+    <string name="update_prompt_title">تحديثات متاحة</string>
+    <string name="update_prompt_message">يتوفر تحديث لـ %1$d تطبيق. هل تريد تحديثها الآن؟</string>
+    <string name="skip_today">تخطي اليوم</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">التحديثات</string>
+    <string name="auto_update_check">التحقق من التحديثات يوميًا</string>
+    <string name="auto_update_check_description">التحقق من تحديثات التطبيقات في الخلفية مرة واحدة يوميًا وإعلامك</string>
+    <string name="show_update_prompt">نافذة التحديث عند التشغيل</string>
+    <string name="show_update_prompt_description">طلب تحديث كل التطبيقات عند العثور على تحديثات بعد فتح التطبيق</string>
+    <string name="update_notification_channel_name">تحديثات التطبيقات</string>
+    <string name="update_notification_title">يتوفر %1$d تحديث للتطبيقات</string>
+    <string name="update_notification_text">اضغط لفتح التطبيقات وتحديثها</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">التطبيقات المقترحة</string>
+    <string name="suggestions_message">ابدأ بهذه التطبيقات الشائعة — ألغِ تحديد ما لا تريده:</string>
+    <string name="suggestions_install">تثبيت (%1$d)</string>
+    <string name="suggestions_skip">تخطي</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">المفضلة</string>

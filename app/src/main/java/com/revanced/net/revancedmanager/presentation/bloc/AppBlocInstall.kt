@@ -4,56 +4,176 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.core.common.Result
+import com.revanced.net.revancedmanager.data.manager.InstallationResult
 import com.revanced.net.revancedmanager.domain.model.AppStatus
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
+import java.io.File
 
 // ============= INSTALLATION LOGIC =============
+//
+// Installations run strictly one at a time: requests go through the
+// AppBloc.installRequests channel and a single processor coroutine drives each
+// install to a terminal result before starting the next.
+
+private const val INSTALL_RESULT_TIMEOUT_MS = 60_000L
 
 internal fun AppBloc.installApp(packageName: String, apkFilePath: String) {
     val appName = (_state.value as? AppState.Success)
         ?.apps?.find { it.packageName == packageName }?.title ?: packageName
-    Log.i(TAG_BLOC, "Queueing app installation: $appName ($packageName)")
     queueInstallation(packageName, apkFilePath, appName)
 }
 
-internal fun AppBloc.installAppDirect(packageName: String, apkFilePath: String) {
-    Log.i(TAG_BLOC, "Installing app directly: $packageName from $apkFilePath")
+internal fun AppBloc.queueInstallation(packageName: String, filePath: String, appName: String = packageName) {
+    if (!pendingInstalls.add(packageName)) {
+        Log.w(TAG_BLOC, "Already queued for install, skipping: $packageName")
+        return
+    }
+    Log.i(TAG_BLOC, "Queueing installation: $appName ($packageName)")
+    installRequests.trySend(AppBloc.PendingInstallation(packageName, filePath, appName))
+}
+
+internal fun AppBloc.startInstallationProcessor() {
     viewModelScope.launch {
-        try {
-            val result = useCases.installAppUseCase(packageName, apkFilePath)
-            when (result) {
-                is Result.Success -> {
-                    if (result.data) {
-                        showToast(stringProvider.getString(R.string.installation_started))
-                    } else {
-                        handleInstallationFailedWithRetry(packageName, stringProvider.getString(R.string.installation_failed_start))
-                    }
-                }
-                is Result.Error -> handleInstallationFailedWithRetry(packageName, result.message)
-                is Result.Loading -> Unit
+        for (request in installRequests) {
+            // Dropped while queued (e.g. a fresh download replaced the APK)
+            if (!pendingInstalls.contains(request.packageName)) continue
+            try {
+                runInstallation(request)
+            } finally {
+                pendingInstalls.remove(request.packageName)
             }
-        } catch (e: Exception) {
-            handleInstallationFailedWithRetry(packageName, e.message ?: "Installation failed")
         }
     }
 }
 
-internal fun AppBloc.handleInstallationFailedWithRetry(packageName: String, error: String) {
-    val currentRetries = installationRetries[packageName] ?: 0
+private suspend fun AppBloc.runInstallation(request: AppBloc.PendingInstallation) = coroutineScope {
+    val packageName = request.packageName
+    Log.i(TAG_BLOC, "Starting installation: ${request.appName} ($packageName)")
+    updateAppStatus(packageName, AppStatus.INSTALLING)
 
-    // Resolve actual device state — don't assume UPDATE_AVAILABLE
+    // Subscribe before committing the session so a fast result can't be missed
+    val terminalResult = async(start = CoroutineStart.UNDISPATCHED) {
+        packageInstaller.installationResults.first {
+            it.packageName == packageName && it !is InstallationResult.PendingUserAction
+        }
+    }
+    val pendingActionToast = launch(start = CoroutineStart.UNDISPATCHED) {
+        packageInstaller.installationResults.first {
+            it.packageName == packageName && it is InstallationResult.PendingUserAction
+        }
+        showToast(stringProvider.getString(R.string.installation_pending_user_action))
+    }
+
+    try {
+        val startError = startInstallation(packageName, request.filePath)
+        if (startError != null) {
+            handleInstallationFailure(packageName, startError)
+            return@coroutineScope
+        }
+
+        // While backgrounded, the system confirm dialog is delivered as a
+        // notification and the user may take arbitrarily long — keep waiting.
+        var result = withTimeoutOrNull(INSTALL_RESULT_TIMEOUT_MS) { terminalResult.await() }
+        while (result == null && wasAppBackgrounded) {
+            result = withTimeoutOrNull(INSTALL_RESULT_TIMEOUT_MS) { terminalResult.await() }
+        }
+
+        when (result) {
+            null -> {
+                Log.w(TAG_BLOC, "Installation timed out: $packageName")
+                handleInstallationAborted(packageName, "User cancelled or timeout")
+            }
+            is InstallationResult.Success ->
+                handleInstallationSuccess(
+                    packageName,
+                    appManager.getInstalledVersion(packageName) ?: "Unknown"
+                )
+            is InstallationResult.Failed -> {
+                val userAborted =
+                    result.statusCode == android.content.pm.PackageInstaller.STATUS_FAILURE_ABORTED ||
+                    result.error.contains("aborted", ignoreCase = true) ||
+                    result.error.contains("cancelled", ignoreCase = true) ||
+                    result.error.contains("user denied", ignoreCase = true)
+                if (userAborted) handleInstallationAborted(packageName, result.error)
+                else handleInstallationFailure(packageName, result.error)
+            }
+            is InstallationResult.PendingUserAction -> Unit // filtered out above
+        }
+    } finally {
+        terminalResult.cancel()
+        pendingActionToast.cancel()
+    }
+}
+
+/** Kick off the install session. Returns an error message, or null when started. */
+private suspend fun AppBloc.startInstallation(packageName: String, filePath: String): String? = try {
+    when (val result = useCases.installAppUseCase(packageName, filePath)) {
+        is Result.Success ->
+            if (result.data) {
+                showToast(stringProvider.getString(R.string.installation_started))
+                null
+            } else {
+                stringProvider.getString(R.string.installation_failed_start)
+            }
+        is Result.Error -> result.message
+        is Result.Loading -> null
+    }
+} catch (e: Exception) {
+    e.message ?: "Installation failed"
+}
+
+internal fun AppBloc.handleInstallationSuccess(packageName: String, installedVersion: String) {
+    val currentState = _state.value as? AppState.Success ?: return
+    val app = currentState.apps.find { it.packageName == packageName } ?: return
+
+    val newStatus = statusForVersions(installedVersion, app.latestVersion)
+    // Success arrives via both PackageInstaller results and the system
+    // PACKAGE_ADDED broadcast — skip the second delivery.
+    if (app.status == newStatus && app.currentVersion == installedVersion) {
+        Log.i(TAG_BLOC, "Installation success already handled for: $packageName")
+        return
+    }
+
+    _state.value = currentState.copy(
+        apps = currentState.apps.map { appItem ->
+            if (appItem.packageName == packageName)
+                appItem.copy(status = newStatus, currentVersion = installedVersion, downloadProgress = 0f)
+            else appItem
+        }
+    )
+    showToast(stringProvider.getString(R.string.installation_completed))
+
+    preferencesManager.removeKey("pending_install_${packageName}")
+    installationRetries.remove(packageName)
+    pendingInstalls.remove(packageName)
+
+    // Clean up the downloaded APK once it has been installed (if enabled)
+    if (preferencesManager.isAutoDeleteApkEnabled()) {
+        deleteDownloadedApk(packageName)
+    }
+    downloadManager.pruneFinishedWork()
+}
+
+internal fun AppBloc.handleInstallationFailure(packageName: String, error: String) {
+    Log.w(TAG_BLOC, "Installation failed: $packageName - $error")
     val actualStatus = resolveActualStatus(packageName)
     updateAppStatus(packageName, actualStatus)
 
-    if (currentRetries < 1) {
-        installationRetries[packageName] = currentRetries + 1
+    // Retry is only possible while the downloaded APK still exists (it may have
+    // been auto-deleted after a previous install)
+    val retries = installationRetries[packageName] ?: 0
+    val apkPath = getDownloadPath(packageName)
+    if (retries < 1 && apkPath != null) {
+        installationRetries[packageName] = retries + 1
         showConfirmationDialog(
             title = stringProvider.getString(R.string.installation_failed_title),
             message = stringProvider.getString(R.string.installation_failed_retry_message, error),
-            onConfirm = AppEvent.RetryInstallation(packageName, getDownloadPath(packageName) ?: "", shouldUninstallFirst = true),
+            onConfirm = AppEvent.RetryInstallation(packageName, apkPath, shouldUninstallFirst = true),
             // Use actualStatus so cancelling the dialog doesn't overwrite with wrong status
             onCancel = AppEvent.DismissDialogAndUpdateStatus(packageName, actualStatus)
         )
@@ -61,49 +181,15 @@ internal fun AppBloc.handleInstallationFailedWithRetry(packageName: String, erro
         installationRetries.remove(packageName)
         showError(stringProvider.getString(R.string.download_failed, error))
     }
-
-    installationQueue.removeAll { it.packageName == packageName }
-
-    viewModelScope.launch {
-        try {
-            downloadStateRepository.removeDownloadState(packageName)
-        } catch (e: Exception) {
-            Log.w(TAG_BLOC, "Failed to remove download state for failed installation", e)
-        }
-    }
+    downloadManager.pruneFinishedWork()
 }
 
-internal fun AppBloc.handleInstallationSuccess(packageName: String, installedVersion: String) {
-    val currentState = _state.value
-    if (currentState is AppState.Success) {
-        val app = currentState.apps.find { it.packageName == packageName }
-        app?.let {
-            val newStatus = when (compareVersions(installedVersion, app.latestVersion)) {
-                0, 1 -> AppStatus.UP_TO_DATE
-                else -> AppStatus.UPDATE_AVAILABLE
-            }
-            val updatedApps = currentState.apps.map { appItem ->
-                if (appItem.packageName == packageName) {
-                    appItem.copy(status = newStatus, currentVersion = installedVersion, downloadProgress = 0f)
-                } else appItem
-            }
-            _state.value = currentState.copy(apps = updatedApps)
-            showToast(stringProvider.getString(R.string.installation_completed))
-
-            preferencesManager.removeKey("pending_install_${packageName}")
-            installationRetries.remove(packageName)
-            completedDownloads.remove(packageName)
-            installationQueue.removeAll { it.packageName == packageName }
-
-            viewModelScope.launch {
-                try {
-                    downloadStateRepository.removeDownloadState(packageName)
-                } catch (e: Exception) {
-                    Log.w(TAG_BLOC, "Failed to remove download state", e)
-                }
-            }
-        }
-    }
+internal fun AppBloc.handleInstallationAborted(packageName: String, error: String) {
+    Log.i(TAG_BLOC, "Installation aborted by user: $packageName - $error")
+    installationRetries.remove(packageName)
+    updateAppStatus(packageName, resolveActualStatus(packageName))
+    showToast(stringProvider.getString(R.string.installation_cancelled_by_user))
+    downloadManager.pruneFinishedWork()
 }
 
 internal suspend fun AppBloc.updateSingleAppStatus(packageName: String) {
@@ -129,14 +215,9 @@ internal suspend fun AppBloc.updateSingleAppStatus(packageName: String) {
 
             val isInstalled = appManager.isAppInstalled(packageName)
             val installedVersion = if (isInstalled) appManager.getInstalledVersion(packageName) else null
-            val newStatus = when {
-                !isInstalled -> AppStatus.NOT_INSTALLED
-                installedVersion != null -> when (compareVersions(installedVersion, appToUpdate.latestVersion)) {
-                    0, 1 -> AppStatus.UP_TO_DATE
-                    else -> AppStatus.UPDATE_AVAILABLE
-                }
-                else -> AppStatus.NOT_INSTALLED
-            }
+            val newStatus =
+                if (installedVersion != null) statusForVersions(installedVersion, appToUpdate.latestVersion)
+                else AppStatus.NOT_INSTALLED
 
             if (newStatus != appToUpdate.status) {
                 val updatedApps = currentState.apps.map { app ->
@@ -150,77 +231,6 @@ internal suspend fun AppBloc.updateSingleAppStatus(packageName: String) {
         }
     } catch (e: Exception) {
         loadApps(forceRefresh = true)
-    }
-}
-
-internal fun AppBloc.handleInstallationCompleted(packageName: String, success: Boolean) {
-    if (success) {
-        updateAppStatus(packageName, AppStatus.UP_TO_DATE)
-        showToast(stringProvider.getString(R.string.installation_completed))
-        installationRetries.remove(packageName)
-        preferencesManager.removeKey("pending_install_${packageName}")
-    } else {
-        val currentState = _state.value
-        if (currentState is AppState.Success) {
-            val app = currentState.apps.find { it.packageName == packageName }
-            app?.let {
-                val apkFilePath = getDownloadPath(packageName) ?: preferencesManager.getPendingInstallPath(packageName)
-                if (apkFilePath != null) {
-                    handleInstallationFailed(packageName, apkFilePath, stringProvider.getString(R.string.installation_failed_start))
-                } else {
-                    updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-                    showError(stringProvider.getString(R.string.installation_failed_apk_not_found))
-                }
-            }
-        }
-    }
-}
-
-internal fun AppBloc.handleInstallationAborted(packageName: String, error: String) {
-    Log.i(TAG_BLOC, "Installation aborted by user: $packageName")
-    installationRetries.remove(packageName)
-
-    val currentState = _state.value
-    if (currentState is AppState.Success) {
-        val app = currentState.apps.find { it.packageName == packageName }
-        app?.let {
-            val isInstalled = appManager.isAppInstalled(packageName)
-            val newStatus = if (isInstalled) {
-                val installedVersion = appManager.getInstalledVersion(packageName)
-                if (installedVersion != null) {
-                    when (compareVersions(installedVersion, app.latestVersion)) {
-                        0, 1 -> AppStatus.UP_TO_DATE
-                        else -> AppStatus.UPDATE_AVAILABLE
-                    }
-                } else AppStatus.NOT_INSTALLED
-            } else AppStatus.NOT_INSTALLED
-            updateAppStatus(packageName, newStatus)
-        }
-    }
-
-    showToast(stringProvider.getString(R.string.installation_cancelled_by_user))
-
-    viewModelScope.launch {
-        downloadStateRepository.removeDownloadState(packageName)
-    }
-    installationQueue.removeAll { it.packageName == packageName }
-    completedDownloads.remove(packageName)
-}
-
-internal fun AppBloc.handleInstallationFailed(packageName: String, apkFilePath: String, error: String) {
-    val currentRetries = installationRetries[packageName] ?: 0
-    if (currentRetries < 1) {
-        installationRetries[packageName] = currentRetries + 1
-        showConfirmationDialog(
-            title = stringProvider.getString(R.string.installation_failed_title),
-            message = stringProvider.getString(R.string.installation_failed_retry_message, error),
-            onConfirm = AppEvent.RetryInstallation(packageName, apkFilePath, shouldUninstallFirst = true),
-            onCancel = AppEvent.UpdateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-        )
-    } else {
-        installationRetries.remove(packageName)
-        updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-        showError(stringProvider.getString(R.string.download_failed, error))
     }
 }
 
@@ -248,23 +258,20 @@ internal fun AppBloc.retryInstallation(packageName: String, apkFilePath: String,
                             showToast(stringProvider.getString(R.string.old_version_uninstalled))
                             // Reinstall triggered by PackageChangedReceiver when uninstall completes
                         } else {
-                            pendingReinstalls.remove(packageName)
-                            pendingUninstallChecks.remove(packageName)
+                            clearPendingReinstall(packageName)
                             showError(stringProvider.getString(R.string.failed_uninstall_old_version))
                             updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
                         }
                     }
                     is Result.Error -> {
-                        pendingReinstalls.remove(packageName)
-                        pendingUninstallChecks.remove(packageName)
+                        clearPendingReinstall(packageName)
                         showError(stringProvider.getString(R.string.failed_uninstall_old_version_error, uninstallResult.message))
                         updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
                     }
                     is Result.Loading -> Unit
                 }
             } catch (e: Exception) {
-                pendingReinstalls.remove(packageName)
-                pendingUninstallChecks.remove(packageName)
+                clearPendingReinstall(packageName)
                 showError(stringProvider.getString(R.string.failed_uninstall_old_version_error, e.message ?: ""))
                 updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
             }
@@ -374,109 +381,29 @@ internal fun AppBloc.reinstallApp(packageName: String) {
             }
         } catch (e: Exception) {
             Log.e(TAG_BLOC, "reinstallApp failed for $packageName", e)
-            pendingReinstallDownloads.remove(packageName)
-            pendingUninstallChecks.remove(packageName)
+            clearPendingReinstall(packageName)
             showError(stringProvider.getString(R.string.reinstall_failed, e.message ?: ""))
             updateSingleAppStatus(packageName)
         }
     }
 }
 
-// ============= INSTALLATION QUEUE =============
-
-internal fun AppBloc.queueInstallation(packageName: String, filePath: String, appName: String = packageName) {
-    Log.i(TAG_BLOC, "Queuing installation: $appName ($packageName)")
-
-    if (installationQueue.any { it.packageName == packageName }) {
-        Log.w(TAG_BLOC, "Already in queue, skipping: $packageName")
-        return
-    }
-
-    installationQueue.add(AppBloc.PendingInstallation(packageName, filePath, appName))
-    Log.i(TAG_BLOC, "Queue size: ${installationQueue.size}, inProgress: $isInstallationInProgress")
-
-    if (!isInstallationInProgress) {
-        triggerNextInstallation()
-    }
-}
-
-internal fun AppBloc.triggerNextInstallation() {
-    val next = installationQueue.firstOrNull()
-    if (next == null) {
-        Log.i(TAG_BLOC, "Installation queue empty, nothing to start")
-        isInstallationInProgress = false
-        return
-    }
-    isInstallationInProgress = true
-    Log.i(TAG_BLOC, "Starting next installation: ${next.appName} (${next.packageName})")
-    updateAppStatus(next.packageName, AppStatus.INSTALLING)
-    installAppDirect(next.packageName, next.filePath)
-}
-
-internal fun AppBloc.processNextInstallation() {
-    Log.i(TAG_BLOC, "processNextInstallation — queue size before cleanup: ${installationQueue.size}")
-
-    installationQueue.removeAll { installation ->
-        val state = _state.value as? AppState.Success
-        val status = state?.apps?.find { it.packageName == installation.packageName }?.status
-        val done = status == AppStatus.UP_TO_DATE ||
-                   status == AppStatus.NOT_INSTALLED ||
-                   status == AppStatus.UPDATE_AVAILABLE
-        if (done) Log.i(TAG_BLOC, "Removing finished entry: ${installation.appName}")
-        done
-    }
-
-    isInstallationInProgress = false
-    Log.i(TAG_BLOC, "Queue size after cleanup: ${installationQueue.size}")
-    triggerNextInstallation()
-}
-
-internal fun AppBloc.clearInstallationQueue() {
-    Log.i(TAG_BLOC, "Clearing installation queue (${installationQueue.size} items)")
-    installationQueue.clear()
-    isInstallationInProgress = false
-}
-
-// ============= CONCURRENT AUTO-INSTALL =============
-
-internal fun AppBloc.autoInstallAllCompleted(
-    completedPackages: List<String>,
-    completedNames: List<String>,
-    completedPaths: List<String>,
-    failedPackages: List<String>,
-    failedNames: List<String>,
-    failedErrors: List<String>
-) {
-    Log.i(TAG_BLOC, "Auto-installing all completed downloads — completed: ${completedPackages.size}, failed: ${failedPackages.size}")
-
-    viewModelScope.launch {
-        try {
-            failedPackages.forEach { pkg -> updateAppStatus(pkg, resolveActualStatus(pkg)) }
-
-            val successState = _state.value as? AppState.Success
-            completedPackages.zip(completedNames).zip(completedPaths).forEach { (namePkg, path) ->
-                val (packageName, appName) = namePkg
-                val currentStatus = successState?.apps?.find { it.packageName == packageName }?.status
-                if (currentStatus == AppStatus.UP_TO_DATE) { Log.w(TAG_BLOC, "Skipping already installed: $packageName"); return@forEach }
-                if (currentStatus == AppStatus.INSTALLING || installationQueue.any { it.packageName == packageName }) {
-                    Log.w(TAG_BLOC, "Skipping already-installing: $packageName"); return@forEach
-                }
-                queueInstallation(packageName, path, appName)
+/**
+ * Delete the downloaded APK for [packageName] from the app's downloads directory.
+ * Used to free storage after a successful install when auto-delete is enabled.
+ */
+internal fun AppBloc.deleteDownloadedApk(packageName: String) {
+    try {
+        val baseDir = context.getExternalFilesDir(null) ?: return
+        val apkFile = File(File(baseDir, "downloads"), "$packageName.apk")
+        if (apkFile.exists()) {
+            if (apkFile.delete()) {
+                Log.i(TAG_BLOC, "Deleted downloaded APK after install: ${apkFile.absolutePath}")
+            } else {
+                Log.w(TAG_BLOC, "Failed to delete downloaded APK: ${apkFile.absolutePath}")
             }
-
-            if (completedPackages.isNotEmpty()) {
-                showToast(
-                    if (completedPackages.size == 1) "Installing ${completedNames[0]}..."
-                    else "Installing ${completedPackages.size} apps..."
-                )
-            }
-            if (failedPackages.isNotEmpty()) {
-                showToast("${failedPackages.size} downloads failed")
-            }
-
-        } catch (e: Exception) {
-            Log.e(TAG_BLOC, "Error auto-installing completed downloads", e)
-            showError("Failed to auto-install apps: ${e.message}")
         }
+    } catch (e: Exception) {
+        Log.w(TAG_BLOC, "Error deleting downloaded APK for $packageName", e)
     }
 }

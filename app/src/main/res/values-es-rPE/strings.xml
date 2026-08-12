@@ -34,10 +34,9 @@
     <string name="installing">Instalando</string>
     <string name="uninstalling">Desinstalando</string>
     <string name="unknown">Desconocido</string>
-    <string name="installed_version">Instalada: v%1$s</string>
-    <string name="latest_version">Última: v%1$s</string>
+    <string name="installed_version">Instalada: %1$s</string>
+    <string name="latest_version">Última: %1$s</string>
     <string name="downloading_progress">Descargando %1$d%%</string>
-    <string name="show_less">Mostrar menos</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Iniciando descarga...</string>
@@ -104,10 +103,46 @@
     <string name="settings_section_display">Pantalla</string>
     <string name="settings_section_debug">Debug</string>
     <string name="settings_section_danger_zone">Zona peligrosa</string>
+    <!-- APK storage / cache cleanup -->
+    <string name="settings_section_storage">Almacenamiento</string>
+    <string name="auto_delete_apk">Eliminar APK automáticamente tras instalar</string>
+    <string name="auto_delete_apk_description">Eliminar el archivo APK descargado cuando la instalación se complete</string>
+    <string name="settings_clear_cache_button">Borrar caché de APK (%1$d archivos · %2$s)</string>
+    <string name="settings_clear_cache_calculating">Borrar caché de APK (calculando…)</string>
+    <string name="settings_clear_cache_empty">No hay archivos APK en caché</string>
+    <string name="settings_clear_cache_confirm_title">¿Borrar caché de APK?</string>
+    <string name="settings_clear_cache_confirm_message">Se eliminarán todos los archivos APK descargados (%1$s). Se descargarán de nuevo cuando se necesiten.</string>
+    <string name="settings_cache_cleared">Se borraron %1$d archivo(s) APK</string>
     <string name="settings_reset_button">Restablecer ajustes</string>
     <string name="settings_reset_confirm_title">¿Restablecer ajustes?</string>
     <string name="settings_reset_confirm_message">Todos los ajustes se restablecerán. Esta acción no se puede deshacer.</string>
     <string name="settings_reset_to_defaults">Ajustes restablecidos</string>
+
+    <!-- Processing indicator -->
+    <string name="filter_processing">Procesando (%1$d)</string>
+
+    <!-- Update all / update prompt -->
+    <string name="update_all">Actualizar todo</string>
+    <string name="update_all_started">Actualizando %1$d app(s)…</string>
+    <string name="update_prompt_title">Actualizaciones disponibles</string>
+    <string name="update_prompt_message">%1$d app(s) tienen actualizaciones disponibles. ¿Quieres actualizarlas ahora?</string>
+    <string name="skip_today">Omitir hoy</string>
+
+    <!-- Background update check -->
+    <string name="settings_section_updates">Actualizaciones</string>
+    <string name="auto_update_check">Buscar actualizaciones a diario</string>
+    <string name="auto_update_check_description">Buscar actualizaciones de apps en segundo plano una vez al día y notificarte</string>
+    <string name="show_update_prompt">Ventana de actualización al iniciar</string>
+    <string name="show_update_prompt_description">Preguntar si actualizar todas las apps cuando se encuentren actualizaciones al abrir la app</string>
+    <string name="update_notification_channel_name">Actualizaciones de apps</string>
+    <string name="update_notification_title">%1$d actualización(es) de apps disponibles</string>
+    <string name="update_notification_text">Toca para abrir y actualizar tus apps</string>
+
+    <!-- First-run suggestions -->
+    <string name="suggestions_title">Apps sugeridas</string>
+    <string name="suggestions_message">Empieza con estas apps populares — desmarca las que no quieras:</string>
+    <string name="suggestions_install">Instalar (%1$d)</string>
+    <string name="suggestions_skip">Omitir</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favoritos</string>
