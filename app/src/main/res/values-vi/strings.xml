@@ -30,7 +30,6 @@
     <string name="uninstall">Gỡ cài đặt</string>
     <string name="reinstall">Cài lại</string>
     <string name="reinstall_started">Đã bắt đầu cài lại</string>
-    <string name="reinstall_failed">Cài lại thất bại</string>
     <string name="installing">Đang cài đặt</string>
     <string name="uninstalling">Đang gỡ cài đặt</string>
     <string name="unknown">Không xác định</string>
@@ -73,9 +72,8 @@
     <string name="reinstall_confirmation_title">Cài lại ứng dụng</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">Cài đặt thất bại: %1$s\n\nBạn có muốn thử lại không? Điều này sẽ gỡ phiên bản cũ trước nếu tồn tại.</string>
     <string name="uninstall_required_message">Để thử lại cài đặt %1$s, phiên bản cũ cần được gỡ trước. Tiếp tục?</string>
-    <string name="reinstall_confirmation_message">Điều này sẽ gỡ cài đặt phiên bản hiện tại của %1$s và tải xuống cài đặt phiên bản mới nhất.\n\nBạn có muốn tiếp tục không?</string>
+    <string name="reinstall_confirmation_message">Bản mới nhất của %1$s sẽ được tải về và cài đè lên bản đang có — đăng nhập, cài đặt và nội dung đã tải đều được giữ nguyên.\n\nNếu Android không cho cài đè (khác chứng chỉ ký, hoặc bản tải về cũ hơn), bạn sẽ được hỏi riêng trước khi có gì bị gỡ.\n\nTải và cài lại?</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">Đóng</string>
@@ -126,8 +124,11 @@
     <string name="update_all">Cập nhật tất cả</string>
     <string name="update_all_started">Đang cập nhật %1$d ứng dụng…</string>
     <string name="update_prompt_title">Có bản cập nhật</string>
-    <string name="update_prompt_message">Có %1$d ứng dụng có bản cập nhật. Bạn có muốn cập nhật ngay không?</string>
+    <string name="update_prompt_message">Có %1$d ứng dụng có bản cập nhật. Chọn ứng dụng muốn cập nhật:</string>
+    <string name="update_selected">Cập nhật (%1$d)</string>
     <string name="skip_today">Bỏ qua hôm nay</string>
+    <string name="update_prompt_muted">Đã tắt gợi ý cập nhật cho %1$s</string>
+    <string name="update_prompt_unmuted">Đã bật gợi ý cập nhật cho %1$s</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">Cập nhật</string>
@@ -157,6 +158,8 @@
     <!-- App detail screen -->
     <string name="app_details">Chi tiết</string>
     <string name="app_not_found">Ứng dụng này không còn trong danh sách.</string>
+    <string name="app_details_update_prompt">Gợi ý cập nhật app này</string>
+    <string name="app_details_update_prompt_description">Tính app này vào popup cập nhật và thông báo cập nhật hằng ngày</string>
     <string name="app_details_about">Giới thiệu</string>
     <string name="app_details_features">Có gì bên trong</string>
     <string name="app_details_variants">Các bản đã phát hành</string>
@@ -180,4 +183,9 @@
     <string name="sort_recently_updated">Mới cập nhật</string>
     <string name="sort_name_asc">Tên (A-Z)</string>
     <string name="card_updated">Cập nhật %1$s</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">Tìm kiếm</string>
+    <string name="search_close">Đóng tìm kiếm</string>
+    <string name="clear_search">Xoá tìm kiếm</string>
+    <string name="scroll_to_top">Về đầu trang</string>
 </resources>

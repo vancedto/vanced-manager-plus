@@ -30,8 +30,9 @@
     <string name="uninstall">Uninstall</string>
     <string name="reinstall">Re-install</string>
     <string name="reinstall_started">Reinstallation started</string>
-    <string name="reinstall_failed">Reinstallation failed</string>
     <string name="installing">Installing</string>
+    <string name="waiting_to_install">Queued · Cancel</string>
+    <string name="cancel_installation">Cancel install</string>
     <string name="uninstalling">Uninstalling</string>
     <string name="unknown">Unknown</string>
     <string name="installed_version">Installed: %1$s</string>
@@ -73,9 +74,22 @@
     <string name="reinstall_confirmation_title">Reinstall Application</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">Installation failed: %1$s\n\nDo you want to retry? This will uninstall the old version first if it exists.</string>
     <string name="uninstall_required_message">To retry installation of %1$s, the old version needs to be uninstalled first. Continue?</string>
-    <string name="reinstall_confirmation_message">This will uninstall the current version of %1$s and download and install the latest version.\n\nDo you want to continue?</string>
+    <string name="reinstall_confirmation_message">The latest version of %1$s will be downloaded and installed over the current one — your logins, settings and downloaded content are kept.\n\nIf Android refuses the update (a different signing certificate, or an older build), you will be asked separately before anything is removed.\n\nDownload and reinstall?</string>
+
+    <!-- Install failure handling (plan-08-14 §1) -->
+    <string name="installation_failed">Installation failed: %1$s</string>
+    <string name="uninstall_and_reinstall">Uninstall &amp; install</string>
+    <string name="download_again">Download again</string>
+    <string name="install_failed_signature_message">The installed version of %1$s is signed with a different certificate, so Android cannot update it in place.\n\nTo install this version, the current app must be uninstalled first — all of its data (logins, settings, downloaded content) will be lost and cannot be recovered. Back up anything important before continuing.</string>
+    <string name="install_failed_downgrade_message">The downloaded version of %1$s is older than the installed one, and Android does not allow downgrades.\n\nTo install it, the current app must be uninstalled first — all of its data (logins, settings, downloaded content) will be lost and cannot be recovered.</string>
+    <string name="install_failed_incompatible_message">%1$s cannot run on this device (unsupported architecture or Android version), so uninstalling the current version would not help.\n\nCheck the available builds on the app\'s detail page for one that matches your device.</string>
+    <string name="install_failed_storage_message">There is not enough free storage to install %1$s, so uninstalling the current version would not help.\n\nFree up space — for example clear the APK cache in Settings — and try again.</string>
+    <string name="install_failed_invalid_message">The downloaded file for %1$s is damaged or incomplete and has been deleted.\n\nDownload it again?</string>
+    <string name="install_failed_blocked_message">The system blocked the installation of %1$s (for example Play Protect or a device policy), so uninstalling the current version would not help.\n\nAllow the installation when asked, or check Play Protect settings, and try again.</string>
+    <string name="install_failed_generic_message">Installation of %1$s failed:\n%2$s\n\nThe installed app was not touched. Download the file again and retry?</string>
+    <string name="install_apk_missing_message">The downloaded file for %1$s is no longer on this device, so nothing was uninstalled.\n\nDownload it again?</string>
+    <string name="install_wrong_package_message">The downloaded file is not %1$s — it contains %2$s — so it was not installed. Download the app again.</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">Close</string>
@@ -125,8 +139,11 @@
     <string name="update_all">Update all</string>
     <string name="update_all_started">Updating %1$d app(s)…</string>
     <string name="update_prompt_title">Updates available</string>
-    <string name="update_prompt_message">%1$d app(s) have updates available. Do you want to update them now?</string>
+    <string name="update_prompt_message">%1$d app(s) have updates available. Pick the ones to update:</string>
+    <string name="update_selected">Update (%1$d)</string>
     <string name="skip_today">Skip today</string>
+    <string name="update_prompt_muted">Update suggestions turned off for %1$s</string>
+    <string name="update_prompt_unmuted">Update suggestions turned on for %1$s</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">Updates</string>
@@ -156,6 +173,8 @@
     <!-- App detail screen -->
     <string name="app_details">Details</string>
     <string name="app_not_found">This app is no longer in the list.</string>
+    <string name="app_details_update_prompt">Suggest updates for this app</string>
+    <string name="app_details_update_prompt_description">Include this app in the update popup and the daily update notification</string>
     <string name="app_details_about">About</string>
     <string name="app_details_features">What\'s included</string>
     <string name="app_details_variants">Available builds</string>
@@ -179,4 +198,9 @@
     <string name="sort_recently_updated">Recently updated</string>
     <string name="sort_name_asc">Name (A-Z)</string>
     <string name="card_updated">Updated %1$s</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">Search</string>
+    <string name="search_close">Close search</string>
+    <string name="clear_search">Clear search</string>
+    <string name="scroll_to_top">Back to top</string>
 </resources>

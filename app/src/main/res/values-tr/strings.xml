@@ -30,13 +30,13 @@
     <string name="uninstall">Kaldır</string>
     <string name="reinstall">Yeniden kur</string>
     <string name="reinstall_started">Yeniden kurulum başlatıldı</string>
-    <string name="reinstall_failed">Yeniden kurulum başarısız</string>
     <string name="installing">Kuruluyor</string>
     <string name="uninstalling">Kaldırılıyor</string>
     <string name="unknown">Bilinmiyor</string>
     <string name="installed_version">Kurulu: %1$s</string>
     <string name="latest_version">Son sürüm: %1$s</string>
     <string name="downloading_progress">İndiriliyor %1$d%%</string>
+    <string name="downloading_cancel">İptal · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">İndirme başlatılıyor...</string>
@@ -63,7 +63,7 @@
     <string name="app_not_installed_proceeding">Uygulama kurulu değil, indirme ile devam ediliyor</string>
     <string name="installation_cancelled_by_user">Kurulum kullanıcı tarafından iptal edildi</string>
     <string name="app_status_updated">Uygulama durumu güncellendi</string>
-    <string name="apps_updated">Uygulamalar güncellendi</string>
+    <string name="apps_updated">%1$d uygulama güncellendi</string>
     <string name="configuration_saved">Yapılandırma kaydedildi</string>
     
     <!-- Dialog Titles -->
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">Yeniden kurulumu onayla</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">Kurulum başarısız: %1$s\n\nYeniden denemek istiyor musunuz? Bu, eski sürümü önce kaldıracaktır.</string>
     <string name="uninstall_required_message">%1$s kurulumunu yeniden denemek için önce eski sürümün kaldırılması gerekiyor. Devam edilsin mi?</string>
-    <string name="reinstall_confirmation_message">%1$s uygulamasını yeniden kurmak istediğinizden emin misiniz? Bu, mevcut sürümü kaldıracak ve en son sürümü kuracaktır.</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">Kapat</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">%1$d uygulama güncelleniyor…</string>
     <string name="update_prompt_title">Güncellemeler mevcut</string>
     <string name="update_prompt_message">%1$d uygulama için güncelleme mevcut. Şimdi güncellemek ister misiniz?</string>
+    <string name="update_selected">Güncelle (%1$d)</string>
     <string name="skip_today">Bugün atla</string>
+    <string name="update_prompt_muted">%1$s için güncelleme önerileri kapatıldı</string>
+    <string name="update_prompt_unmuted">%1$s için güncelleme önerileri açıldı</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">Güncellemeler</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">Favorilere eklendi</string>
     <string name="favorite_removed">Favorilerden kaldırıldı</string>
     <string name="no_favorites_yet">Henüz favori yok. Eklemek için bir uygulamanın yıldızına dokunun.</string>
+    <string name="favorite_remove_title">Favorilerden çıkar</string>
+    <string name="app_details">Ayrıntılar</string>
+    <string name="app_not_found">Bu uygulama artık listede değil.</string>
+    <string name="app_details_update_prompt">Bu uygulama için güncelleme öner</string>
+    <string name="app_details_update_prompt_description">Bu uygulamayı güncelleme penceresine ve günlük güncelleme bildirimine dahil et</string>
+    <string name="app_details_about">Hakkında</string>
+    <string name="app_details_features">Neler var</string>
+    <string name="app_details_variants">Mevcut yapılar</string>
+    <string name="app_details_variants_auto">Cihazınız için otomatik seçildi — seçim yapmanıza gerek yok.</string>
+    <string name="app_details_variant_selected">Bu cihaz için seçildi</string>
+    <string name="app_details_by">%1$s tarafından</string>
+    <string name="app_details_updated">%1$s güncellendi</string>
+    <string name="app_details_size">Boyut</string>
+    <string name="app_details_more">Daha fazla</string>
+    <string name="app_details_requires_microg">Bu uygulamanın oturum açmak ve içerik oynatmak için MicroG\'ye ihtiyacı var.</string>
+    <string name="copy_package_name">Paket adını kopyala</string>
+    <string name="package_name_copied">Paket adı kopyalandı</string>
+    <string name="share_app">Paylaş</string>
+    <string name="open_website">Web sitesini aç</string>
+    <string name="open_app_page">vanced.to\'da görüntüle</string>
+    <string name="app_details_incompatible">Bu cihaz için derlenmemiş</string>
+    <string name="app_details_variant_best_effort">%1$s için yapı yayınlanmadı. Bunun yerine %2$s yapısı denenecek — kurulmayabilir.</string>
+    <string name="sort_label">Sırala</string>
+    <string name="sort_catalog">Önerilen</string>
+    <string name="sort_recently_updated">Son güncellenenler</string>
+    <string name="sort_name_asc">Ad (A-Z)</string>
+    <string name="card_updated">%1$s güncellendi</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">Ara</string>
+    <string name="search_close">Aramayı kapat</string>
+    <string name="clear_search">Aramayı temizle</string>
+    <string name="scroll_to_top">Başa dön</string>
 </resources>

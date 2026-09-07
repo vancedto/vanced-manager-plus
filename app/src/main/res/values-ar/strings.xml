@@ -30,13 +30,13 @@
     <string name="uninstall">إلغاء التثبيت</string>
     <string name="reinstall">إعادة التثبيت</string>
     <string name="reinstall_started">بدأت إعادة التثبيت</string>
-    <string name="reinstall_failed">فشلت إعادة التثبيت</string>
     <string name="installing">جاري التثبيت</string>
     <string name="uninstalling">جاري إلغاء التثبيت</string>
     <string name="unknown">غير معروف</string>
     <string name="installed_version">المثبت:  الإصدار  %1$s</string>
     <string name="latest_version">الأحدث:  الإصدار  %1$s</string>
     <string name="downloading_progress">جاري التحميل %1$d%%</string>
+    <string name="downloading_cancel">إلغاء · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">بدء التحميل...</string>
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">إعادة تثبيت التطبيق</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">فشل التثبيت:  %1$s\n\nهل تريد إعادة المحاولة؟ سيتم إلغاء تثبيت الإصدار القديم أولاً إذا كان موجوداً.</string>
     <string name="uninstall_required_message">لإعادة محاولة تثبيت %1$s، يجب إلغاء تثبيت الإصدار القديم أولاً. المتابعة؟</string>
-    <string name="reinstall_confirmation_message">سيؤدي هذا إلى إلغاء تثبيت الإصدار الحالي من %1$s وتحميل وتثبيت أحدث إصدار.\n\nهل تريد المتابعة؟</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">إغلاق</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">جارٍ تحديث %1$d تطبيق…</string>
     <string name="update_prompt_title">تحديثات متاحة</string>
     <string name="update_prompt_message">يتوفر تحديث لـ %1$d تطبيق. هل تريد تحديثها الآن؟</string>
+    <string name="update_selected">تحديث (%1$d)</string>
     <string name="skip_today">تخطي اليوم</string>
+    <string name="update_prompt_muted">تم إيقاف اقتراحات التحديث لـ %1$s</string>
+    <string name="update_prompt_unmuted">تم تفعيل اقتراحات التحديث لـ %1$s</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">التحديثات</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">تمت الإضافة إلى المفضلة</string>
     <string name="favorite_removed">تمت الإزالة من المفضلة</string>
     <string name="no_favorites_yet">لا توجد مفضلة بعد. انقر على النجمة لإضافة تطبيق.</string>
+    <string name="favorite_remove_title">إزالة من المفضلة</string>
+    <string name="app_details">التفاصيل</string>
+    <string name="app_not_found">لم يعد هذا التطبيق في القائمة.</string>
+    <string name="app_details_update_prompt">اقتراح تحديثات هذا التطبيق</string>
+    <string name="app_details_update_prompt_description">تضمين هذا التطبيق في نافذة التحديث وفي إشعار التحديث اليومي</string>
+    <string name="app_details_about">حول التطبيق</string>
+    <string name="app_details_features">ما الذي يتضمنه</string>
+    <string name="app_details_variants">الإصدارات المتاحة</string>
+    <string name="app_details_variants_auto">تم اختيارها تلقائيًا لجهازك — لا حاجة لاختيار شيء.</string>
+    <string name="app_details_variant_selected">تم اختيارها لهذا الجهاز</string>
+    <string name="app_details_by">بواسطة %1$s</string>
+    <string name="app_details_updated">تم التحديث %1$s</string>
+    <string name="app_details_size">الحجم</string>
+    <string name="app_details_more">المزيد</string>
+    <string name="app_details_requires_microg">يحتاج هذا التطبيق إلى MicroG لتسجيل الدخول وتشغيل المحتوى.</string>
+    <string name="copy_package_name">نسخ اسم الحزمة</string>
+    <string name="package_name_copied">تم نسخ اسم الحزمة</string>
+    <string name="share_app">مشاركة</string>
+    <string name="open_website">فتح الموقع</string>
+    <string name="open_app_page">عرض على vanced.to</string>
+    <string name="app_details_incompatible">غير مصمم لهذا الجهاز</string>
+    <string name="app_details_variant_best_effort">لم يُنشر أي إصدار لـ %1$s. سيتم تجربة إصدار %2$s — قد لا يتم تثبيته.</string>
+    <string name="sort_label">الترتيب</string>
+    <string name="sort_catalog">موصى به</string>
+    <string name="sort_recently_updated">المحدثة مؤخرًا</string>
+    <string name="sort_name_asc">الاسم (A-Z)</string>
+    <string name="card_updated">تم التحديث %1$s</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">بحث</string>
+    <string name="search_close">إغلاق البحث</string>
+    <string name="clear_search">مسح البحث</string>
+    <string name="scroll_to_top">العودة إلى الأعلى</string>
 </resources>

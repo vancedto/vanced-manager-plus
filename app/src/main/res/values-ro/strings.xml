@@ -30,13 +30,13 @@
     <string name="uninstall">Dezinstalează</string>
     <string name="reinstall">Reinstalează</string>
     <string name="reinstall_started">Reinstalare începută</string>
-    <string name="reinstall_failed">Reinstalare eșuată</string>
     <string name="installing">Se instalează</string>
     <string name="uninstalling">Se dezinstalează</string>
     <string name="unknown">Necunoscut</string>
     <string name="installed_version">Instalată: %1$s</string>
     <string name="latest_version">Cea mai recentă: %1$s</string>
     <string name="downloading_progress">Se descarcă %1$d%%</string>
+    <string name="downloading_cancel">Anulează · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Se începe descărcarea...</string>
@@ -63,7 +63,7 @@
     <string name="app_not_installed_proceeding">Aplicația nu este instalată, se continuă cu descărcarea</string>
     <string name="installation_cancelled_by_user">Instalare anulată de utilizator</string>
     <string name="app_status_updated">Status aplicație actualizat</string>
-    <string name="apps_updated">Aplicații actualizate</string>
+    <string name="apps_updated">Aplicații actualizate: %1$d</string>
     <string name="configuration_saved">Configurație salvată</string>
     
     <!-- Dialog Titles -->
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">Confirmă reinstalarea</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">Instalare eșuată: %1$s\n\nVreți să încercați din nou? Aceasta va dezinstala mai întâi versiunea veche dacă există.</string>
     <string name="uninstall_required_message">Pentru a reîncerca instalarea %1$s, versiunea veche trebuie dezinstalată mai întâi. Continuați?</string>
-    <string name="reinstall_confirmation_message">Sunteți sigur că doriți să reinstalați %1$s? Aceasta va dezinstala versiunea curentă și va instala cea mai recentă versiune.</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">Închide</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">Se actualizează %1$d aplicații…</string>
     <string name="update_prompt_title">Actualizări disponibile</string>
     <string name="update_prompt_message">%1$d aplicații au actualizări disponibile. Vrei să le actualizezi acum?</string>
+    <string name="update_selected">Actualizează (%1$d)</string>
     <string name="skip_today">Sari peste azi</string>
+    <string name="update_prompt_muted">Sugestiile de actualizare pentru %1$s au fost dezactivate</string>
+    <string name="update_prompt_unmuted">Sugestiile de actualizare pentru %1$s au fost activate</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">Actualizări</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">Adăugat la favorite</string>
     <string name="favorite_removed">Eliminat din favorite</string>
     <string name="no_favorites_yet">Niciun favorit încă. Apăsați steluța unei aplicații pentru a adăuga.</string>
+    <string name="favorite_remove_title">Elimină de la favorite</string>
+    <string name="app_details">Detalii</string>
+    <string name="app_not_found">Această aplicație nu mai este în listă.</string>
+    <string name="app_details_update_prompt">Sugerează actualizări pentru această aplicație</string>
+    <string name="app_details_update_prompt_description">Include această aplicație în fereastra de actualizare și în notificarea zilnică</string>
+    <string name="app_details_about">Despre</string>
+    <string name="app_details_features">Ce include</string>
+    <string name="app_details_variants">Versiuni disponibile</string>
+    <string name="app_details_variants_auto">Aleasă automat pentru dispozitivul tău — nu trebuie să alegi nimic.</string>
+    <string name="app_details_variant_selected">Aleasă pentru acest dispozitiv</string>
+    <string name="app_details_by">de %1$s</string>
+    <string name="app_details_updated">Actualizată %1$s</string>
+    <string name="app_details_size">Dimensiune</string>
+    <string name="app_details_more">Mai mult</string>
+    <string name="app_details_requires_microg">Această aplicație are nevoie de MicroG pentru autentificare și redarea conținutului.</string>
+    <string name="copy_package_name">Copiază numele pachetului</string>
+    <string name="package_name_copied">Numele pachetului a fost copiat</string>
+    <string name="share_app">Distribuie</string>
+    <string name="open_website">Deschide site-ul</string>
+    <string name="open_app_page">Vezi pe vanced.to</string>
+    <string name="app_details_incompatible">Nu este compilată pentru acest dispozitiv</string>
+    <string name="app_details_variant_best_effort">Nu a fost publicată nicio versiune pentru %1$s. Se va încerca versiunea %2$s — s-ar putea să nu se instaleze.</string>
+    <string name="sort_label">Sortează</string>
+    <string name="sort_catalog">Recomandate</string>
+    <string name="sort_recently_updated">Actualizate recent</string>
+    <string name="sort_name_asc">Nume (A-Z)</string>
+    <string name="card_updated">Actualizată %1$s</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">Căutare</string>
+    <string name="search_close">Închide căutarea</string>
+    <string name="clear_search">Șterge căutarea</string>
+    <string name="scroll_to_top">Înapoi sus</string>
 </resources>

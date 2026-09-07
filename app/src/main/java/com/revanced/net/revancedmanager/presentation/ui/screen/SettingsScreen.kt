@@ -35,6 +35,7 @@ import com.revanced.net.revancedmanager.domain.model.AppConfig
 import com.revanced.net.revancedmanager.domain.model.Language
 import com.revanced.net.revancedmanager.domain.model.ThemeMode
 import com.revanced.net.revancedmanager.presentation.bloc.ApkCacheInfo
+import com.revanced.net.revancedmanager.presentation.ui.components.SettingsSwitchRow
 import com.revanced.net.revancedmanager.presentation.ui.components.tvFocusBorder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -277,59 +278,6 @@ private fun SettingsSectionHeader(title: String) {
             modifier = Modifier.padding(start = 16.dp, top = 20.dp, bottom = 6.dp)
         )
         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-    }
-}
-
-// ---- Switch row ----
-
-@Composable
-private fun SettingsSwitchRow(
-    title: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    subtitle: String? = null
-) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .border(
-                1.dp,
-                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
-                RoundedCornerShape(16.dp)
-            ),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
-                )
-                if (subtitle != null) {
-                    Text(
-                        text = subtitle,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Switch(
-                checked = checked,
-                onCheckedChange = onCheckedChange,
-                modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
-            )
-        }
     }
 }
 

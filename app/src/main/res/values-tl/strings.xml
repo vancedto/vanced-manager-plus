@@ -30,13 +30,13 @@
     <string name="uninstall">I-uninstall</string>
     <string name="reinstall">I-reinstall</string>
     <string name="reinstall_started">Nagsimula ang pag-reinstall</string>
-    <string name="reinstall_failed">Nabigo ang pag-reinstall</string>
     <string name="installing">Nag-i-install</string>
     <string name="uninstalling">Nag-a-uninstall</string>
     <string name="unknown">Hindi alam</string>
     <string name="installed_version">Naka-install: %1$s</string>
     <string name="latest_version">Pinakabago: %1$s</string>
     <string name="downloading_progress">Nagda-download %1$d%%</string>
+    <string name="downloading_cancel">Kanselahin · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Nagsisimula ang download...</string>
@@ -63,7 +63,7 @@
     <string name="app_not_installed_proceeding">Hindi naka-install ang app, magpapatuloy sa download</string>
     <string name="installation_cancelled_by_user">Kinansela ng user ang pag-install</string>
     <string name="app_status_updated">Na-update ang status ng app</string>
-    <string name="apps_updated">Na-update ang mga app</string>
+    <string name="apps_updated">Na-update ang %1$d app</string>
     <string name="configuration_saved">Na-save ang configuration</string>
     
     <!-- Dialog Titles -->
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">Kumpirmahin ang Pag-reinstall</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">Nabigo ang pag-install: %1$s\n\nGusto mo bang subukan ulit? Ito ay mag-u-uninstall muna ng lumang version kung meron.</string>
     <string name="uninstall_required_message">Para subukan ulit ang pag-install ng %1$s, kailangan muna i-uninstall ang lumang version. Magpatuloy?</string>
-    <string name="reinstall_confirmation_message">Sigurado ka bang gusto mong i-reinstall ang %1$s? Ito ay mag-u-uninstall ng kasalukuyang version at mag-i-install ng pinakabagong version.</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">Isara</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">Ina-update ang %1$d (na) app…</string>
     <string name="update_prompt_title">May available na update</string>
     <string name="update_prompt_message">May available na update ang %1$d (na) app. Gusto mo ba silang i-update ngayon?</string>
+    <string name="update_selected">I-update (%1$d)</string>
     <string name="skip_today">Laktawan ngayon</string>
+    <string name="update_prompt_muted">Naka-off na ang mga suhestiyon ng update para sa %1$s</string>
+    <string name="update_prompt_unmuted">Naka-on na ang mga suhestiyon ng update para sa %1$s</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">Mga Update</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">Naidagdag sa mga paborito</string>
     <string name="favorite_removed">Naalis sa mga paborito</string>
     <string name="no_favorites_yet">Wala pang mga paborito. I-tap ang bituin sa isang app para magdagdag.</string>
+    <string name="favorite_remove_title">Alisin sa mga paborito</string>
+    <string name="app_details">Mga detalye</string>
+    <string name="app_not_found">Wala na ang app na ito sa listahan.</string>
+    <string name="app_details_update_prompt">Magmungkahi ng update para sa app na ito</string>
+    <string name="app_details_update_prompt_description">Isama ang app na ito sa popup ng update at sa araw-araw na notification</string>
+    <string name="app_details_about">Tungkol dito</string>
+    <string name="app_details_features">Ano ang kasama</string>
+    <string name="app_details_variants">Mga available na build</string>
+    <string name="app_details_variants_auto">Awtomatikong napili para sa iyong device — wala nang kailangang piliin.</string>
+    <string name="app_details_variant_selected">Napili para sa device na ito</string>
+    <string name="app_details_by">ni %1$s</string>
+    <string name="app_details_updated">Na-update %1$s</string>
+    <string name="app_details_size">Laki</string>
+    <string name="app_details_more">Higit pa</string>
+    <string name="app_details_requires_microg">Kailangan ng app na ito ang MicroG para makapag-sign in at makapag-play ng content.</string>
+    <string name="copy_package_name">Kopyahin ang package name</string>
+    <string name="package_name_copied">Nakopya ang package name</string>
+    <string name="share_app">Ibahagi</string>
+    <string name="open_website">Buksan ang website</string>
+    <string name="open_app_page">Tingnan sa vanced.to</string>
+    <string name="app_details_incompatible">Hindi ginawa para sa device na ito</string>
+    <string name="app_details_variant_best_effort">Walang build para sa %1$s na inilabas. Susubukan ang build na %2$s — maaaring hindi ma-install.</string>
+    <string name="sort_label">Ayusin</string>
+    <string name="sort_catalog">Inirerekomenda</string>
+    <string name="sort_recently_updated">Kamakailang na-update</string>
+    <string name="sort_name_asc">Pangalan (A-Z)</string>
+    <string name="card_updated">Na-update %1$s</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">Maghanap</string>
+    <string name="search_close">Isara ang paghahanap</string>
+    <string name="clear_search">I-clear ang paghahanap</string>
+    <string name="scroll_to_top">Bumalik sa itaas</string>
 </resources>

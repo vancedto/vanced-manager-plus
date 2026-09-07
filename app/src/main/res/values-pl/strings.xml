@@ -30,13 +30,13 @@
     <string name="uninstall">Odinstaluj</string>
     <string name="reinstall">Zainstaluj ponownie</string>
     <string name="reinstall_started">Ponowna instalacja rozpoczęta</string>
-    <string name="reinstall_failed">Ponowna instalacja nieudana</string>
     <string name="installing">Instalowanie</string>
     <string name="uninstalling">Odinstalowywanie</string>
     <string name="unknown">Nieznany</string>
     <string name="installed_version">Zainstalowana: %1$s</string>
     <string name="latest_version">Najnowsza: %1$s</string>
     <string name="downloading_progress">Pobieranie %1$d%%</string>
+    <string name="downloading_cancel">Anuluj · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Rozpoczynanie pobierania...</string>
@@ -63,7 +63,7 @@
     <string name="app_not_installed_proceeding">Aplikacja nie jest zainstalowana, kontynuowanie pobierania</string>
     <string name="installation_cancelled_by_user">Instalacja anulowana przez użytkownika</string>
     <string name="app_status_updated">Status aplikacji zaktualizowany</string>
-    <string name="apps_updated">Aplikacje zaktualizowane</string>
+    <string name="apps_updated">Zaktualizowane aplikacje: %1$d</string>
     <string name="configuration_saved">Konfiguracja zapisana</string>
     
     <!-- Dialog Titles -->
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">Potwierdź ponowną instalację</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">Instalacja nieudana: %1$s\n\nCzy chcesz spróbować ponownie? To najpierw odinstaluje starą wersję jeśli istnieje.</string>
     <string name="uninstall_required_message">Aby ponowić instalację %1$s, stara wersja musi zostać najpierw odinstalowana. Kontynuować?</string>
-    <string name="reinstall_confirmation_message">Czy na pewno chcesz ponownie zainstalować %1$s? To odinstaluje obecną wersję i zainstaluje najnowszą wersję.</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">Zamknij</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">Aktualizowanie %1$d aplikacji…</string>
     <string name="update_prompt_title">Dostępne aktualizacje</string>
     <string name="update_prompt_message">%1$d aplikacji ma dostępne aktualizacje. Czy chcesz je teraz zaktualizować?</string>
+    <string name="update_selected">Aktualizuj (%1$d)</string>
     <string name="skip_today">Pomiń dzisiaj</string>
+    <string name="update_prompt_muted">Wyłączono propozycje aktualizacji dla %1$s</string>
+    <string name="update_prompt_unmuted">Włączono propozycje aktualizacji dla %1$s</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">Aktualizacje</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">Dodano do ulubionych</string>
     <string name="favorite_removed">Usunięto z ulubionych</string>
     <string name="no_favorites_yet">Brak ulubionych. Dotknij gwiazdki przy aplikacji, aby dodać.</string>
+    <string name="favorite_remove_title">Usuń z ulubionych</string>
+    <string name="app_details">Szczegóły</string>
+    <string name="app_not_found">Tej aplikacji nie ma już na liście.</string>
+    <string name="app_details_update_prompt">Proponuj aktualizacje tej aplikacji</string>
+    <string name="app_details_update_prompt_description">Uwzględniaj tę aplikację w oknie aktualizacji i w codziennym powiadomieniu</string>
+    <string name="app_details_about">O aplikacji</string>
+    <string name="app_details_features">Co zawiera</string>
+    <string name="app_details_variants">Dostępne kompilacje</string>
+    <string name="app_details_variants_auto">Wybrana automatycznie dla Twojego urządzenia — nie musisz nic wybierać.</string>
+    <string name="app_details_variant_selected">Wybrana dla tego urządzenia</string>
+    <string name="app_details_by">od %1$s</string>
+    <string name="app_details_updated">Zaktualizowano %1$s</string>
+    <string name="app_details_size">Rozmiar</string>
+    <string name="app_details_more">Więcej</string>
+    <string name="app_details_requires_microg">Ta aplikacja wymaga MicroG do logowania i odtwarzania treści.</string>
+    <string name="copy_package_name">Kopiuj nazwę pakietu</string>
+    <string name="package_name_copied">Skopiowano nazwę pakietu</string>
+    <string name="share_app">Udostępnij</string>
+    <string name="open_website">Otwórz stronę</string>
+    <string name="open_app_page">Zobacz na vanced.to</string>
+    <string name="app_details_incompatible">Nie zbudowano dla tego urządzenia</string>
+    <string name="app_details_variant_best_effort">Nie opublikowano kompilacji dla %1$s. Zostanie wypróbowana kompilacja %2$s — może się nie zainstalować.</string>
+    <string name="sort_label">Sortuj</string>
+    <string name="sort_catalog">Polecane</string>
+    <string name="sort_recently_updated">Ostatnio zaktualizowane</string>
+    <string name="sort_name_asc">Nazwa (A-Z)</string>
+    <string name="card_updated">Zaktualizowano %1$s</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">Szukaj</string>
+    <string name="search_close">Zamknij wyszukiwanie</string>
+    <string name="clear_search">Wyczyść wyszukiwanie</string>
+    <string name="scroll_to_top">Wróć na górę</string>
 </resources>

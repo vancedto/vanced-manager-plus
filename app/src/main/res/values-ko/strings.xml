@@ -30,13 +30,13 @@
     <string name="uninstall">제거</string>
     <string name="reinstall">재설치</string>
     <string name="reinstall_started">재설치 시작됨</string>
-    <string name="reinstall_failed">재설치 실패</string>
     <string name="installing">설치 중</string>
     <string name="uninstalling">제거 중</string>
     <string name="unknown">알 수 없음</string>
     <string name="installed_version">설치됨: %1$s</string>
     <string name="latest_version">최신: %1$s</string>
     <string name="downloading_progress">다운로드 %1$d%%</string>
+    <string name="downloading_cancel">취소 · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">다운로드 시작 중...</string>
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">애플리케이션 재설치</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">설치 실패: %1$s\n\n다시 시도하시겠습니까? 이전 버전이 있으면 먼저 제거됩니다.</string>
     <string name="uninstall_required_message">%1$s 설치를 다시 시도하려면 이전 버전을 먼저 제거해야 합니다. 계속하시겠습니까?</string>
-    <string name="reinstall_confirmation_message">이것은 %1$s의 현재 버전을 제거하고 최신 버전을 다운로드하여 설치합니다.\n\n계속하시겠습니까?</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">닫기</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">%1$d개 앱 업데이트 중…</string>
     <string name="update_prompt_title">업데이트 사용 가능</string>
     <string name="update_prompt_message">%1$d개 앱에 업데이트가 있습니다. 지금 업데이트하시겠습니까?</string>
+    <string name="update_selected">업데이트 (%1$d)</string>
     <string name="skip_today">오늘 건너뛰기</string>
+    <string name="update_prompt_muted">%1$s의 업데이트 알림을 껐습니다</string>
+    <string name="update_prompt_unmuted">%1$s의 업데이트 알림을 켰습니다</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">업데이트</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">즐겨찾기에 추가됨</string>
     <string name="favorite_removed">즐겨찾기에서 제거됨</string>
     <string name="no_favorites_yet">즐겨찾기가 없습니다. 앱의 별표를 탭하여 추가하세요.</string>
+    <string name="favorite_remove_title">즐겨찾기에서 제거</string>
+    <string name="app_details">상세 정보</string>
+    <string name="app_not_found">이 앱은 목록에 더 이상 없습니다.</string>
+    <string name="app_details_update_prompt">이 앱의 업데이트 제안</string>
+    <string name="app_details_update_prompt_description">업데이트 팝업과 매일 업데이트 알림에 이 앱 포함</string>
+    <string name="app_details_about">정보</string>
+    <string name="app_details_features">포함된 기능</string>
+    <string name="app_details_variants">제공되는 빌드</string>
+    <string name="app_details_variants_auto">기기에 맞게 자동으로 선택되어 따로 고를 필요가 없습니다.</string>
+    <string name="app_details_variant_selected">이 기기에 선택됨</string>
+    <string name="app_details_by">제작: %1$s</string>
+    <string name="app_details_updated">%1$s 업데이트됨</string>
+    <string name="app_details_size">크기</string>
+    <string name="app_details_more">더보기</string>
+    <string name="app_details_requires_microg">이 앱은 로그인과 재생을 위해 MicroG가 필요합니다.</string>
+    <string name="copy_package_name">패키지 이름 복사</string>
+    <string name="package_name_copied">패키지 이름을 복사했습니다</string>
+    <string name="share_app">공유</string>
+    <string name="open_website">웹사이트 열기</string>
+    <string name="open_app_page">vanced.to에서 보기</string>
+    <string name="app_details_incompatible">이 기기용으로 빌드되지 않음</string>
+    <string name="app_details_variant_best_effort">%1$s용 빌드가 없습니다. 대신 %2$s 빌드를 시도하며, 설치되지 않을 수 있습니다.</string>
+    <string name="sort_label">정렬</string>
+    <string name="sort_catalog">추천순</string>
+    <string name="sort_recently_updated">최근 업데이트순</string>
+    <string name="sort_name_asc">이름 (A-Z)</string>
+    <string name="card_updated">%1$s 업데이트됨</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">검색</string>
+    <string name="search_close">검색 닫기</string>
+    <string name="clear_search">검색 지우기</string>
+    <string name="scroll_to_top">맨 위로</string>
 </resources>

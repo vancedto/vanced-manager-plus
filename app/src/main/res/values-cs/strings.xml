@@ -30,13 +30,13 @@
     <string name="uninstall">Odinstalovat</string>
     <string name="reinstall">Přeinstalovat</string>
     <string name="reinstall_started">Přeinstalace zahájena</string>
-    <string name="reinstall_failed">Přeinstalace selhala</string>
     <string name="installing">Instalace</string>
     <string name="uninstalling">Odinstalace</string>
     <string name="unknown">Neznámý</string>
     <string name="installed_version">Nainstalováno: %1$s</string>
     <string name="latest_version">Nejnovější: %1$s</string>
     <string name="downloading_progress">Stahování %1$d%%</string>
+    <string name="downloading_cancel">Zrušit · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Zahajování stahování...</string>
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">Přeinstalovat aplikaci</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">Instalace selhala: %1$s\n\nChcete to zkusit znovu? Pokud existuje, bude nejprve odinstalována stará verze.</string>
     <string name="uninstall_required_message">Pro opakování instalace %1$s je nutné nejprve odinstalovat starou verzi. Pokračovat?</string>
-    <string name="reinstall_confirmation_message">Tím se odinstaluje aktuální verze %1$s a stáhne a nainstaluje se nejnovější verze.\n\nChcete pokračovat?</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">Zavřít</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">Aktualizuji %1$d aplikací…</string>
     <string name="update_prompt_title">Dostupné aktualizace</string>
     <string name="update_prompt_message">%1$d aplikací má dostupné aktualizace. Chcete je nyní aktualizovat?</string>
+    <string name="update_selected">Aktualizovat (%1$d)</string>
     <string name="skip_today">Přeskočit dnes</string>
+    <string name="update_prompt_muted">Návrhy aktualizací pro %1$s vypnuty</string>
+    <string name="update_prompt_unmuted">Návrhy aktualizací pro %1$s zapnuty</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">Aktualizace</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">Přidáno do oblíbených</string>
     <string name="favorite_removed">Odebráno z oblíbených</string>
     <string name="no_favorites_yet">Žádné oblíbené. Klepněte na hvězdičku u aplikace pro přidání.</string>
+    <string name="favorite_remove_title">Odebrat z oblíbených</string>
+    <string name="app_details">Podrobnosti</string>
+    <string name="app_not_found">Tato aplikace už není v seznamu.</string>
+    <string name="app_details_update_prompt">Navrhovat aktualizace této aplikace</string>
+    <string name="app_details_update_prompt_description">Zahrnout tuto aplikaci do okna aktualizací a do denního oznámení</string>
+    <string name="app_details_about">O aplikaci</string>
+    <string name="app_details_features">Co obsahuje</string>
+    <string name="app_details_variants">Dostupná sestavení</string>
+    <string name="app_details_variants_auto">Vybráno automaticky pro vaše zařízení — nemusíte nic vybírat.</string>
+    <string name="app_details_variant_selected">Vybráno pro toto zařízení</string>
+    <string name="app_details_by">od %1$s</string>
+    <string name="app_details_updated">Aktualizováno %1$s</string>
+    <string name="app_details_size">Velikost</string>
+    <string name="app_details_more">Více</string>
+    <string name="app_details_requires_microg">Tato aplikace potřebuje MicroG k přihlášení a přehrávání obsahu.</string>
+    <string name="copy_package_name">Kopírovat název balíčku</string>
+    <string name="package_name_copied">Název balíčku zkopírován</string>
+    <string name="share_app">Sdílet</string>
+    <string name="open_website">Otevřít web</string>
+    <string name="open_app_page">Zobrazit na vanced.to</string>
+    <string name="app_details_incompatible">Nesestaveno pro toto zařízení</string>
+    <string name="app_details_variant_best_effort">Pro %1$s nebylo zveřejněno žádné sestavení. Zkusí se sestavení %2$s — nemusí se nainstalovat.</string>
+    <string name="sort_label">Řadit</string>
+    <string name="sort_catalog">Doporučené</string>
+    <string name="sort_recently_updated">Nedávno aktualizované</string>
+    <string name="sort_name_asc">Název (A-Z)</string>
+    <string name="card_updated">Aktualizováno %1$s</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">Hledat</string>
+    <string name="search_close">Zavřít hledání</string>
+    <string name="clear_search">Vymazat hledání</string>
+    <string name="scroll_to_top">Zpět nahoru</string>
 </resources>

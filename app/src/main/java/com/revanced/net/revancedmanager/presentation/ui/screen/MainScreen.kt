@@ -4,10 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,7 +27,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -34,6 +39,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Coffee
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -43,37 +49,48 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.presentation.bloc.AppBloc
@@ -87,6 +104,7 @@ import com.revanced.net.revancedmanager.presentation.bloc.getApkCacheInfo
 import com.revanced.net.revancedmanager.presentation.bloc.shareDebugLogs
 import com.revanced.net.revancedmanager.presentation.ui.components.AppCard
 import com.revanced.net.revancedmanager.presentation.ui.components.AppDialogHost
+import com.revanced.net.revancedmanager.presentation.ui.components.ProcessingIndicatorButton
 import com.revanced.net.revancedmanager.presentation.ui.components.SuggestionsDialog
 import com.revanced.net.revancedmanager.presentation.ui.components.tvFocusBorder
 import com.revanced.net.revancedmanager.presentation.ui.theme.noiseBackground
@@ -107,84 +125,274 @@ fun MainScreen(
     val background = MaterialTheme.colorScheme.background
     val noiseAlpha = if (background.luminance() < 0.1f) 0.08f else 0.05f
 
+    var searchActive by rememberSaveable { mutableStateOf(false) }
+    var filterExpanded by rememberSaveable { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
+    val successState = state as? AppState.Success
+    val isFilterActive = (successState?.filterOption ?: AppFilterOption.ALL) != AppFilterOption.ALL
+    val showChips = (filterExpanded || isFilterActive) && successState != null
+
+    // Auto-show chips when a filter becomes active from outside
+    LaunchedEffect(isFilterActive) {
+        if (isFilterActive) filterExpanded = true
+    }
+
+    // Pin top bar and focus search field when entering search mode
+    LaunchedEffect(searchActive) {
+        if (searchActive) {
+            scrollBehavior.state.heightOffset = 0f
+            focusRequester.requestFocus()
+        }
+    }
+
+    // Intercept system back button to exit search before exiting screen
+    BackHandler(enabled = searchActive) {
+        viewModel.handleEvent(AppEvent.ClearSearch)
+        searchActive = false
+    }
+
+    // Scroll list to top when search query, filter option, or sort option changes
+    var isFirstRun by remember { mutableStateOf(true) }
+    LaunchedEffect(
+        successState?.searchQuery,
+        successState?.filterOption,
+        successState?.sortOption
+    ) {
+        if (isFirstRun) {
+            isFirstRun = false
+        } else if (successState != null) {
+            listState.scrollToItem(0)
+        }
+    }
+
     // When the last processing item finishes, leave the PROCESSING filter so the
     // user is not left staring at an empty list
-    val successState = state as? AppState.Success
     LaunchedEffect(successState?.processingCount, successState?.filterOption) {
         if (successState?.filterOption == AppFilterOption.PROCESSING && successState.processingCount == 0) {
             viewModel.handleEvent(AppEvent.SetFilter(AppFilterOption.ALL))
         }
     }
 
+    val showScrollToTop by remember {
+        derivedStateOf { listState.firstVisibleItemIndex > 8 }
+    }
+
     Scaffold(
         modifier = Modifier
             .noiseBackground(background, noiseAlpha)
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+            .then(
+                if (searchActive) Modifier
+                else Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            ),
         containerColor = Color.Transparent,
         topBar = {
-            TopAppBar(
-                title = {
-                    Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                        Text(
-                            text = stringResource(R.string.app_name),
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = stringResource(R.string.app_subtitle),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                },
-                actions = {
-                    // Processing indicator: shows how many apps are being
-                    // downloaded/installed/uninstalled; tap to filter to them
-                    val processingCount = (state as? AppState.Success)?.processingCount ?: 0
-                    AnimatedVisibility(visible = processingCount > 0) {
-                        BadgedBox(
-                            badge = {
-                                Badge(containerColor = MaterialTheme.colorScheme.primary) {
-                                    Text("$processingCount")
-                                }
-                            }
-                        ) {
-                            IconButton(
-                                onClick = { viewModel.handleEvent(AppEvent.SetFilter(AppFilterOption.PROCESSING)) },
-                                modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
-                                    strokeWidth = 2.dp
+            Column {
+                TopAppBar(
+                    title = {
+                        if (searchActive) {
+                            TextField(
+                                value = successState?.searchQuery ?: "",
+                                onValueChange = { viewModel.handleEvent(AppEvent.SearchApps(it)) },
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(R.string.search_apps),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                },
+                                singleLine = true,
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    disabledContainerColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                ),
+                                textStyle = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .focusRequester(focusRequester)
+                            )
+                        } else {
+                            Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                                Text(
+                                    text = stringResource(R.string.app_name),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    text = stringResource(R.string.app_subtitle),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
-                    }
-                    IconButton(
-                        onClick = { viewModel.handleEvent(AppEvent.RefreshApps) },
-                        modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Refresh,
-                            contentDescription = stringResource(R.string.retry)
-                        )
-                    }
-                    IconButton(
-                        onClick = onOpenSettings,
-                        modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = stringResource(R.string.settings)
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    scrolledContainerColor = Color.Transparent,
+                    },
+                    navigationIcon = {
+                        if (searchActive) {
+                            IconButton(
+                                onClick = {
+                                    viewModel.handleEvent(AppEvent.ClearSearch)
+                                    searchActive = false
+                                },
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .tvFocusBorder(shape = RoundedCornerShape(50))
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.search_close),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+                    },
+                    actions = {
+                        if (searchActive) {
+                            val query = successState?.searchQuery ?: ""
+                            if (query.isNotEmpty()) {
+                                IconButton(
+                                    onClick = { viewModel.handleEvent(AppEvent.ClearSearch) },
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .tvFocusBorder(shape = RoundedCornerShape(50))
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Clear,
+                                        contentDescription = stringResource(R.string.clear_search),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
+                        } else {
+                            // Processing indicator: shows how many apps are being
+                            // downloaded/installed/uninstalled; tap to filter to them
+                            val processingCount = successState?.processingCount ?: 0
+                            AnimatedVisibility(visible = processingCount > 0) {
+                                ProcessingIndicatorButton(
+                                    count = processingCount,
+                                    onClick = { viewModel.handleEvent(AppEvent.SetFilter(AppFilterOption.PROCESSING)) }
+                                )
+                            }
+                            if (successState != null) {
+                                IconButton(
+                                    onClick = { searchActive = true },
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .tvFocusBorder(shape = RoundedCornerShape(50))
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Search,
+                                        contentDescription = stringResource(R.string.search_label),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                BadgedBox(
+                                    badge = {
+                                        if (isFilterActive) {
+                                            Badge(containerColor = MaterialTheme.colorScheme.primary)
+                                        }
+                                    }
+                                ) {
+                                    IconButton(
+                                        onClick = { filterExpanded = !filterExpanded },
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .tvFocusBorder(shape = RoundedCornerShape(50))
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.FilterList,
+                                            contentDescription = stringResource(R.string.filter_label),
+                                            modifier = Modifier.size(20.dp),
+                                            tint = if (isFilterActive) MaterialTheme.colorScheme.primary
+                                                   else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
+                                SortControl(
+                                    sortOption = successState.sortOption,
+                                    onSortChange = { viewModel.handleEvent(AppEvent.SetSort(it)) }
+                                )
+                            }
+                            IconButton(
+                                onClick = { viewModel.handleEvent(AppEvent.RefreshApps) },
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .tvFocusBorder(shape = RoundedCornerShape(50))
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Refresh,
+                                    contentDescription = stringResource(R.string.retry),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            IconButton(
+                                onClick = onOpenSettings,
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .tvFocusBorder(shape = RoundedCornerShape(50))
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Settings,
+                                    contentDescription = stringResource(R.string.settings),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Transparent,
+                    )
                 )
-            )
+
+                AnimatedVisibility(
+                    visible = showChips,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
+                    if (successState != null) {
+                        FilterChipsRow(
+                            filterOption = successState.filterOption,
+                            onFilterChange = { viewModel.handleEvent(AppEvent.SetFilter(it)) },
+                            processingCount = successState.processingCount,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+            }
+        },
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = showScrollToTop,
+                enter = scaleIn() + fadeIn(),
+                exit = scaleOut() + fadeOut()
+            ) {
+                SmallFloatingActionButton(
+                    onClick = {
+                        scope.launch {
+                            listState.animateScrollToItem(0)
+                        }
+                    },
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowUp,
+                        contentDescription = stringResource(R.string.scroll_to_top)
+                    )
+                }
+            }
         }
     ) { paddingValues ->
         when (val currentState = state) {
@@ -208,25 +416,12 @@ fun MainScreen(
                     apps = filtered,
                     searchQuery = currentState.searchQuery,
                     filterOption = currentState.filterOption,
-                    onSearchQueryChange = { query ->
-                        viewModel.handleEvent(AppEvent.SearchApps(query))
-                    },
-                    onClearSearch = {
-                        viewModel.handleEvent(AppEvent.ClearSearch)
-                    },
-                    onFilterChange = { filter ->
-                        viewModel.handleEvent(AppEvent.SetFilter(filter))
-                    },
-                    sortOption = currentState.sortOption,
-                    onSortChange = { sort ->
-                        viewModel.handleEvent(AppEvent.SetSort(sort))
-                    },
                     onEvent = viewModel::handleEvent,
                     onOpenDetail = onOpenDetail,
                     isCompactMode = currentState.config.compactMode,
                     isRefreshing = currentState.isRefreshing,
                     onRefresh = { viewModel.handleEvent(AppEvent.PullToRefreshApps) },
-                    processingCount = currentState.processingCount,
+                    listState = listState,
                     modifier = Modifier.padding(paddingValues)
                 )
 
@@ -327,17 +522,12 @@ private fun AppListScreen(
     apps: List<com.revanced.net.revancedmanager.domain.model.RevancedApp>,
     searchQuery: String = "",
     filterOption: AppFilterOption = AppFilterOption.ALL,
-    onSearchQueryChange: (String) -> Unit = {},
-    onClearSearch: () -> Unit = {},
-    onFilterChange: (AppFilterOption) -> Unit = {},
-    sortOption: AppSortOption = AppSortOption.CATALOG,
-    onSortChange: (AppSortOption) -> Unit = {},
     onEvent: (AppEvent) -> Unit,
     onOpenDetail: (String) -> Unit = {},
     isCompactMode: Boolean = false,
     isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {},
-    processingCount: Int = 0,
+    listState: LazyListState = rememberLazyListState(),
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -348,22 +538,9 @@ private fun AppListScreen(
         modifier = modifier.fillMaxSize()
     ) {
         LazyColumn(
+            state = listState,
             modifier = Modifier.fillMaxSize()
         ) {
-        // Search + filter bar
-        item {
-            SearchAndFilterBar(
-                query = searchQuery,
-                filterOption = filterOption,
-                onQueryChange = onSearchQueryChange,
-                onClear = onClearSearch,
-                onFilterChange = onFilterChange,
-                sortOption = sortOption,
-                onSortChange = onSortChange,
-                processingCount = processingCount,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-        }
 
         // App cards
         // Empty state when no apps match search
@@ -419,6 +596,9 @@ private fun AppListScreen(
                 },
                 onCancelDownload = {
                     onEvent(AppEvent.CancelDownload(app.packageName))
+                },
+                onCancelInstall = {
+                    onEvent(AppEvent.CancelInstallation(app.packageName))
                 },
                 onOpenDetail = { onOpenDetail(app.id) },
                 isCompactMode = isCompactMode
@@ -549,202 +729,88 @@ private fun launchUrl(context: Context, url: String) {
 }
 
 /**
- * Combined search + filter bar with animated filter chips.
+ * Filter chips row displayed under the TopAppBar
  */
 @Composable
-private fun SearchAndFilterBar(
-    query: String,
+private fun FilterChipsRow(
     filterOption: AppFilterOption,
-    onQueryChange: (String) -> Unit,
-    onClear: () -> Unit,
     onFilterChange: (AppFilterOption) -> Unit,
-    sortOption: AppSortOption = AppSortOption.CATALOG,
-    onSortChange: (AppSortOption) -> Unit = {},
-    processingCount: Int = 0,
+    processingCount: Int,
     modifier: Modifier = Modifier
 ) {
-    var filterExpanded by remember { mutableStateOf(filterOption != AppFilterOption.ALL) }
-    val isFilterActive = filterOption != AppFilterOption.ALL
-
-    // Auto-show chips when a filter becomes active from outside
-    LaunchedEffect(isFilterActive) {
-        if (isFilterActive) filterExpanded = true
-    }
-
-    // Chips are visible when expanded OR when a filter is active
-    val showChips = filterExpanded || isFilterActive
-
-    Column(modifier = modifier) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            // Search field
-            androidx.compose.material3.TextField(
-                value = query,
-                onValueChange = onQueryChange,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(48.dp),
-                placeholder = {
+    Row(
+        modifier = modifier
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        val chipColors = FilterChipDefaults.filterChipColors(
+            selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+            selectedLabelColor = MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        val chipBorder = FilterChipDefaults.filterChipBorder(
+            enabled = true,
+            selected = false,
+            borderColor = MaterialTheme.colorScheme.outline,
+            selectedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+        )
+        val chipFocusShape = RoundedCornerShape(8.dp)
+        FilterChip(
+            selected = filterOption == AppFilterOption.ALL,
+            onClick = { onFilterChange(AppFilterOption.ALL) },
+            label = { Text(text = stringResource(R.string.filter_all), style = MaterialTheme.typography.labelSmall) },
+            colors = chipColors,
+            border = chipBorder,
+            modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
+        )
+        FilterChip(
+            selected = filterOption == AppFilterOption.INSTALLED,
+            onClick = { onFilterChange(AppFilterOption.INSTALLED) },
+            label = { Text(text = stringResource(R.string.filter_installed), style = MaterialTheme.typography.labelSmall) },
+            colors = chipColors,
+            border = chipBorder,
+            modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
+        )
+        FilterChip(
+            selected = filterOption == AppFilterOption.NOT_INSTALLED,
+            onClick = { onFilterChange(AppFilterOption.NOT_INSTALLED) },
+            label = { Text(text = stringResource(R.string.filter_not_installed), style = MaterialTheme.typography.labelSmall) },
+            colors = chipColors,
+            border = chipBorder,
+            modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
+        )
+        FilterChip(
+            selected = filterOption == AppFilterOption.UPDATES_AVAILABLE,
+            onClick = { onFilterChange(AppFilterOption.UPDATES_AVAILABLE) },
+            label = { Text(text = stringResource(R.string.filter_updates), style = MaterialTheme.typography.labelSmall) },
+            colors = chipColors,
+            border = chipBorder,
+            modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
+        )
+        FilterChip(
+            selected = filterOption == AppFilterOption.FAVORITES,
+            onClick = { onFilterChange(AppFilterOption.FAVORITES) },
+            label = { Text(text = stringResource(R.string.filter_favorites), style = MaterialTheme.typography.labelSmall) },
+            colors = chipColors,
+            border = chipBorder,
+            modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
+        )
+        // Only meaningful while something is in flight (or still selected)
+        if (processingCount > 0 || filterOption == AppFilterOption.PROCESSING) {
+            FilterChip(
+                selected = filterOption == AppFilterOption.PROCESSING,
+                onClick = { onFilterChange(AppFilterOption.PROCESSING) },
+                label = {
                     Text(
-                        text = stringResource(R.string.search_apps),
-                        style = MaterialTheme.typography.bodySmall
+                        text = stringResource(R.string.filter_processing, processingCount),
+                        style = MaterialTheme.typography.labelSmall
                     )
                 },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Search,
-                        contentDescription = "Search",
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                trailingIcon = {
-                    if (query.isNotEmpty()) {
-                        androidx.compose.material3.IconButton(
-                            onClick = onClear,
-                            modifier = Modifier.size(32.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Clear,
-                                contentDescription = "Clear search",
-                                modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                colors = androidx.compose.material3.TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                ),
-                textStyle = MaterialTheme.typography.bodySmall
+                colors = chipColors,
+                border = chipBorder,
+                modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
             )
-
-            // Filter toggle button with active-state badge
-            BadgedBox(
-                badge = {
-                    if (isFilterActive) {
-                        Badge(containerColor = MaterialTheme.colorScheme.primary)
-                    }
-                }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .tvFocusBorder(shape = MaterialTheme.shapes.medium)
-                        .clip(MaterialTheme.shapes.medium)
-                        .background(
-                            if (isFilterActive) MaterialTheme.colorScheme.primaryContainer
-                            else MaterialTheme.colorScheme.surfaceVariant
-                        )
-                        .clickable { filterExpanded = !filterExpanded },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.FilterList,
-                        contentDescription = stringResource(R.string.filter_label),
-                        modifier = Modifier.size(20.dp),
-                        tint = if (isFilterActive) MaterialTheme.colorScheme.onPrimaryContainer
-                               else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            SortControl(sortOption = sortOption, onSortChange = onSortChange)
-        }
-
-        // Animated filter chips row
-        AnimatedVisibility(
-            visible = showChips,
-            enter = expandVertically() + fadeIn(),
-            exit = shrinkVertically() + fadeOut()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                val chipColors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
-                    selectedLabelColor = MaterialTheme.colorScheme.primary,
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                val chipBorder = FilterChipDefaults.filterChipBorder(
-                    enabled = true,
-                    selected = false,
-                    borderColor = MaterialTheme.colorScheme.outline,
-                    selectedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                )
-                val chipFocusShape = RoundedCornerShape(8.dp)
-                FilterChip(
-                    selected = filterOption == AppFilterOption.ALL,
-                    onClick = { onFilterChange(AppFilterOption.ALL) },
-                    label = { Text(text = stringResource(R.string.filter_all), style = MaterialTheme.typography.labelSmall) },
-                    colors = chipColors,
-                    border = chipBorder,
-                    modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
-                )
-                FilterChip(
-                    selected = filterOption == AppFilterOption.INSTALLED,
-                    onClick = { onFilterChange(AppFilterOption.INSTALLED) },
-                    label = { Text(text = stringResource(R.string.filter_installed), style = MaterialTheme.typography.labelSmall) },
-                    colors = chipColors,
-                    border = chipBorder,
-                    modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
-                )
-                FilterChip(
-                    selected = filterOption == AppFilterOption.NOT_INSTALLED,
-                    onClick = { onFilterChange(AppFilterOption.NOT_INSTALLED) },
-                    label = { Text(text = stringResource(R.string.filter_not_installed), style = MaterialTheme.typography.labelSmall) },
-                    colors = chipColors,
-                    border = chipBorder,
-                    modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
-                )
-                FilterChip(
-                    selected = filterOption == AppFilterOption.UPDATES_AVAILABLE,
-                    onClick = { onFilterChange(AppFilterOption.UPDATES_AVAILABLE) },
-                    label = { Text(text = stringResource(R.string.filter_updates), style = MaterialTheme.typography.labelSmall) },
-                    colors = chipColors,
-                    border = chipBorder,
-                    modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
-                )
-                FilterChip(
-                    selected = filterOption == AppFilterOption.FAVORITES,
-                    onClick = { onFilterChange(AppFilterOption.FAVORITES) },
-                    label = { Text(text = stringResource(R.string.filter_favorites), style = MaterialTheme.typography.labelSmall) },
-                    colors = chipColors,
-                    border = chipBorder,
-                    modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
-                )
-                // Only meaningful while something is in flight (or still selected)
-                if (processingCount > 0 || filterOption == AppFilterOption.PROCESSING) {
-                    FilterChip(
-                        selected = filterOption == AppFilterOption.PROCESSING,
-                        onClick = { onFilterChange(AppFilterOption.PROCESSING) },
-                        label = {
-                            Text(
-                                text = stringResource(R.string.filter_processing, processingCount),
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        },
-                        colors = chipColors,
-                        border = chipBorder,
-                        modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
-                    )
-                }
-            }
         }
     }
 }
@@ -765,28 +831,22 @@ private fun SortControl(
     val isActive = sortOption != AppSortOption.CATALOG
 
     Box {
-        Box(
+        IconButton(
+            onClick = { expanded = true },
             modifier = Modifier
-                .size(48.dp)
-                .tvFocusBorder(shape = MaterialTheme.shapes.medium)
-                .clip(MaterialTheme.shapes.medium)
-                .background(
-                    if (isActive) MaterialTheme.colorScheme.primaryContainer
-                    else MaterialTheme.colorScheme.surfaceVariant
-                )
-                .clickable { expanded = true },
-            contentAlignment = Alignment.Center
+                .size(40.dp)
+                .tvFocusBorder(shape = RoundedCornerShape(50))
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Sort,
                 contentDescription = stringResource(R.string.sort_label),
                 modifier = Modifier.size(20.dp),
-                tint = if (isActive) MaterialTheme.colorScheme.onPrimaryContainer
-                       else MaterialTheme.colorScheme.onSurfaceVariant
+                tint = if (isActive) MaterialTheme.colorScheme.primary
+                       else MaterialTheme.colorScheme.onSurface
             )
         }
 
-        androidx.compose.material3.DropdownMenu(
+        DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {

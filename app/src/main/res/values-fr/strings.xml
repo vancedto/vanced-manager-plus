@@ -30,13 +30,13 @@
     <string name="uninstall">Désinstaller</string>
     <string name="reinstall">Réinstaller</string>
     <string name="reinstall_started">Réinstallation démarrée</string>
-    <string name="reinstall_failed">Échec de la réinstallation</string>
     <string name="installing">Installation</string>
     <string name="uninstalling">Désinstallation</string>
     <string name="unknown">Inconnu</string>
     <string name="installed_version">Installé : %1$s</string>
     <string name="latest_version">Dernière : %1$s</string>
     <string name="downloading_progress">Téléchargement %1$d%%</string>
+    <string name="downloading_cancel">Annuler · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Démarrage du téléchargement...</string>
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">Réinstaller l\'application</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">Installation échouée : %1$s\n\nVoulez-vous réessayer ? Cela désinstallera d\'abord l\'ancienne version si elle existe.</string>
     <string name="uninstall_required_message">Pour réessayer l\'installation de %1$s, l\'ancienne version doit d\'abord être désinstallée. Continuer ?</string>
-    <string name="reinstall_confirmation_message">Cela désinstallera la version actuelle de %1$s et téléchargera et installera la dernière version.\n\nVoulez-vous continuer ?</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">Fermer</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">Mise à jour de %1$d application(s)…</string>
     <string name="update_prompt_title">Mises à jour disponibles</string>
     <string name="update_prompt_message">%1$d application(s) ont des mises à jour disponibles. Voulez-vous les mettre à jour maintenant ?</string>
+    <string name="update_selected">Mettre à jour (%1$d)</string>
     <string name="skip_today">Ignorer aujourd\'hui</string>
+    <string name="update_prompt_muted">Suggestions de mise à jour désactivées pour %1$s</string>
+    <string name="update_prompt_unmuted">Suggestions de mise à jour activées pour %1$s</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">Mises à jour</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">Ajouté aux favoris</string>
     <string name="favorite_removed">Retiré des favoris</string>
     <string name="no_favorites_yet">Pas encore de favoris. Appuyez sur l\'étoile d\'une app pour l\'ajouter.</string>
+    <string name="favorite_remove_title">Retirer des favoris</string>
+    <string name="app_details">Détails</string>
+    <string name="app_not_found">Cette app n\'est plus dans la liste.</string>
+    <string name="app_details_update_prompt">Suggérer les mises à jour de cette app</string>
+    <string name="app_details_update_prompt_description">Inclure cette app dans la fenêtre de mise à jour et la notification quotidienne</string>
+    <string name="app_details_about">À propos</string>
+    <string name="app_details_features">Ce qui est inclus</string>
+    <string name="app_details_variants">Versions disponibles</string>
+    <string name="app_details_variants_auto">Choisie automatiquement pour votre appareil — rien à sélectionner.</string>
+    <string name="app_details_variant_selected">Choisie pour cet appareil</string>
+    <string name="app_details_by">par %1$s</string>
+    <string name="app_details_updated">Mise à jour %1$s</string>
+    <string name="app_details_size">Taille</string>
+    <string name="app_details_more">Plus</string>
+    <string name="app_details_requires_microg">Cette app a besoin de MicroG pour se connecter et lire du contenu.</string>
+    <string name="copy_package_name">Copier le nom du paquet</string>
+    <string name="package_name_copied">Nom du paquet copié</string>
+    <string name="share_app">Partager</string>
+    <string name="open_website">Ouvrir le site</string>
+    <string name="open_app_page">Voir sur vanced.to</string>
+    <string name="app_details_incompatible">Pas conçue pour cet appareil</string>
+    <string name="app_details_variant_best_effort">Aucune version pour %1$s n\'a été publiée. La version %2$s sera essayée — l\'installation peut échouer.</string>
+    <string name="sort_label">Trier</string>
+    <string name="sort_catalog">Recommandé</string>
+    <string name="sort_recently_updated">Récemment mises à jour</string>
+    <string name="sort_name_asc">Nom (A-Z)</string>
+    <string name="card_updated">Mise à jour %1$s</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">Rechercher</string>
+    <string name="search_close">Fermer la recherche</string>
+    <string name="clear_search">Effacer la recherche</string>
+    <string name="scroll_to_top">Haut de page</string>
 </resources>

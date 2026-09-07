@@ -4,14 +4,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -41,7 +47,11 @@ fun AppDialogHost(
             onConfirm = { dialogState.onConfirmAction() },
             onCancel = {
                 dialogState.onCancelAction?.invoke() ?: onEvent(AppEvent.DismissDialog)
-            }
+            },
+            confirmLabel = dialogState.confirmLabel,
+            cancelLabel = dialogState.cancelLabel,
+            destructive = dialogState.destructive,
+            showCancelButton = dialogState.showCancelButton
         )
         is DialogState.Progress -> ProgressDialog(
             title = dialogState.title,
@@ -60,7 +70,11 @@ fun ConfirmationDialog(
     title: String,
     message: String,
     onConfirm: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    confirmLabel: String? = null,
+    cancelLabel: String? = null,
+    destructive: Boolean = false,
+    showCancelButton: Boolean = true
 ) {
     AlertDialog(
         onDismissRequest = onCancel,
@@ -77,15 +91,27 @@ fun ConfirmationDialog(
             )
         },
         confirmButton = {
-            Button(onClick = onConfirm) {
-                Text(stringResource(R.string.confirm))
+            Button(
+                onClick = onConfirm,
+                colors = if (destructive) {
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    )
+                } else {
+                    ButtonDefaults.buttonColors()
+                }
+            ) {
+                Text(confirmLabel ?: stringResource(R.string.confirm))
             }
         },
-        dismissButton = {
-            TextButton(onClick = onCancel) {
-                Text(stringResource(R.string.cancel))
+        dismissButton = if (showCancelButton) {
+            {
+                TextButton(onClick = onCancel) {
+                    Text(cancelLabel ?: stringResource(R.string.cancel))
+                }
             }
-        }
+        } else null
     )
 }
 
@@ -126,11 +152,20 @@ fun ProgressDialog(
 }
 
 /**
- * "N updates available" prompt with three choices:
- * update everything, snooze for today, or dismiss.
+ * "N updates available" prompt: every app with an update listed with its icon and version change,
+ * each tickable, plus the choices to snooze for today or dismiss.
+ *
+ * Everything starts ticked, so the common answer — update the lot — is still one tap.
  */
 @Composable
 fun UpdatePromptDialog(dialogState: DialogState.UpdatePrompt) {
+    val checked = remember(dialogState.apps) {
+        mutableStateMapOf<String, Boolean>().apply {
+            dialogState.apps.forEach { put(it.id, true) }
+        }
+    }
+    val selectedCount = checked.count { it.value }
+
     AlertDialog(
         onDismissRequest = dialogState.onDismiss,
         title = {
@@ -140,17 +175,37 @@ fun UpdatePromptDialog(dialogState: DialogState.UpdatePrompt) {
             )
         },
         text = {
-            Text(
-                text = stringResource(R.string.update_prompt_message, dialogState.updateCount),
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Column {
+                Text(
+                    text = stringResource(R.string.update_prompt_message, dialogState.apps.size),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                LazyColumn(modifier = Modifier.heightIn(max = 320.dp)) {
+                    items(items = dialogState.apps, key = { it.id }) { app ->
+                        AppCheckRow(
+                            app = app,
+                            // The version change is what the user is being asked about; the package
+                            // name is a tap away on the app's own page.
+                            subtitle = app.currentVersion
+                                ?.let { "v$it → v${app.latestVersion}" }
+                                ?: "v${app.latestVersion}",
+                            isChecked = checked[app.id] == true,
+                            onCheckedChange = { checked[app.id] = it }
+                        )
+                    }
+                }
+            }
         },
         confirmButton = {
             Button(
-                onClick = dialogState.onUpdateAll,
+                onClick = {
+                    dialogState.onUpdateSelected(checked.filterValues { it }.keys.toList())
+                },
+                enabled = selectedCount > 0,
                 modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
             ) {
-                Text(stringResource(R.string.update_all))
+                Text(stringResource(R.string.update_selected, selectedCount))
             }
         },
         dismissButton = {

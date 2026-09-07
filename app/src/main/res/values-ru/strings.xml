@@ -30,13 +30,13 @@
     <string name="uninstall">Удалить</string>
     <string name="reinstall">Переустановить</string>
     <string name="reinstall_started">Переустановка начата</string>
-    <string name="reinstall_failed">Переустановка не удалась</string>
     <string name="installing">Установка</string>
     <string name="uninstalling">Удаление</string>
     <string name="unknown">Неизвестно</string>
     <string name="installed_version">Установлено: %1$s</string>
     <string name="latest_version">Последняя: %1$s</string>
     <string name="downloading_progress">Скачивание %1$d%%</string>
+    <string name="downloading_cancel">Отмена · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Начинается скачивание...</string>
@@ -63,7 +63,7 @@
     <string name="app_not_installed_proceeding">Приложение не установлено, продолжение установки...</string>
     <string name="installation_cancelled_by_user">Установка отменена пользователем</string>
     <string name="app_status_updated">Статус приложения обновлён</string>
-    <string name="apps_updated">Приложения обновлены</string>
+    <string name="apps_updated">Обновлено приложений: %1$d</string>
     <string name="configuration_saved">Конфигурация сохранена</string>
     
     <!-- Dialog Titles -->
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">Подтвердить переустановку</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">Установка не удалась: %1$s\n\nПопробовать снова? Это сначала удалит старую версию, если она существует.</string>
     <string name="uninstall_required_message">Чтобы повторить установку %1$s, сначала нужно удалить старую версию. Продолжить?</string>
-    <string name="reinstall_confirmation_message">Вы уверены, что хотите переустановить %1$s? Это удалит текущую версию и установит новую.</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">Закрыть</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">Обновление %1$d приложений…</string>
     <string name="update_prompt_title">Доступны обновления</string>
     <string name="update_prompt_message">Для %1$d приложений доступны обновления. Обновить их сейчас?</string>
+    <string name="update_selected">Обновить (%1$d)</string>
     <string name="skip_today">Пропустить сегодня</string>
+    <string name="update_prompt_muted">Предложения обновлений для %1$s отключены</string>
+    <string name="update_prompt_unmuted">Предложения обновлений для %1$s включены</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">Обновления</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">Добавлено в избранное</string>
     <string name="favorite_removed">Удалено из избранного</string>
     <string name="no_favorites_yet">Нет избранного. Нажмите звезду на приложении, чтобы добавить.</string>
+    <string name="favorite_remove_title">Удалить из избранного</string>
+    <string name="app_details">Подробности</string>
+    <string name="app_not_found">Этого приложения больше нет в списке.</string>
+    <string name="app_details_update_prompt">Предлагать обновления для этого приложения</string>
+    <string name="app_details_update_prompt_description">Учитывать это приложение в окне обновлений и в ежедневном уведомлении</string>
+    <string name="app_details_about">Описание</string>
+    <string name="app_details_features">Что внутри</string>
+    <string name="app_details_variants">Доступные сборки</string>
+    <string name="app_details_variants_auto">Выбрана автоматически для вашего устройства — выбирать ничего не нужно.</string>
+    <string name="app_details_variant_selected">Выбрана для этого устройства</string>
+    <string name="app_details_by">от %1$s</string>
+    <string name="app_details_updated">Обновлено %1$s</string>
+    <string name="app_details_size">Размер</string>
+    <string name="app_details_more">Ещё</string>
+    <string name="app_details_requires_microg">Этому приложению нужен MicroG, чтобы входить в аккаунт и воспроизводить контент.</string>
+    <string name="copy_package_name">Скопировать имя пакета</string>
+    <string name="package_name_copied">Имя пакета скопировано</string>
+    <string name="share_app">Поделиться</string>
+    <string name="open_website">Открыть сайт</string>
+    <string name="open_app_page">Открыть на vanced.to</string>
+    <string name="app_details_incompatible">Не собрано для этого устройства</string>
+    <string name="app_details_variant_best_effort">Сборка для %1$s не публиковалась. Будет использована сборка %2$s — она может не установиться.</string>
+    <string name="sort_label">Сортировка</string>
+    <string name="sort_catalog">Рекомендуемые</string>
+    <string name="sort_recently_updated">Недавно обновлённые</string>
+    <string name="sort_name_asc">Название (A-Z)</string>
+    <string name="card_updated">Обновлено %1$s</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">Поиск</string>
+    <string name="search_close">Закрыть поиск</string>
+    <string name="clear_search">Очистить поиск</string>
+    <string name="scroll_to_top">Наверх</string>
 </resources>

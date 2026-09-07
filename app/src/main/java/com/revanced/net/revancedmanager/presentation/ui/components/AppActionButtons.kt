@@ -33,6 +33,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,6 +55,10 @@ import com.revanced.net.revancedmanager.presentation.ui.theme.downloadColor
 import com.revanced.net.revancedmanager.presentation.ui.theme.openColor
 import com.revanced.net.revancedmanager.presentation.ui.theme.uninstallColor
 import com.revanced.net.revancedmanager.presentation.ui.theme.updateColor
+import kotlinx.coroutines.delay
+
+/** How long an install may sit in INSTALLING before the user is offered a way to cancel it. */
+private const val STUCK_INSTALL_GRACE_MS = 30_000L
 
 /**
  * The status-driven action row — what an app offers right now, from Download through Open,
@@ -68,6 +77,7 @@ fun AppActionButtons(
     onUninstallClick: () -> Unit,
     onFavoriteToggle: () -> Unit,
     onCancelDownload: () -> Unit,
+    onCancelInstall: () -> Unit,
     modifier: Modifier = Modifier,
     compact: Boolean = true,
     /**
@@ -176,14 +186,33 @@ fun AppActionButtons(
                 )
             }
             AppStatus.INSTALLING -> {
-                ActionButton(
-                    text = "${stringResource(R.string.installing)}...",
-                    icon = Icons.Default.Download,
-                    onClick = { },
-                    enabled = false,
-                    compact = compact,
-                    modifier = Modifier.weight(1f)
-                )
+                // An install that hangs — a swallowed confirmation notification, a ROM that
+                // silently drops the session — used to freeze the whole sequential queue with no
+                // way out. After a grace period the button turns into a cancel.
+                var cancellable by remember(app.packageName) { mutableStateOf(false) }
+                LaunchedEffect(app.packageName) {
+                    delay(STUCK_INSTALL_GRACE_MS)
+                    cancellable = true
+                }
+                if (cancellable) {
+                    ActionButton(
+                        text = stringResource(R.string.cancel_installation),
+                        icon = Icons.Default.Close,
+                        onClick = onCancelInstall,
+                        color = MaterialTheme.colorScheme.uninstallColor,
+                        compact = compact,
+                        modifier = Modifier.weight(1f)
+                    )
+                } else {
+                    ActionButton(
+                        text = "${stringResource(R.string.installing)}...",
+                        icon = Icons.Default.Download,
+                        onClick = { },
+                        enabled = false,
+                        compact = compact,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
             AppStatus.UNINSTALLING -> {
                 ActionButton(
@@ -196,11 +225,14 @@ fun AppActionButtons(
                 )
             }
             AppStatus.READY_TO_INSTALL -> {
+                // Downloaded and waiting its turn — installs run one at a time. Saying
+                // "Installing" here claimed ten apps were installing at once during a batch
+                // update; tapping cancels this app's place in the queue.
                 ActionButton(
-                    text = stringResource(R.string.installing),
-                    icon = Icons.Default.Download,
-                    onClick = onDownloadClick, // Same handler — it resumes into installation
-                    color = MaterialTheme.colorScheme.primary,
+                    text = stringResource(R.string.waiting_to_install),
+                    icon = Icons.Default.Close,
+                    onClick = onCancelInstall,
+                    color = MaterialTheme.colorScheme.uninstallColor,
                     compact = compact,
                     modifier = Modifier.weight(1f)
                 )

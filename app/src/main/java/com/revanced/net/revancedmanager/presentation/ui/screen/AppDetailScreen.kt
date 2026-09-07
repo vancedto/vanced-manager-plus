@@ -65,6 +65,7 @@ import com.revanced.net.revancedmanager.presentation.bloc.AppEvent
 import com.revanced.net.revancedmanager.presentation.bloc.AppState
 import com.revanced.net.revancedmanager.presentation.ui.components.AppActionButtons
 import com.revanced.net.revancedmanager.presentation.ui.components.AppDialogHost
+import com.revanced.net.revancedmanager.presentation.ui.components.SettingsSwitchRow
 import com.revanced.net.revancedmanager.presentation.ui.components.appMetaText
 import com.revanced.net.revancedmanager.presentation.ui.components.labelledValue
 import com.revanced.net.revancedmanager.presentation.ui.components.tvFocusBorder
@@ -237,7 +238,19 @@ private fun AppDetailContent(
                 onUninstallClick = { onEvent(AppEvent.UninstallApp(app.packageName)) },
                 onFavoriteToggle = { onEvent(AppEvent.ToggleFavorite(app.id)) },
                 onCancelDownload = { onEvent(AppEvent.CancelDownload(app.packageName)) },
+                onCancelInstall = { onEvent(AppEvent.CancelInstallation(app.packageName)) },
                 compact = false
+            )
+        }
+
+        item {
+            // Per-app opt-out of the launch prompt and the daily update notification. On by
+            // default — nothing is stored until the user turns it off.
+            SettingsSwitchRow(
+                title = stringResource(R.string.app_details_update_prompt),
+                subtitle = stringResource(R.string.app_details_update_prompt_description),
+                checked = app.updatePromptEnabled,
+                onCheckedChange = { onEvent(AppEvent.ToggleUpdatePrompt(app.id)) }
             )
         }
 

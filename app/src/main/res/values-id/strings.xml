@@ -30,13 +30,13 @@
     <string name="uninstall">Hapus</string>
     <string name="reinstall">Instal Ulang</string>
     <string name="reinstall_started">Instalasi ulang dimulai</string>
-    <string name="reinstall_failed">Instalasi ulang gagal</string>
     <string name="installing">Memasang</string>
     <string name="uninstalling">Menghapus</string>
     <string name="unknown">Tidak diketahui</string>
     <string name="installed_version">Terpasang: %1$s</string>
     <string name="latest_version">Terbaru: %1$s</string>
     <string name="downloading_progress">Mengunduh %1$d%%</string>
+    <string name="downloading_cancel">Batal · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Memulai unduhan...</string>
@@ -63,7 +63,7 @@
     <string name="app_not_installed_proceeding">Aplikasi tidak terpasang, melanjutkan instalasi...</string>
     <string name="installation_cancelled_by_user">Instalasi dibatalkan oleh pengguna</string>
     <string name="app_status_updated">Status aplikasi diperbarui</string>
-    <string name="apps_updated">Aplikasi diperbarui</string>
+    <string name="apps_updated">%1$d aplikasi diperbarui</string>
     <string name="configuration_saved">Konfigurasi tersimpan</string>
     
     <!-- Dialog Titles -->
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">Konfirmasi Instalasi Ulang</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">Instalasi gagal: %1$s\n\nCoba lagi? Ini akan menghapus versi lama terlebih dahulu jika ada.</string>
     <string name="uninstall_required_message">Untuk mencoba instalasi %1$s lagi, versi lama perlu dihapus dulu. Lanjutkan?</string>
-    <string name="reinstall_confirmation_message">Apakah Anda yakin ingin menginstal ulang %1$s? Ini akan menghapus versi saat ini dan menginstal yang baru.</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">Tutup</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">Memperbarui %1$d aplikasi…</string>
     <string name="update_prompt_title">Pembaruan tersedia</string>
     <string name="update_prompt_message">%1$d aplikasi memiliki pembaruan. Perbarui sekarang?</string>
+    <string name="update_selected">Perbarui (%1$d)</string>
     <string name="skip_today">Lewati hari ini</string>
+    <string name="update_prompt_muted">Saran pembaruan untuk %1$s dimatikan</string>
+    <string name="update_prompt_unmuted">Saran pembaruan untuk %1$s dinyalakan</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">Pembaruan</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">Ditambahkan ke favorit</string>
     <string name="favorite_removed">Dihapus dari favorit</string>
     <string name="no_favorites_yet">Belum ada favorit. Ketuk bintang pada app untuk menambahkan.</string>
+    <string name="favorite_remove_title">Hapus dari favorit</string>
+    <string name="app_details">Detail</string>
+    <string name="app_not_found">Aplikasi ini tidak ada lagi di daftar.</string>
+    <string name="app_details_update_prompt">Sarankan pembaruan untuk aplikasi ini</string>
+    <string name="app_details_update_prompt_description">Sertakan aplikasi ini di popup pembaruan dan notifikasi pembaruan harian</string>
+    <string name="app_details_about">Tentang</string>
+    <string name="app_details_features">Apa saja isinya</string>
+    <string name="app_details_variants">Build yang tersedia</string>
+    <string name="app_details_variants_auto">Dipilih otomatis untuk perangkat Anda — tidak perlu memilih.</string>
+    <string name="app_details_variant_selected">Dipilih untuk perangkat ini</string>
+    <string name="app_details_by">oleh %1$s</string>
+    <string name="app_details_updated">Diperbarui %1$s</string>
+    <string name="app_details_size">Ukuran</string>
+    <string name="app_details_more">Lainnya</string>
+    <string name="app_details_requires_microg">Aplikasi ini memerlukan MicroG untuk masuk dan memutar konten.</string>
+    <string name="copy_package_name">Salin nama paket</string>
+    <string name="package_name_copied">Nama paket disalin</string>
+    <string name="share_app">Bagikan</string>
+    <string name="open_website">Buka situs web</string>
+    <string name="open_app_page">Lihat di vanced.to</string>
+    <string name="app_details_incompatible">Tidak dibuat untuk perangkat ini</string>
+    <string name="app_details_variant_best_effort">Tidak ada build untuk %1$s yang dirilis. Build %2$s akan dicoba — mungkin tidak bisa dipasang.</string>
+    <string name="sort_label">Urutkan</string>
+    <string name="sort_catalog">Direkomendasikan</string>
+    <string name="sort_recently_updated">Baru diperbarui</string>
+    <string name="sort_name_asc">Nama (A-Z)</string>
+    <string name="card_updated">Diperbarui %1$s</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">Cari</string>
+    <string name="search_close">Tutup pencarian</string>
+    <string name="clear_search">Hapus pencarian</string>
+    <string name="scroll_to_top">Kembali ke atas</string>
 </resources>

@@ -71,6 +71,7 @@ sealed class AppState {
         private companion object {
             val PROCESSING_STATUSES = setOf(
                 AppStatus.DOWNLOADING,
+                AppStatus.READY_TO_INSTALL,
                 AppStatus.INSTALLING,
                 AppStatus.UNINSTALLING
             )
@@ -91,7 +92,14 @@ sealed class DialogState {
         val title: String,
         val message: String,
         val onConfirmAction: () -> Unit,
-        val onCancelAction: (() -> Unit)? = null
+        val onCancelAction: (() -> Unit)? = null,
+        /** Overrides the generic "Confirm" so destructive buttons say what they do ("Uninstall & install"). */
+        val confirmLabel: String? = null,
+        val cancelLabel: String? = null,
+        /** Renders the confirm button in the error color for irreversible actions. */
+        val destructive: Boolean = false,
+        /** False for purely informational dialogs whose only action is acknowledging. */
+        val showCancelButton: Boolean = true
     ) : DialogState()
     
     data class Progress(
@@ -101,13 +109,13 @@ sealed class DialogState {
     ) : DialogState()
 
     /**
-     * Three-choice prompt shown after the app list is refreshed on launch when
-     * updates are available: update everything, snooze for the rest of the day,
-     * or just close the dialog.
+     * Prompt shown after the app list is refreshed on launch when updates are available. Lists
+     * [apps] with a checkbox each — [onUpdateSelected] receives the ids still ticked — alongside
+     * the choices to snooze for the rest of the day or just close the dialog.
      */
     data class UpdatePrompt(
-        val updateCount: Int,
-        val onUpdateAll: () -> Unit,
+        val apps: List<RevancedApp>,
+        val onUpdateSelected: (List<String>) -> Unit,
         val onSkipToday: () -> Unit,
         val onDismiss: () -> Unit
     ) : DialogState()

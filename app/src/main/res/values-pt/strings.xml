@@ -30,13 +30,13 @@
     <string name="uninstall">Desinstalar</string>
     <string name="reinstall">Reinstalar</string>
     <string name="reinstall_started">Reinstalação iniciada</string>
-    <string name="reinstall_failed">Reinstalação falhou</string>
     <string name="installing">Instalando</string>
     <string name="uninstalling">Desinstalando</string>
     <string name="unknown">Desconhecido</string>
     <string name="installed_version">Instalado: %1$s</string>
     <string name="latest_version">Mais recente: %1$s</string>
     <string name="downloading_progress">Baixando %1$d%%</string>
+    <string name="downloading_cancel">Cancelar · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">Iniciando download...</string>
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">Reinstalar aplicativo</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">Instalação falhou: %1$s\n\nDeseja tentar novamente? Isso desinstalará a versão antiga primeiro, se existir.</string>
     <string name="uninstall_required_message">Para tentar novamente a instalação de %1$s, a versão antiga precisa ser desinstalada primeiro. Continuar?</string>
-    <string name="reinstall_confirmation_message">Isso desinstalará a versão atual de %1$s e baixará e instalará a versão mais recente.\n\nDeseja continuar?</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">Fechar</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">Atualizando %1$d app(s)…</string>
     <string name="update_prompt_title">Atualizações disponíveis</string>
     <string name="update_prompt_message">%1$d app(s) têm atualizações disponíveis. Deseja atualizá-los agora?</string>
+    <string name="update_selected">Atualizar (%1$d)</string>
     <string name="skip_today">Pular hoje</string>
+    <string name="update_prompt_muted">Sugestões de atualização desativadas para %1$s</string>
+    <string name="update_prompt_unmuted">Sugestões de atualização ativadas para %1$s</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">Atualizações</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">Adicionado aos favoritos</string>
     <string name="favorite_removed">Removido dos favoritos</string>
     <string name="no_favorites_yet">Sem favoritos ainda. Toque na estrela de um app para adicionar.</string>
+    <string name="favorite_remove_title">Remover dos favoritos</string>
+    <string name="app_details">Detalhes</string>
+    <string name="app_not_found">Este app não está mais na lista.</string>
+    <string name="app_details_update_prompt">Sugerir atualizações deste app</string>
+    <string name="app_details_update_prompt_description">Incluir este app no popup de atualização e na notificação diária</string>
+    <string name="app_details_about">Sobre</string>
+    <string name="app_details_features">O que vem incluído</string>
+    <string name="app_details_variants">Builds disponíveis</string>
+    <string name="app_details_variants_auto">Escolhida automaticamente para o seu aparelho — nada a selecionar.</string>
+    <string name="app_details_variant_selected">Escolhida para este aparelho</string>
+    <string name="app_details_by">por %1$s</string>
+    <string name="app_details_updated">Atualizado %1$s</string>
+    <string name="app_details_size">Tamanho</string>
+    <string name="app_details_more">Mais</string>
+    <string name="app_details_requires_microg">Este app precisa do MicroG para entrar na conta e reproduzir conteúdo.</string>
+    <string name="copy_package_name">Copiar nome do pacote</string>
+    <string name="package_name_copied">Nome do pacote copiado</string>
+    <string name="share_app">Compartilhar</string>
+    <string name="open_website">Abrir site</string>
+    <string name="open_app_page">Ver em vanced.to</string>
+    <string name="app_details_incompatible">Não compilado para este aparelho</string>
+    <string name="app_details_variant_best_effort">Nenhuma build para %1$s foi publicada. A build %2$s será tentada — pode não instalar.</string>
+    <string name="sort_label">Ordenar</string>
+    <string name="sort_catalog">Recomendados</string>
+    <string name="sort_recently_updated">Atualizados recentemente</string>
+    <string name="sort_name_asc">Nome (A-Z)</string>
+    <string name="card_updated">Atualizado %1$s</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">Pesquisar</string>
+    <string name="search_close">Fechar pesquisa</string>
+    <string name="clear_search">Limpar pesquisa</string>
+    <string name="scroll_to_top">Voltar ao topo</string>
 </resources>

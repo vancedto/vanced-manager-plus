@@ -85,6 +85,15 @@ class AppBloc @Inject constructor(
     internal val pendingInstalls = mutableSetOf<String>()
     internal val installationRetries = mutableMapOf<String, Int>()
 
+    /**
+     * Install-failure dialogs waiting their turn. There is a single dialogState for the whole
+     * app, so during a batch update each new failure dialog used to overwrite the previous one —
+     * the user only ever saw (and answered) the last failure, and the rest vanished without a
+     * trace. Failure dialogs queue here instead and are shown one at a time, only once the
+     * install queue has drained, so they never interrupt a running batch either.
+     */
+    internal val queuedDialogs = ArrayDeque<DialogState.Confirmation>()
+
     // ---- Lifecycle ----
     internal var wasAppBackgrounded = false
 
@@ -95,8 +104,7 @@ class AppBloc @Inject constructor(
     internal var pendingUpdateAllRequest = false
 
     // ---- Uninstall / reinstall tracking ----
-    internal val pendingReinstalls = mutableMapOf<String, String>()         // packageName -> apkPath (retry flow)
-    internal val pendingReinstallDownloads = mutableMapOf<String, String>() // packageName -> downloadUrl (reinstall flow)
+    internal val pendingReinstalls = mutableMapOf<String, String>()  // packageName -> apkPath (retry flow)
     internal val pendingUninstallChecks = mutableSetOf<String>()
 
     data class PendingInstallation(
@@ -107,6 +115,9 @@ class AppBloc @Inject constructor(
 
     init {
         Log.i(TAG_BLOC, "AppBloc initialized")
+        // Sessions left over from a killed process would otherwise linger forever (and hold
+        // storage); nothing in this process owns them yet, so they are safe to abandon.
+        packageInstaller.abandonOrphanedSessions()
         handleEvent(AppEvent.LoadConfiguration)
         handleEvent(AppEvent.LoadAppsFromCacheFirst)
         startInstallationProcessor()
@@ -194,28 +205,20 @@ class AppBloc @Inject constructor(
 
     /**
      * After an uninstall completes, continue whichever flow requested it:
-     * retry-install from an existing APK, reinstall via a fresh download, or
-     * plain uninstall.
+     * install the already-downloaded-and-verified APK, or plain uninstall.
      */
     internal fun handlePendingReinstall(packageName: String) {
         val pendingApkPath = pendingReinstalls.remove(packageName)
-        val pendingDownloadUrl = pendingReinstallDownloads.remove(packageName)
-        when {
-            pendingApkPath != null -> installApp(packageName, pendingApkPath)
-            pendingDownloadUrl != null -> {
-                Log.i(TAG_BLOC, "Starting reinstall download for: $packageName")
-                downloadApp(packageName, pendingDownloadUrl)
-            }
-            else -> {
-                updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
-                showToast(stringProvider.getString(R.string.uninstallation_completed))
-            }
+        if (pendingApkPath != null) {
+            installApp(packageName, pendingApkPath)
+        } else {
+            updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
+            showToast(stringProvider.getString(R.string.uninstallation_completed))
         }
     }
 
     internal fun clearPendingReinstall(packageName: String) {
         pendingReinstalls.remove(packageName)
-        pendingReinstallDownloads.remove(packageName)
         pendingUninstallChecks.remove(packageName)
     }
 
@@ -245,6 +248,7 @@ class AppBloc @Inject constructor(
             is AppEvent.UpdateSingleApp -> updateSingleApp(event.app)
             is AppEvent.DownloadApp -> downloadApp(event.packageName, event.downloadUrl)
             is AppEvent.CancelDownload -> cancelDownload(event.packageName)
+            is AppEvent.CancelInstallation -> cancelInstallation(event.packageName)
             is AppEvent.InstallApp -> installApp(event.packageName, event.apkFilePath)
             is AppEvent.RetryInstallation -> retryInstallation(event.packageName, event.apkFilePath, event.shouldUninstallFirst)
             is AppEvent.ConfirmUninstallBeforeReinstall -> confirmUninstallBeforeReinstall(event.packageName, event.apkFilePath)
@@ -267,6 +271,8 @@ class AppBloc @Inject constructor(
             is AppEvent.SetSort -> setSort(event.sort)
             is AppEvent.ToggleFavorite -> toggleFavorite(event.appId)
             is AppEvent.UpdateAllApps -> updateAllApps()
+            is AppEvent.UpdateSelectedApps -> updateSelectedApps(event.appIds)
+            is AppEvent.ToggleUpdatePrompt -> toggleUpdatePrompt(event.appId)
             is AppEvent.InstallSuggestedApps -> installSuggestedApps(event.appIds)
             is AppEvent.DismissSuggestions -> dismissSuggestions()
         }
@@ -301,24 +307,102 @@ class AppBloc @Inject constructor(
         _toastMessage.value = null
     }
 
-    internal fun showConfirmationDialog(title: String, message: String, onConfirm: AppEvent, onCancel: AppEvent?) {
-        val dialogState = DialogState.Confirmation(
+    internal fun showConfirmationDialog(
+        title: String,
+        message: String,
+        onConfirm: AppEvent,
+        onCancel: AppEvent?,
+        confirmLabel: String? = null,
+        cancelLabel: String? = null,
+        destructive: Boolean = false,
+        showCancelButton: Boolean = true
+    ) {
+        setDialogState(
+            buildConfirmation(title, message, onConfirm, onCancel, confirmLabel, cancelLabel, destructive, showCancelButton)
+        )
+    }
+
+    /**
+     * Show an install-failure dialog without losing any other: shown immediately when nothing
+     * else is on screen and the install queue is idle, queued otherwise. The queue drains one
+     * dialog at a time via [dismissDialog] / [flushQueuedDialogs].
+     */
+    internal fun enqueueConfirmationDialog(
+        title: String,
+        message: String,
+        onConfirm: AppEvent,
+        onCancel: AppEvent?,
+        confirmLabel: String? = null,
+        cancelLabel: String? = null,
+        destructive: Boolean = false,
+        showCancelButton: Boolean = true
+    ) {
+        val dialog = buildConfirmation(title, message, onConfirm, onCancel, confirmLabel, cancelLabel, destructive, showCancelButton)
+        if (currentDialogState() == null && pendingInstalls.isEmpty()) {
+            setDialogState(dialog)
+        } else {
+            queuedDialogs.addLast(dialog)
+        }
+    }
+
+    /** A dialog whose only action is acknowledging — used for errors that must be readable (§1.1). */
+    internal fun showInfoDialog(title: String, message: String) {
+        enqueueConfirmationDialog(
             title = title,
             message = message,
-            onConfirmAction = { handleEvent(onConfirm) },
-            onCancelAction = onCancel?.let { { handleEvent(it) } }
+            onConfirm = AppEvent.DismissDialog,
+            onCancel = null,
+            confirmLabel = stringProvider.getString(R.string.close_button),
+            showCancelButton = false
         )
-        when (val currentState = _state.value) {
-            is AppState.Success -> _state.value = currentState.copy(dialogState = dialogState)
-            is AppState.Error -> _state.value = currentState.copy(dialogState = dialogState)
-            is AppState.Loading -> Unit
-        }
     }
 
     internal fun dismissDialog() {
         when (val currentState = _state.value) {
             is AppState.Success -> _state.value = currentState.copy(dialogState = null)
             is AppState.Error -> _state.value = currentState.copy(dialogState = null)
+            is AppState.Loading -> Unit
+        }
+        flushQueuedDialogs()
+    }
+
+    /** Show the next queued failure dialog, if the screen is free and no batch is running. */
+    internal fun flushQueuedDialogs() {
+        if (queuedDialogs.isEmpty()) return
+        if (currentDialogState() != null || pendingInstalls.isNotEmpty()) return
+        setDialogState(queuedDialogs.removeFirst())
+    }
+
+    private fun buildConfirmation(
+        title: String,
+        message: String,
+        onConfirm: AppEvent,
+        onCancel: AppEvent?,
+        confirmLabel: String?,
+        cancelLabel: String?,
+        destructive: Boolean,
+        showCancelButton: Boolean
+    ) = DialogState.Confirmation(
+        title = title,
+        message = message,
+        onConfirmAction = { handleEvent(onConfirm) },
+        onCancelAction = onCancel?.let { { handleEvent(it) } },
+        confirmLabel = confirmLabel,
+        cancelLabel = cancelLabel,
+        destructive = destructive,
+        showCancelButton = showCancelButton
+    )
+
+    private fun currentDialogState(): DialogState? = when (val s = _state.value) {
+        is AppState.Success -> s.dialogState
+        is AppState.Error -> s.dialogState
+        is AppState.Loading -> null
+    }
+
+    private fun setDialogState(dialogState: DialogState) {
+        when (val currentState = _state.value) {
+            is AppState.Success -> _state.value = currentState.copy(dialogState = dialogState)
+            is AppState.Error -> _state.value = currentState.copy(dialogState = dialogState)
             is AppState.Loading -> Unit
         }
     }

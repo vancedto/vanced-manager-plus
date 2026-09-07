@@ -29,6 +29,8 @@ sealed class AppEvent {
     // New events for improved flow
     data class RetryInstallation(val packageName: String, val apkFilePath: String, val shouldUninstallFirst: Boolean = false) : AppEvent()
     data class CancelDownload(val packageName: String) : AppEvent()
+    /** Escape hatch for an install that is stuck waiting on a confirmation that never arrives. */
+    data class CancelInstallation(val packageName: String) : AppEvent()
     data class ConfirmUninstallBeforeReinstall(val packageName: String, val apkFilePath: String) : AppEvent()
     data class ShowConfirmationDialog(val title: String, val message: String, val onConfirm: AppEvent, val onCancel: AppEvent? = null) : AppEvent()
     data object DismissDialog : AppEvent()
@@ -54,8 +56,13 @@ sealed class AppEvent {
     /** Keyed by catalog entry: several entries can share a package, and a star is about one of them. */
     data class ToggleFavorite(val appId: String) : AppEvent()
 
-    // Update-all events (update prompt dialog / update notification)
+    // Update events (update prompt dialog / update notification)
+    /** Every app with an update the user has not muted — the notification's "Update all" action. */
     data object UpdateAllApps : AppEvent()
+    /** Only the entries ticked in the update prompt. */
+    data class UpdateSelectedApps(val appIds: List<String>) : AppEvent()
+    /** Include or exclude one app from the update prompt and the update notification. */
+    data class ToggleUpdatePrompt(val appId: String) : AppEvent()
 
     // First-run suggestions events
     data class InstallSuggestedApps(val appIds: List<String>) : AppEvent()

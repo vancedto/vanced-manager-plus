@@ -7,8 +7,9 @@ package com.revanced.net.revancedmanager.domain.model
  * downstream — download, install, update checks — keeps working off them unchanged. The full set
  * of published builds is in [variants], for display.
  *
- * The fields below [isFavorite] arrive with the v3 API and all have defaults, so callers that
- * construct or copy this model without them still compile.
+ * The fields below [updatePromptEnabled] arrive with the v3 API and all have defaults, so callers
+ * that construct or copy this model without them still compile. [isFavorite] and
+ * [updatePromptEnabled] are local preferences rather than catalog data.
  */
 data class RevancedApp(
     /**
@@ -35,6 +36,13 @@ data class RevancedApp(
     val status: AppStatus,
     val downloadProgress: Float = 0f,
     val isFavorite: Boolean = false,
+    /**
+     * Whether this entry may be offered by the launch update prompt and the daily update
+     * notification. Toggled per app in the detail screen; on by default.
+     *
+     * A local preference like [isFavorite], not something the catalog carries.
+     */
+    val updatePromptEnabled: Boolean = true,
     /** 200px icon for the detail page; falls back to [iconUrl] when the server has none. */
     val iconLargeUrl: String = "",
     /** Plain text with newlines — the catalog is not markdown. */

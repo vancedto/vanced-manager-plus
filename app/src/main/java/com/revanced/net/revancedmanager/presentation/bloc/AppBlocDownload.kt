@@ -6,6 +6,7 @@ import androidx.work.WorkInfo
 import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.data.manager.DownloadState
 import com.revanced.net.revancedmanager.domain.model.AppStatus
+import com.revanced.net.revancedmanager.domain.model.RevancedApp
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.io.File
@@ -76,17 +77,33 @@ internal fun AppBloc.downloadApp(packageName: String, downloadUrl: String) {
 }
 
 /**
- * Download every app that has an update available. Downloads run in parallel
- * through WorkManager; completed downloads feed the sequential install queue,
- * so no extra coordination is needed here.
+ * Download every app that has an update available, skipping the ones the user muted in the detail
+ * screen — an app kept out of the prompt and the notification should not be updated by the
+ * notification's "Update all" action either.
  */
 internal fun AppBloc.updateAllApps() {
     val appsToUpdate = (_state.value as? AppState.Success)
-        ?.apps?.filter { it.status == AppStatus.UPDATE_AVAILABLE }
+        ?.apps?.filter { it.status == AppStatus.UPDATE_AVAILABLE && it.updatePromptEnabled }
         ?: return
+    updateApps(appsToUpdate)
+}
+
+/** Download the entries the user ticked in the update prompt. */
+internal fun AppBloc.updateSelectedApps(appIds: List<String>) {
+    val appsToUpdate = (_state.value as? AppState.Success)
+        ?.apps?.filter { it.id in appIds && it.status == AppStatus.UPDATE_AVAILABLE }
+        ?: return
+    updateApps(appsToUpdate)
+}
+
+/**
+ * Downloads run in parallel through WorkManager; completed downloads feed the sequential install
+ * queue, so no extra coordination is needed here.
+ */
+private fun AppBloc.updateApps(appsToUpdate: List<RevancedApp>) {
     if (appsToUpdate.isEmpty()) return
 
-    Log.i(TAG_BLOC, "Updating all apps: ${appsToUpdate.size} update(s)")
+    Log.i(TAG_BLOC, "Updating ${appsToUpdate.size} app(s)")
     showToast(stringProvider.getString(R.string.update_all_started, appsToUpdate.size))
     appsToUpdate.forEach { downloadApp(it.packageName, it.downloadUrl) }
 }
@@ -95,19 +112,42 @@ internal fun AppBloc.handleDownloadCompleted(packageName: String, filePath: Stri
     val app = (_state.value as? AppState.Success)?.apps?.find { it.packageName == packageName }
     val wasRequestedByUser = userRequestedDownloads.remove(packageName)
 
-    // Work records replayed after a restart can point at an app that has since
-    // been installed — don't install the same version again. A download the user just started is
-    // never a replay, and skipping it there would silently swallow a deliberate choice of a
-    // different architecture for an app that is already up to date.
-    if (!wasRequestedByUser && app != null && resolveActualStatus(packageName) == AppStatus.UP_TO_DATE) {
-        Log.i(TAG_BLOC, "Replayed download for an up-to-date app, skipping install: $packageName")
-        downloadManager.pruneFinishedWork()
+    // Work records replayed after a restart can point at an app that has since been installed —
+    // don't install the same build again. A download the user just started is never a replay, and
+    // skipping it there would silently swallow a deliberate choice of a different architecture for
+    // an app that is already up to date.
+    //
+    // The question is put to the APK file, not to the app list, because the list is loaded
+    // asynchronously and the replay usually arrives first: a state-based check would see no app at
+    // all and let the install through. That is what made the manager re-offer its own installer
+    // after updating itself — the self-install kills the process before the record is pruned, so
+    // the leftover download was replayed on every launch.
+    // null means the file is not a package PackageManager can read, so PackageInstaller would
+    // reject it too — treat it like nothing left to install rather than committing a doomed session.
+    if (!wasRequestedByUser && appManager.isApkAlreadyInstalled(filePath) != false) {
+        Log.i(TAG_BLOC, "Replayed download installs nothing new, skipping: $packageName")
+        finishReplayedDownload(packageName)
         return
     }
 
     Log.i(TAG_BLOC, "Download completed, queueing for installation: $packageName -> $filePath")
     queueInstallation(packageName, filePath, app?.title ?: packageName)
     showToast(stringProvider.getString(R.string.download_completed_installing))
+}
+
+/**
+ * Clean up after a download whose install is not going to happen: drop the work record so it is
+ * not replayed again, and drop the APK the successful install would have removed itself.
+ *
+ * Both are normally done by handleInstallationSuccess, which never runs when the package being
+ * installed is this app — the system kills the process the moment the update commits.
+ */
+private fun AppBloc.finishReplayedDownload(packageName: String) {
+    downloadManager.pruneFinishedWork()
+    if (preferencesManager.isAutoDeleteApkEnabled()) {
+        deleteDownloadedApk(packageName)
+    }
+    updateAppStatus(packageName, resolveActualStatus(packageName))
 }
 
 internal fun AppBloc.handleDownloadFailed(packageName: String, error: String) {

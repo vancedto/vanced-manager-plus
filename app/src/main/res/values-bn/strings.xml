@@ -30,13 +30,13 @@
     <string name="uninstall">আনইনস্টল</string>
     <string name="reinstall">পুনরায় ইনস্টল</string>
     <string name="reinstall_started">পুনরায় ইনস্টল শুরু</string>
-    <string name="reinstall_failed">পুনরায় ইনস্টল ব্যর্থ</string>
     <string name="installing">ইনস্টল হচ্ছে</string>
     <string name="uninstalling">আনইনস্টল হচ্ছে</string>
     <string name="unknown">অজানা</string>
     <string name="installed_version">ইনস্টল: %1$s</string>
     <string name="latest_version">সর্বশেষ: %1$s</string>
     <string name="downloading_progress">ডাউনলোড %1$d%%</string>
+    <string name="downloading_cancel">বাতিল · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">ডাউনলোড শুরু হচ্ছে...</string>
@@ -63,7 +63,7 @@
     <string name="app_not_installed_proceeding">অ্যাপ ইনস্টল নেই, ডাউনলোড চালিয়ে যাচ্ছে</string>
     <string name="installation_cancelled_by_user">ব্যবহারকারী দ্বারা ইনস্টল বাতিল</string>
     <string name="app_status_updated">অ্যাপ স্ট্যাটাস আপডেট</string>
-    <string name="apps_updated">অ্যাপ আপডেট</string>
+    <string name="apps_updated">%1$d টি অ্যাপ আপডেট হয়েছে</string>
     <string name="configuration_saved">কনফিগারেশন সংরক্ষিত</string>
     
     <!-- Dialog Titles -->
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">পুনরায় ইনস্টল নিশ্চিত করুন</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">ইনস্টল ব্যর্থ: %1$s\n\nআবার চেষ্টা করবেন? এটি প্রথমে পুরানো সংস্করণ আনইনস্টল করবে।</string>
     <string name="uninstall_required_message">%1$s এর ইনস্টল আবার চেষ্টা করতে, প্রথমে পুরানো সংস্করণ আনইনস্টল করতে হবে। চালিয়ে যান?</string>
-    <string name="reinstall_confirmation_message">আপনি কি নিশ্চিত যে %1$s পুনরায় ইনস্টল করতে চান? এটি বর্তমান সংস্করণ আনইনস্টল করে সর্বশেষ সংস্করণ ইনস্টল করবে।</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">বন্ধ</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">%1$dটি অ্যাপ আপডেট হচ্ছে…</string>
     <string name="update_prompt_title">আপডেট উপলব্ধ</string>
     <string name="update_prompt_message">%1$dটি অ্যাপের আপডেট উপলব্ধ। এখনই আপডেট করতে চান?</string>
+    <string name="update_selected">আপডেট (%1$d)</string>
     <string name="skip_today">আজ বাদ দিন</string>
+    <string name="update_prompt_muted">%1$s-এর আপডেট পরামর্শ বন্ধ করা হয়েছে</string>
+    <string name="update_prompt_unmuted">%1$s-এর আপডেট পরামর্শ চালু করা হয়েছে</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">আপডেট</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">প্রিয়তে যোগ হয়েছে</string>
     <string name="favorite_removed">প্রিয় থেকে সরানো হয়েছে</string>
     <string name="no_favorites_yet">এখনো কোনো প্রিয় নেই। যোগ করতে অ্যাপের তারায় ট্যাপ করুন।</string>
+    <string name="favorite_remove_title">পছন্দ থেকে সরান</string>
+    <string name="app_details">বিবরণ</string>
+    <string name="app_not_found">এই অ্যাপটি আর তালিকায় নেই।</string>
+    <string name="app_details_update_prompt">এই অ্যাপের আপডেটের পরামর্শ দিন</string>
+    <string name="app_details_update_prompt_description">আপডেট পপআপ ও দৈনিক আপডেট বিজ্ঞপ্তিতে এই অ্যাপ যুক্ত রাখুন</string>
+    <string name="app_details_about">পরিচিতি</string>
+    <string name="app_details_features">যা যা আছে</string>
+    <string name="app_details_variants">উপলব্ধ বিল্ড</string>
+    <string name="app_details_variants_auto">আপনার ডিভাইসের জন্য স্বয়ংক্রিয়ভাবে বেছে নেওয়া — কিছু বাছাই করার দরকার নেই।</string>
+    <string name="app_details_variant_selected">এই ডিভাইসের জন্য বাছাই করা</string>
+    <string name="app_details_by">%1$s-এর তৈরি</string>
+    <string name="app_details_updated">%1$s আপডেট হয়েছে</string>
+    <string name="app_details_size">আকার</string>
+    <string name="app_details_more">আরও</string>
+    <string name="app_details_requires_microg">সাইন ইন ও কনটেন্ট চালাতে এই অ্যাপের জন্য MicroG দরকার।</string>
+    <string name="copy_package_name">প্যাকেজ নাম কপি করুন</string>
+    <string name="package_name_copied">প্যাকেজ নাম কপি হয়েছে</string>
+    <string name="share_app">শেয়ার</string>
+    <string name="open_website">ওয়েবসাইট খুলুন</string>
+    <string name="open_app_page">vanced.to-তে দেখুন</string>
+    <string name="app_details_incompatible">এই ডিভাইসের জন্য তৈরি নয়</string>
+    <string name="app_details_variant_best_effort">%1$s-এর জন্য কোনো বিল্ড প্রকাশ করা হয়নি। বদলে %2$s বিল্ড চেষ্টা করা হবে — ইনস্টল নাও হতে পারে।</string>
+    <string name="sort_label">সাজান</string>
+    <string name="sort_catalog">প্রস্তাবিত</string>
+    <string name="sort_recently_updated">সম্প্রতি আপডেট হওয়া</string>
+    <string name="sort_name_asc">নাম (A-Z)</string>
+    <string name="card_updated">%1$s আপডেট হয়েছে</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">অনুসন্ধান</string>
+    <string name="search_close">অনুসন্ধান বন্ধ করুন</string>
+    <string name="clear_search">অনুসন্ধান মুছুন</string>
+    <string name="scroll_to_top">উপরে ফিরে যান</string>
 </resources>

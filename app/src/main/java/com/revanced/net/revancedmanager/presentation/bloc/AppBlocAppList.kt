@@ -47,6 +47,25 @@ internal fun AppBloc.setSort(sort: AppSortOption) {
 }
 
 /**
+ * Restore the per-app preferences that live on the device rather than in the catalog, so every
+ * path that loads a list applies all of them instead of remembering to call each one.
+ */
+internal fun AppBloc.applyLocalFlags(apps: List<RevancedApp>): List<RevancedApp> =
+    applyUpdatePromptMutes(applyFavorites(apps))
+
+/**
+ * Mark the apps the user has excluded from the update prompt in the detail screen.
+ *
+ * Stored per catalog entry for the same reason favourites are, and stored as the muted set, so
+ * the common case — nothing muted — costs one empty read and leaves the list untouched.
+ */
+private fun AppBloc.applyUpdatePromptMutes(apps: List<RevancedApp>): List<RevancedApp> {
+    val muted = preferencesManager.getUpdatePromptMutedApps()
+    return if (muted.isEmpty()) apps
+    else apps.map { it.copy(updatePromptEnabled = it.id !in muted) }
+}
+
+/**
  * Mark the apps the user has starred.
  *
  * Favourites are stored per catalog entry, not per package: preferring the anddea build of YouTube
@@ -130,6 +149,35 @@ internal fun AppBloc.toggleFavorite(appId: String) {
     }
 }
 
+/**
+ * Flip whether this app may be offered by the update prompt and the update notification.
+ *
+ * No confirmation, unlike starring: it is a switch on the app's own page and flipping it back is
+ * the same gesture again.
+ */
+internal fun AppBloc.toggleUpdatePrompt(appId: String) {
+    val currentState = _state.value as? AppState.Success ?: return
+    val app = currentState.apps.find { it.id == appId } ?: return
+
+    val enabled = !app.updatePromptEnabled
+    val muted = preferencesManager.getUpdatePromptMutedApps().toMutableSet()
+    if (enabled) muted.remove(appId) else muted.add(appId)
+    preferencesManager.saveUpdatePromptMutedApps(muted)
+
+    Log.i(TAG_BLOC, "Update suggestions for $appId: ${if (enabled) "on" else "off"}")
+    _state.value = currentState.copy(
+        apps = currentState.apps.map {
+            if (it.id == appId) it.copy(updatePromptEnabled = enabled) else it
+        }
+    )
+    showToast(
+        stringProvider.getString(
+            if (enabled) R.string.update_prompt_unmuted else R.string.update_prompt_muted,
+            app.title
+        )
+    )
+}
+
 internal fun AppBloc.loadAppsFromCacheFirst() {
     Log.i(TAG_BLOC, "Loading apps from cache first")
     viewModelScope.launch {
@@ -142,7 +190,10 @@ internal fun AppBloc.loadAppsFromCacheFirst() {
                     }
                     is Result.Success -> {
                         val config = loadConfigSafely()
-                        _state.value = AppState.Success(applyFavorites(result.data), config = config)
+                        _state.value = AppState.Success(
+                            mergeInFlightState(applyLocalFlags(result.data)),
+                            config = config
+                        )
                         onAppListLoaded()
                         viewModelScope.launch {
                             delay(500)
@@ -172,7 +223,7 @@ internal fun AppBloc.backgroundRefreshApps() {
                                 // copy() keeps search/filter/dialog/suggestions intact while
                                 // swapping in the fresh list
                                 _state.value = currentState.copy(
-                                    apps = mergeInFlightState(applyFavorites(result.data)),
+                                    apps = mergeInFlightState(applyLocalFlags(result.data)),
                                     config = config
                                 )
                                 if (updatedApps.size > 1) {
@@ -210,7 +261,7 @@ internal fun AppBloc.loadApps(forceRefresh: Boolean) {
                     is Result.Loading -> _state.value = AppState.Loading
                     is Result.Success -> {
                         val config = loadConfigSafely()
-                        _state.value = AppState.Success(mergeInFlightState(applyFavorites(result.data)), config = config)
+                        _state.value = AppState.Success(mergeInFlightState(applyLocalFlags(result.data)), config = config)
                         onAppListLoaded()
                     }
                     is Result.Error -> {
@@ -248,7 +299,7 @@ internal fun AppBloc.pullToRefreshApps() {
                         val config = loadConfigSafely()
                         val latest = _state.value as? AppState.Success
                         _state.value = AppState.Success(
-                            apps = mergeInFlightState(applyFavorites(result.data)),
+                            apps = mergeInFlightState(applyLocalFlags(result.data)),
                             searchQuery = latest?.searchQuery ?: "",
                             filterOption = latest?.filterOption ?: AppFilterOption.ALL,
                             sortOption = latest?.sortOption ?: AppSortOption.CATALOG,
@@ -316,21 +367,28 @@ internal fun AppBloc.compareVersions(version1: String, version2: String): Int =
  * Preserve in-flight download/install state when replacing the app list with
  * freshly loaded data — otherwise a refresh resets a DOWNLOADING/INSTALLING
  * card back to its network-derived status while the operation is still running.
+ *
+ * [AppBloc.pendingInstalls] is consulted as well as the current list, because an install can start
+ * before there is any list to record it on: a download left finished by a previous process is
+ * replayed as soon as the bloc subscribes, which is well before the catalog has loaded.
  */
 internal fun AppBloc.mergeInFlightState(newApps: List<RevancedApp>): List<RevancedApp> {
-    val currentApps = (_state.value as? AppState.Success)?.apps ?: return newApps
-    val inFlight = currentApps
+    val inFlight = (_state.value as? AppState.Success)?.apps
+        .orEmpty()
         .filter {
             it.status == AppStatus.DOWNLOADING ||
             it.status == AppStatus.INSTALLING ||
             it.status == AppStatus.UNINSTALLING
         }
         .associateBy { it.packageName }
-    if (inFlight.isEmpty()) return newApps
+    if (inFlight.isEmpty() && pendingInstalls.isEmpty()) return newApps
     return newApps.map { app ->
-        inFlight[app.packageName]?.let { old ->
-            app.copy(status = old.status, downloadProgress = old.downloadProgress)
-        } ?: app
+        val old = inFlight[app.packageName]
+        when {
+            old != null -> app.copy(status = old.status, downloadProgress = old.downloadProgress)
+            app.packageName in pendingInstalls -> app.copy(status = AppStatus.INSTALLING)
+            else -> app
+        }
     }
 }
 
@@ -398,20 +456,24 @@ private fun AppBloc.maybeShowUpdatePrompt() {
     if (!state.config.showUpdatePromptEnabled) return
     if (state.dialogState != null || state.suggestedApps != null) return
 
-    val updateCount = state.apps.count { it.status == AppStatus.UPDATE_AVAILABLE }
-    if (updateCount == 0) return
+    // Apps muted in the detail screen are left out entirely rather than listed unticked: the point
+    // of the switch is not to be asked about them.
+    val updatable = state.apps.filter {
+        it.status == AppStatus.UPDATE_AVAILABLE && it.updatePromptEnabled
+    }
+    if (updatable.isEmpty()) return
 
     val today = LocalDate.now().toString()
     if (preferencesManager.getUpdatePromptSnoozedDate() == today) return
 
-    Log.i(TAG_BLOC, "Showing update prompt: $updateCount update(s) available")
+    Log.i(TAG_BLOC, "Showing update prompt: ${updatable.size} update(s) available")
     updatePromptShownThisSession = true
     _state.value = state.copy(
         dialogState = DialogState.UpdatePrompt(
-            updateCount = updateCount,
-            onUpdateAll = {
+            apps = updatable,
+            onUpdateSelected = { appIds ->
                 dismissDialog()
-                handleEvent(AppEvent.UpdateAllApps)
+                handleEvent(AppEvent.UpdateSelectedApps(appIds))
             },
             onSkipToday = {
                 preferencesManager.setUpdatePromptSnoozedDate(today)

@@ -48,6 +48,7 @@ fun AppCard(
     onReinstallClick: () -> Unit,
     onFavoriteToggle: () -> Unit,
     onCancelDownload: () -> Unit,
+    onCancelInstall: () -> Unit,
     onOpenDetail: () -> Unit,
     isCompactMode: Boolean = false,
     modifier: Modifier = Modifier
@@ -183,6 +184,7 @@ fun AppCard(
                 onUninstallClick = onUninstallClick,
                 onFavoriteToggle = onFavoriteToggle,
                 onCancelDownload = onCancelDownload,
+                onCancelInstall = onCancelInstall,
                 compact = true,
                 isCompactMode = isCompactMode
             )

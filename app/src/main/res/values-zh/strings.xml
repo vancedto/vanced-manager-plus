@@ -30,13 +30,13 @@
     <string name="uninstall">卸载</string>
     <string name="reinstall">重新安装</string>
     <string name="reinstall_started">重新安装已开始</string>
-    <string name="reinstall_failed">重新安装失败</string>
     <string name="installing">正在安装</string>
     <string name="uninstalling">正在卸载</string>
     <string name="unknown">未知</string>
     <string name="installed_version">已安装: %1$s</string>
     <string name="latest_version">最新版: %1$s</string>
     <string name="downloading_progress">正在下载 %1$d%%</string>
+    <string name="downloading_cancel">取消 · %1$d%%</string>
     
     <!-- Toast Messages -->
     <string name="download_starting">开始下载...</string>
@@ -72,9 +72,7 @@
     <string name="reinstall_confirmation_title">重新安装应用</string>
     
     <!-- Dialog Messages -->
-    <string name="installation_failed_retry_message">安装失败：%1$s\n\n您想要重试吗？如果存在旧版本，这将首先卸载旧版本。</string>
     <string name="uninstall_required_message">要重试安装%1$s，需要先卸载旧版本。继续？</string>
-    <string name="reinstall_confirmation_message">这将卸载当前版本的%1$s并下载安装最新版本。\n\n您想要继续吗？</string>
     
     <!-- Concurrent Downloads Dialog -->
     <string name="close_button">关闭</string>
@@ -126,7 +124,10 @@
     <string name="update_all_started">正在更新 %1$d 个应用…</string>
     <string name="update_prompt_title">有可用更新</string>
     <string name="update_prompt_message">%1$d 个应用有可用更新。是否立即更新？</string>
+    <string name="update_selected">更新 (%1$d)</string>
     <string name="skip_today">今天跳过</string>
+    <string name="update_prompt_muted">已关闭 %1$s 的更新提示</string>
+    <string name="update_prompt_unmuted">已开启 %1$s 的更新提示</string>
 
     <!-- Background update check -->
     <string name="settings_section_updates">更新</string>
@@ -151,4 +152,36 @@
     <string name="favorite_added">已添加到收藏</string>
     <string name="favorite_removed">已从收藏中移除</string>
     <string name="no_favorites_yet">还没有收藏。点击应用的星标即可添加。</string>
+    <string name="favorite_remove_title">从收藏中移除</string>
+    <string name="app_details">详情</string>
+    <string name="app_not_found">该应用已不在列表中。</string>
+    <string name="app_details_update_prompt">提示此应用的更新</string>
+    <string name="app_details_update_prompt_description">让此应用出现在更新弹窗和每日更新通知中</string>
+    <string name="app_details_about">关于</string>
+    <string name="app_details_features">包含内容</string>
+    <string name="app_details_variants">可用版本</string>
+    <string name="app_details_variants_auto">已根据你的设备自动选择，无需手动挑选。</string>
+    <string name="app_details_variant_selected">已为此设备选择</string>
+    <string name="app_details_by">作者：%1$s</string>
+    <string name="app_details_updated">更新于 %1$s</string>
+    <string name="app_details_size">大小</string>
+    <string name="app_details_more">更多</string>
+    <string name="app_details_requires_microg">此应用需要安装 MicroG 才能登录和播放内容。</string>
+    <string name="copy_package_name">复制包名</string>
+    <string name="package_name_copied">包名已复制</string>
+    <string name="share_app">分享</string>
+    <string name="open_website">打开官网</string>
+    <string name="open_app_page">在 vanced.to 上查看</string>
+    <string name="app_details_incompatible">未针对此设备构建</string>
+    <string name="app_details_variant_best_effort">没有发布适用于 %1$s 的版本。将尝试 %2$s 版本，可能无法安装。</string>
+    <string name="sort_label">排序</string>
+    <string name="sort_catalog">推荐</string>
+    <string name="sort_recently_updated">最近更新</string>
+    <string name="sort_name_asc">名称 (A-Z)</string>
+    <string name="card_updated">更新于 %1$s</string>
+    <!-- TopAppBar Search & Navigation -->
+    <string name="search_label">搜索</string>
+    <string name="search_close">关闭搜索</string>
+    <string name="clear_search">清除搜索</string>
+    <string name="scroll_to_top">回到顶部</string>
 </resources>
