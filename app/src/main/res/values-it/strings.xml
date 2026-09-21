@@ -45,6 +45,7 @@
     <string name="download_failed_memory">Download fallito per memoria insufficiente. Chiudi altre app e riprova.</string>
     <string name="download_failed_storage">Download fallito per spazio insufficiente. Libera spazio e riprova.</string>
     <string name="download_cancelled">Download annullato</string>
+    <string name="download_file_missing">Il file scaricato non è più disponibile. Riprova.</string>
     <string name="installation_started">Installazione avviata</string>
     <string name="installation_completed">Installazione completata con successo</string>
     <string name="installation_failed_start">Impossibile avviare installazione</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">%1$d app hanno aggiornamenti disponibili. Vuoi aggiornarle ora?</string>
     <string name="update_selected">Aggiorna (%1$d)</string>
     <string name="skip_today">Salta oggi</string>
+    <string name="update_prompt_dont_show_again">Non mostrare più</string>
+    <string name="update_prompt_turned_off">Avviso aggiornamenti disattivato — riattivalo nelle Impostazioni</string>
     <string name="update_prompt_muted">Suggerimenti di aggiornamento disattivati per %1$s</string>
     <string name="update_prompt_unmuted">Suggerimenti di aggiornamento attivati per %1$s</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">Inizia con queste app popolari — deseleziona quelle che non vuoi:</string>
     <string name="suggestions_install">Installa (%1$d)</string>
     <string name="suggestions_skip">Salta</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">Fonti delle app</string>
+    <string name="show_community_apps">Mostra app della community</string>
+    <string name="show_community_apps_description">Elenca anche le app patchate da sviluppatori della community, non solo ReVanced e Morphe</string>
+    <string name="app_source_title">Da dove devono provenire le app?</string>
+    <string name="app_source_message">Oltre ai repository ufficiali ReVanced e Morphe, il catalogo include app patchate da sviluppatori della community. Puoi cambiare questa scelta più tardi nelle Impostazioni.</string>
+    <string name="app_source_option_all">Tutte le app (ReVanced, Morphe + community)</string>
+    <string name="app_source_option_official">Solo ufficiali (ReVanced e Morphe)</string>
+    <string name="app_source_continue">Continua</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Preferiti</string>

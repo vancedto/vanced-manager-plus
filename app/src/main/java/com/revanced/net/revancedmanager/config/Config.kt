@@ -35,4 +35,16 @@ object Config {
         "app.revanced.android.gms",                 // MicroG (required by the two above)
         "app.morphe.android.apps.photos"            // Google Photos Morphe
     )
+
+    /**
+     * Patch providers treated as "official" sources: the ReVanced team and the Morphe team. Every
+     * other provider in the catalog is a community contributor, and the user chooses on first run
+     * (and later in Settings) whether those apps are listed at all — the catalog grew past 300
+     * entries and most of them come from community repos.
+     *
+     * Keys match `provider` in the v3 API, which is `patchProvider` in revanced.yaml. Apps with no
+     * provider (MicroG, NewPipe, SmartTube, the manager itself) are not patched by anyone and are
+     * always shown — MicroG in particular is required by the Morphe YouTube builds.
+     */
+    val MAINSTREAM_PROVIDERS = setOf("morphe", "revanced")
 }

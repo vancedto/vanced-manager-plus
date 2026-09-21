@@ -45,6 +45,7 @@
     <string name="download_failed_memory">Unduhan gagal karena memori tidak cukup. Tutup aplikasi lain dan coba lagi.</string>
     <string name="download_failed_storage">Unduhan gagal karena ruang penyimpanan tidak cukup. Kosongkan ruang dan coba lagi.</string>
     <string name="download_cancelled">Unduhan dibatalkan</string>
+    <string name="download_file_missing">Berkas yang diunduh sudah tidak tersedia. Silakan coba lagi.</string>
     <string name="installation_started">Instalasi dimulai</string>
     <string name="installation_completed">Instalasi berhasil</string>
     <string name="installation_failed_start">Gagal memulai instalasi</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">%1$d aplikasi memiliki pembaruan. Perbarui sekarang?</string>
     <string name="update_selected">Perbarui (%1$d)</string>
     <string name="skip_today">Lewati hari ini</string>
+    <string name="update_prompt_dont_show_again">Jangan tampilkan lagi</string>
+    <string name="update_prompt_turned_off">Popup pembaruan dimatikan — aktifkan lagi di Pengaturan</string>
     <string name="update_prompt_muted">Saran pembaruan untuk %1$s dimatikan</string>
     <string name="update_prompt_unmuted">Saran pembaruan untuk %1$s dinyalakan</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">Mulai dengan aplikasi populer ini — hapus centang yang tidak Anda inginkan:</string>
     <string name="suggestions_install">Pasang (%1$d)</string>
     <string name="suggestions_skip">Lewati</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">Sumber aplikasi</string>
+    <string name="show_community_apps">Tampilkan aplikasi komunitas</string>
+    <string name="show_community_apps_description">Tampilkan juga aplikasi yang di-patch oleh pengembang komunitas, bukan hanya ReVanced dan Morphe</string>
+    <string name="app_source_title">Dari mana aplikasi diambil?</string>
+    <string name="app_source_message">Selain repo resmi ReVanced dan Morphe, katalog juga berisi aplikasi yang di-patch oleh pengembang komunitas. Anda dapat mengubahnya nanti di Pengaturan.</string>
+    <string name="app_source_option_all">Semua aplikasi (ReVanced, Morphe + komunitas)</string>
+    <string name="app_source_option_official">Hanya resmi (ReVanced &amp; Morphe)</string>
+    <string name="app_source_continue">Lanjutkan</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favorit</string>

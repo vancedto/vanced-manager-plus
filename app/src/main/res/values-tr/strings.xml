@@ -45,6 +45,7 @@
     <string name="download_failed_memory">Yetersiz bellek nedeniyle indirme başarısız. Lütfen diğer uygulamaları kapatın ve tekrar deneyin.</string>
     <string name="download_failed_storage">Yetersiz depolama alanı nedeniyle indirme başarısız. Lütfen alan boşaltın ve tekrar deneyin.</string>
     <string name="download_cancelled">İndirme iptal edildi</string>
+    <string name="download_file_missing">İndirilen dosya artık mevcut değil. Lütfen tekrar deneyin.</string>
     <string name="installation_started">Kurulum başlatıldı</string>
     <string name="installation_completed">Kurulum başarıyla tamamlandı</string>
     <string name="installation_failed_start">Kurulum başlatılamadı</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">%1$d uygulama için güncelleme mevcut. Şimdi güncellemek ister misiniz?</string>
     <string name="update_selected">Güncelle (%1$d)</string>
     <string name="skip_today">Bugün atla</string>
+    <string name="update_prompt_dont_show_again">Bir daha gösterme</string>
+    <string name="update_prompt_turned_off">Güncelleme penceresi kapatıldı — Ayarlar\'dan yeniden açın</string>
     <string name="update_prompt_muted">%1$s için güncelleme önerileri kapatıldı</string>
     <string name="update_prompt_unmuted">%1$s için güncelleme önerileri açıldı</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">Bu popüler uygulamalarla başla — istemediklerinin işaretini kaldır:</string>
     <string name="suggestions_install">Yükle (%1$d)</string>
     <string name="suggestions_skip">Atla</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">Uygulama kaynakları</string>
+    <string name="show_community_apps">Topluluk uygulamalarını göster</string>
+    <string name="show_community_apps_description">Yalnızca ReVanced ve Morphe değil, topluluk geliştiricileri tarafından yamalanan uygulamaları da listele</string>
+    <string name="app_source_title">Uygulamalar nereden gelsin?</string>
+    <string name="app_source_message">Resmi ReVanced ve Morphe depolarının yanı sıra katalogda topluluk geliştiricileri tarafından yamalanan uygulamalar da bulunur. Bunu daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
+    <string name="app_source_option_all">Tüm uygulamalar (ReVanced, Morphe + topluluk)</string>
+    <string name="app_source_option_official">Yalnızca resmi (ReVanced ve Morphe)</string>
+    <string name="app_source_continue">Devam</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favoriler</string>

@@ -4,12 +4,14 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.config.Config
+import com.revanced.net.revancedmanager.core.common.PackageOwnership
 import com.revanced.net.revancedmanager.core.common.Result
 import com.revanced.net.revancedmanager.domain.model.AppConfig
 import com.revanced.net.revancedmanager.domain.model.AppStatus
 import com.revanced.net.revancedmanager.domain.model.Language
 import com.revanced.net.revancedmanager.domain.model.RevancedApp
 import com.revanced.net.revancedmanager.domain.model.ThemeMode
+import com.revanced.net.revancedmanager.domain.model.visibleFor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -306,7 +308,8 @@ internal fun AppBloc.pullToRefreshApps() {
                             dialogState = latest?.dialogState,
                             config = config,
                             isRefreshing = false,
-                            suggestedApps = latest?.suggestedApps
+                            suggestedApps = latest?.suggestedApps,
+                            askAppSource = latest?.askAppSource ?: false
                         )
                         onAppListLoaded()
                     }
@@ -335,24 +338,69 @@ internal fun AppBloc.updateAppProgress(packageName: String, progress: Float) {
     }
 }
 
+/**
+ * Set the status of every entry of [packageName].
+ *
+ * An in-flight status (downloading, installing, uninstalling) is about the package — one download,
+ * one installer session — so every entry sharing the package shows it. A settled status is about
+ * a build that is or is not installed, and that build belongs to exactly one entry: the owner under
+ * [PackageOwnership] gets [status], and any other entry for the package reads as not installed.
+ * With one entry per package, which is every package but MicroG, the two cases are the same.
+ */
 internal fun AppBloc.updateAppStatus(packageName: String, status: AppStatus) {
-    val currentState = _state.value
-    if (currentState is AppState.Success) {
-        _state.value = currentState.copy(
-            apps = currentState.apps.map { app ->
-                if (app.packageName == packageName) app.copy(status = status) else app
+    val currentState = _state.value as? AppState.Success ?: return
+    val ownerId = if (status in SETTLED_STATUSES) ownerOf(currentState.apps, packageName)?.id else null
+    _state.value = currentState.copy(
+        apps = currentState.apps.map { app ->
+            when {
+                app.packageName != packageName -> app
+                ownerId == null || app.id == ownerId -> app.copy(status = status)
+                else -> app.copy(status = AppStatus.NOT_INSTALLED, currentVersion = null)
             }
-        )
-    }
+        }
+    )
 }
 
+/** Statuses that describe what is installed rather than what is happening. */
+private val SETTLED_STATUSES = setOf(
+    AppStatus.NOT_INSTALLED,
+    AppStatus.UP_TO_DATE,
+    AppStatus.UPDATE_AVAILABLE,
+    AppStatus.UNKNOWN
+)
+
 // ============= HELPERS =============
+
+/**
+ * The entry among [apps] that owns whatever is installed as [packageName], or null when nothing
+ * is installed or nothing in the list carries the package.
+ */
+internal fun AppBloc.ownerOf(apps: List<RevancedApp>, packageName: String): RevancedApp? {
+    val installedVersion = appManager.getInstalledVersion(packageName) ?: return null
+    return PackageOwnership.ownerOf(apps.filter { it.packageName == packageName }, installedVersion)
+}
+
+/**
+ * Re-derive version and status for every entry of [packageName] from what is actually installed,
+ * clearing any download progress. The bloc-side twin of the repository's withInstallStatus, for
+ * the moments a flow settles — install finished, package event, status refresh.
+ */
+internal fun AppBloc.settleEntries(apps: List<RevancedApp>, packageName: String): List<RevancedApp> {
+    val entries = apps.filter { it.packageName == packageName }
+    if (entries.isEmpty()) return apps
+    val installedVersion = appManager.getInstalledVersion(packageName)
+    val settled = PackageOwnership.withInstallStatus(entries) { installedVersion }.associateBy { it.id }
+    return apps.map { app -> settled[app.id]?.copy(downloadProgress = 0f) ?: app }
+}
 
 internal fun AppBloc.resolveActualStatus(packageName: String): AppStatus {
     if (!appManager.isAppInstalled(packageName)) return AppStatus.NOT_INSTALLED
     val installedVersion = appManager.getInstalledVersion(packageName) ?: return AppStatus.NOT_INSTALLED
-    val latestVersion = (_state.value as? AppState.Success)
-        ?.apps?.find { it.packageName == packageName }?.latestVersion ?: return AppStatus.UP_TO_DATE
+    // The owner's latest version, not the first entry's: with two MicroG entries the first one
+    // in catalog order may be the build that is *not* installed.
+    val entries = (_state.value as? AppState.Success)?.apps.orEmpty()
+    val latestVersion = PackageOwnership.ownerOf(entries.filter { it.packageName == packageName }, installedVersion)
+        ?.latestVersion ?: return AppStatus.UP_TO_DATE
     return statusForVersions(installedVersion, latestVersion)
 }
 
@@ -404,8 +452,9 @@ internal fun AppBloc.loadConfigSafely(): AppConfig = try {
 
 /**
  * Called after every successful list load/refresh. Consumes a pending
- * "Update all" request from the update notification first; otherwise offers
- * the first-run suggestions popup, then the "updates available" prompt.
+ * "Update all" request from the update notification first; otherwise asks
+ * where apps should come from (once), then offers the first-run suggestions
+ * popup, then the "updates available" prompt.
  */
 internal fun AppBloc.onAppListLoaded() {
     if (pendingUpdateAllRequest) {
@@ -415,6 +464,39 @@ internal fun AppBloc.onAppListLoaded() {
         updateAllApps()
         return
     }
+    maybeAskAppSource()
+    maybeShowSuggestions()
+    maybeShowUpdatePrompt()
+}
+
+/**
+ * First run (or first launch after upgrading to a version that has the choice): ask whether to
+ * list community-patched apps or only ReVanced and Morphe. Goes before the other launch popups
+ * because it decides what those popups may list; [chooseAppSource] resumes them.
+ */
+private fun AppBloc.maybeAskAppSource() {
+    if (preferencesManager.isAppSourceChosen()) return
+    val state = _state.value as? AppState.Success ?: return
+    if (state.askAppSource || state.apps.isEmpty()) return
+
+    Log.i(TAG_BLOC, "Asking for app source on first run")
+    _state.value = state.copy(askAppSource = true)
+}
+
+/**
+ * Record the answer to the app source dialog, then carry on with the launch popups it was
+ * holding back. The choice is saved as part of [AppConfig], so the switch in Settings and this
+ * dialog write the same preference.
+ */
+internal fun AppBloc.chooseAppSource(showCommunityApps: Boolean) {
+    preferencesManager.setAppSourceChosen()
+    val state = _state.value as? AppState.Success ?: return
+
+    val config = state.config.copy(showCommunityApps = showCommunityApps)
+    preferencesManager.saveAppConfig(config)
+    Log.i(TAG_BLOC, "App source chosen: community apps ${if (showCommunityApps) "shown" else "hidden"}")
+    _state.value = state.copy(config = config, askAppSource = false)
+
     maybeShowSuggestions()
     maybeShowUpdatePrompt()
 }
@@ -426,7 +508,7 @@ internal fun AppBloc.onAppListLoaded() {
 private fun AppBloc.maybeShowSuggestions() {
     if (preferencesManager.isSuggestionsShown()) return
     val state = _state.value as? AppState.Success ?: return
-    if (state.suggestedApps != null || state.apps.isEmpty()) return
+    if (state.askAppSource || state.suggestedApps != null || state.apps.isEmpty()) return
 
     // SUGGESTED_PACKAGES names packages, and a package can have several catalog entries — the
     // catalog has four MicroG builds. Offer one per package, the first in catalog order, or the
@@ -454,11 +536,11 @@ private fun AppBloc.maybeShowUpdatePrompt() {
     if (updatePromptShownThisSession) return
     val state = _state.value as? AppState.Success ?: return
     if (!state.config.showUpdatePromptEnabled) return
-    if (state.dialogState != null || state.suggestedApps != null) return
+    if (state.dialogState != null || state.suggestedApps != null || state.askAppSource) return
 
     // Apps muted in the detail screen are left out entirely rather than listed unticked: the point
-    // of the switch is not to be asked about them.
-    val updatable = state.apps.filter {
+    // of the switch is not to be asked about them. Same for apps hidden by the source choice.
+    val updatable = state.apps.visibleFor(state.config).filter {
         it.status == AppStatus.UPDATE_AVAILABLE && it.updatePromptEnabled
     }
     if (updatable.isEmpty()) return
@@ -479,9 +561,27 @@ private fun AppBloc.maybeShowUpdatePrompt() {
                 preferencesManager.setUpdatePromptSnoozedDate(today)
                 dismissDialog()
             },
-            onDismiss = { dismissDialog() }
+            onDismiss = { dismissDialog() },
+            onTurnOff = { turnOffUpdatePrompt() }
         )
     )
+}
+
+/**
+ * The "Don't show again" button inside the prompt itself: flip the "Update popup on launch"
+ * setting off, so the user who never wants to be asked does not have to find it in Settings. Only
+ * the popup goes — the launch refresh, the status on every card and the daily notification are untouched.
+ */
+private fun AppBloc.turnOffUpdatePrompt() {
+    val config = loadConfigSafely().copy(showUpdatePromptEnabled = false)
+    preferencesManager.saveAppConfig(config)
+    when (val s = _state.value) {
+        is AppState.Success -> _state.value = s.copy(config = config, dialogState = null)
+        is AppState.Error -> _state.value = s.copy(config = config)
+        is AppState.Loading -> Unit
+    }
+    Log.i(TAG_BLOC, "Update prompt turned off from the prompt")
+    showToast(stringProvider.getString(R.string.update_prompt_turned_off))
 }
 
 /** Install the suggested apps the user ticked, then close the popup for good. */

@@ -45,6 +45,7 @@
     <string name="download_failed_memory">Échec du téléchargement en raison d\'une mémoire insuffisante. Fermez d\'autres applications et réessayez.</string>
     <string name="download_failed_storage">Échec du téléchargement en raison d\'un espace de stockage insuffisant. Libérez de l\'espace et réessayez.</string>
     <string name="download_cancelled">Téléchargement annulé</string>
+    <string name="download_file_missing">Le fichier téléchargé n\'est plus disponible. Veuillez réessayer.</string>
     <string name="installation_started">Installation démarrée</string>
     <string name="installation_completed">Installation terminée avec succès</string>
     <string name="installation_failed_start">Échec du démarrage de l\'installation</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">%1$d application(s) ont des mises à jour disponibles. Voulez-vous les mettre à jour maintenant ?</string>
     <string name="update_selected">Mettre à jour (%1$d)</string>
     <string name="skip_today">Ignorer aujourd\'hui</string>
+    <string name="update_prompt_dont_show_again">Ne plus afficher</string>
+    <string name="update_prompt_turned_off">Fenêtre de mise à jour désactivée — réactivez-la dans les Paramètres</string>
     <string name="update_prompt_muted">Suggestions de mise à jour désactivées pour %1$s</string>
     <string name="update_prompt_unmuted">Suggestions de mise à jour activées pour %1$s</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">Commencez avec ces applications populaires — décochez celles que vous ne voulez pas :</string>
     <string name="suggestions_install">Installer (%1$d)</string>
     <string name="suggestions_skip">Ignorer</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">Sources d\'applications</string>
+    <string name="show_community_apps">Afficher les applications communautaires</string>
+    <string name="show_community_apps_description">Lister aussi les applications patchées par des développeurs de la communauté, pas seulement ReVanced et Morphe</string>
+    <string name="app_source_title">D\'où doivent venir les applications ?</string>
+    <string name="app_source_message">En plus des dépôts officiels ReVanced et Morphe, le catalogue contient des applications patchées par des développeurs de la communauté. Vous pourrez changer ce choix plus tard dans les Paramètres.</string>
+    <string name="app_source_option_all">Toutes les applications (ReVanced, Morphe + communauté)</string>
+    <string name="app_source_option_official">Officielles uniquement (ReVanced et Morphe)</string>
+    <string name="app_source_continue">Continuer</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favoris</string>

@@ -45,6 +45,7 @@
     <string name="download_failed_memory">Tải về thất bại do không đủ bộ nhớ. Vui lòng đóng các ứng dụng khác và thử lại.</string>
     <string name="download_failed_storage">Tải về thất bại do không đủ dung lượng lưu trữ. Vui lòng giải phóng dung lượng và thử lại.</string>
     <string name="download_cancelled">Đã hủy tải xuống</string>
+    <string name="download_file_missing">Tệp đã tải về không còn nữa. Vui lòng thử lại.</string>
     <string name="installation_started">Bắt đầu cài đặt</string>
     <string name="installation_completed">Cài đặt thành công</string>
     <string name="installation_failed_start">Không thể bắt đầu cài đặt</string>
@@ -127,6 +128,8 @@
     <string name="update_prompt_message">Có %1$d ứng dụng có bản cập nhật. Chọn ứng dụng muốn cập nhật:</string>
     <string name="update_selected">Cập nhật (%1$d)</string>
     <string name="skip_today">Bỏ qua hôm nay</string>
+    <string name="update_prompt_dont_show_again">Không hiện lại</string>
+    <string name="update_prompt_turned_off">Đã tắt hộp thoại cập nhật — bật lại trong Cài đặt</string>
     <string name="update_prompt_muted">Đã tắt gợi ý cập nhật cho %1$s</string>
     <string name="update_prompt_unmuted">Đã bật gợi ý cập nhật cho %1$s</string>
 
@@ -145,6 +148,16 @@
     <string name="suggestions_message">Bắt đầu với các ứng dụng phổ biến sau — bỏ chọn nếu không muốn:</string>
     <string name="suggestions_install">Cài đặt (%1$d)</string>
     <string name="suggestions_skip">Bỏ qua</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">Nguồn ứng dụng</string>
+    <string name="show_community_apps">Hiện ứng dụng cộng đồng</string>
+    <string name="show_community_apps_description">Liệt kê cả ứng dụng do các nhà phát triển cộng đồng patch, không chỉ ReVanced và Morphe</string>
+    <string name="app_source_title">Lấy ứng dụng từ đâu?</string>
+    <string name="app_source_message">Ngoài kho chính thức của ReVanced và Morphe, danh mục còn có ứng dụng do các nhà phát triển cộng đồng patch. Bạn có thể đổi lại trong Cài đặt.</string>
+    <string name="app_source_option_all">Tất cả (ReVanced, Morphe + cộng đồng)</string>
+    <string name="app_source_option_official">Chỉ chính thức (ReVanced &amp; Morphe)</string>
+    <string name="app_source_continue">Tiếp tục</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Yêu thích</string>

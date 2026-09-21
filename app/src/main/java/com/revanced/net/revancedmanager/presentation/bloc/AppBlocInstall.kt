@@ -3,6 +3,7 @@ package com.revanced.net.revancedmanager.presentation.bloc
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.revanced.net.revancedmanager.R
+import com.revanced.net.revancedmanager.core.common.PackageOwnership
 import com.revanced.net.revancedmanager.core.common.Result
 import com.revanced.net.revancedmanager.data.manager.InstallationResult
 import com.revanced.net.revancedmanager.domain.model.AppStatus
@@ -81,9 +82,11 @@ private suspend fun AppBloc.runInstallation(request: AppBloc.PendingInstallation
     // guaranteed-to-fail install.
     val preflight = withContext(Dispatchers.IO) { appManager.preflight(packageName, request.filePath) }
     if (preflight !is InstallPreflight.Ok) {
+        Log.w(TAG_BLOC, "[$blocId] Preflight blocked $packageName: ${preflight::class.simpleName}")
         handleInstallPreflight(packageName, request.filePath, preflight)
         return@coroutineScope
     }
+    Log.i(TAG_BLOC, "[$blocId] Preflight OK for $packageName, committing session")
 
     updateAppStatus(packageName, AppStatus.INSTALLING)
 
@@ -126,7 +129,8 @@ private suspend fun AppBloc.runInstallation(request: AppBloc.PendingInstallation
             is InstallationResult.Success ->
                 handleInstallationSuccess(
                     packageName,
-                    appManager.getInstalledVersion(packageName) ?: "Unknown"
+                    appManager.getInstalledVersion(packageName) ?: "Unknown",
+                    source = "PackageInstaller result"
                 )
             is InstallationResult.Failed -> {
                 val reason = InstallFailureReason.from(result.statusCode, result.error)
@@ -141,24 +145,49 @@ private suspend fun AppBloc.runInstallation(request: AppBloc.PendingInstallation
     }
 }
 
-/** Kick off the install session. Returns an error message, or null when started. */
-private suspend fun AppBloc.startInstallation(packageName: String, filePath: String): String? = try {
-    when (val result = useCases.installAppUseCase(packageName, filePath)) {
-        is Result.Success ->
-            if (result.data) {
-                showToast(stringProvider.getString(R.string.installation_started))
-                null
-            } else {
-                stringProvider.getString(R.string.installation_failed_start)
-            }
-        is Result.Error -> result.message
-        is Result.Loading -> null
+/**
+ * Kick off the install session. Returns an error message, or null when started.
+ *
+ * Refuses to open a second session while one is already live for this package. The sequential
+ * processor makes that impossible within one AppBloc, so this is a backstop against the shape of
+ * bug that produced four concurrent sessions for a single tap: several live AppBlocs, each with
+ * its own install queue, all reacting to the same finished download. Three of those sessions were
+ * left orphaned and surfaced later as spurious INSTALL_FAILED_ABORTED results.
+ */
+private suspend fun AppBloc.startInstallation(packageName: String, filePath: String): String? {
+    if (packageInstaller.hasActiveSessionFor(packageName)) {
+        Log.w(
+            TAG_BLOC,
+            "[$blocId] Install session already open for $packageName — not opening a second one"
+        )
+        return stringProvider.getString(R.string.installation_failed_start)
     }
-} catch (e: Exception) {
-    e.message ?: "Installation failed"
+    return try {
+        when (val result = useCases.installAppUseCase(packageName, filePath)) {
+            is Result.Success ->
+                if (result.data) {
+                    showToast(stringProvider.getString(R.string.installation_started))
+                    null
+                } else {
+                    stringProvider.getString(R.string.installation_failed_start)
+                }
+            is Result.Error -> result.message
+            is Result.Loading -> null
+        }
+    } catch (e: Exception) {
+        e.message ?: "Installation failed"
+    }
 }
 
-internal fun AppBloc.handleInstallationSuccess(packageName: String, installedVersion: String) {
+internal fun AppBloc.handleInstallationSuccess(
+    packageName: String,
+    installedVersion: String,
+    source: String = "unspecified"
+) {
+    Log.i(
+        TAG_BLOC,
+        "[$blocId] Installation success delivered via $source: $packageName v$installedVersion"
+    )
     // Cleanup first, unconditionally: an install can finish before the catalog list has loaded
     // (a download record replayed after process death does exactly this), and skipping cleanup
     // there used to leave the APK on disk and the work record alive to be replayed on every
@@ -173,23 +202,25 @@ internal fun AppBloc.handleInstallationSuccess(packageName: String, installedVer
 
     // UI update only when there is a list to update
     val currentState = _state.value as? AppState.Success ?: return
-    val app = currentState.apps.find { it.packageName == packageName } ?: return
+    // The entry that owns the build just installed — with two MicroG entries, the one whose
+    // version band holds it, not the first one in the list.
+    val app = PackageOwnership.ownerOf(
+        currentState.apps.filter { it.packageName == packageName },
+        installedVersion
+    ) ?: return
 
     val newStatus = statusForVersions(installedVersion, app.latestVersion)
     // Success arrives via both PackageInstaller results and the system
     // PACKAGE_ADDED broadcast — skip the second delivery.
     if (app.status == newStatus && app.currentVersion == installedVersion) {
-        Log.i(TAG_BLOC, "Installation success already handled for: $packageName")
+        Log.i(
+            TAG_BLOC,
+            "[$blocId] Installation success already handled for: $packageName (this delivery: $source)"
+        )
         return
     }
 
-    _state.value = currentState.copy(
-        apps = currentState.apps.map { appItem ->
-            if (appItem.packageName == packageName)
-                appItem.copy(status = newStatus, currentVersion = installedVersion, downloadProgress = 0f)
-            else appItem
-        }
-    )
+    _state.value = currentState.copy(apps = settleEntries(currentState.apps, packageName))
     showToast(stringProvider.getString(R.string.installation_completed))
 }
 
@@ -202,7 +233,7 @@ internal fun AppBloc.handleInstallationSuccess(packageName: String, installedVer
  * the same reason, so those get an explanation (and a re-download where that helps) instead.
  */
 internal fun AppBloc.handleInstallationFailure(packageName: String, error: String, statusCode: Int = -1) {
-    Log.w(TAG_BLOC, "Installation failed: $packageName - $error (status=$statusCode)")
+    Log.w(TAG_BLOC, "[$blocId] Installation failed: $packageName - $error (status=$statusCode)")
     updateAppStatus(packageName, resolveActualStatus(packageName))
     downloadManager.pruneFinishedWork()
 
@@ -374,36 +405,25 @@ internal suspend fun AppBloc.updateSingleAppStatus(packageName: String) {
     try {
         val currentState = _state.value
         if (currentState is AppState.Success) {
+            // In-flight statuses are shared by every entry of the package, so any of them will do.
             val appToUpdate = currentState.apps.find { it.packageName == packageName } ?: return
 
             if (appToUpdate.status in IN_FLIGHT_STATUSES) {
                 if (appToUpdate.status == AppStatus.UNINSTALLING) {
                     if (!appManager.isAppInstalled(packageName)) {
-                        val updatedApps = currentState.apps.map { app ->
-                            if (app.packageName == packageName)
-                                app.copy(status = AppStatus.NOT_INSTALLED, currentVersion = null, downloadProgress = 0f)
-                            else app
-                        }
-                        _state.value = currentState.copy(apps = updatedApps)
+                        _state.value = currentState.copy(apps = settleEntries(currentState.apps, packageName))
                         showToast(stringProvider.getString(R.string.uninstallation_completed))
                     }
                 }
                 return
             }
 
-            val isInstalled = appManager.isAppInstalled(packageName)
-            val installedVersion = if (isInstalled) appManager.getInstalledVersion(packageName) else null
-            val newStatus =
-                if (installedVersion != null) statusForVersions(installedVersion, appToUpdate.latestVersion)
-                else AppStatus.NOT_INSTALLED
-
-            if (newStatus != appToUpdate.status) {
-                val updatedApps = currentState.apps.map { app ->
-                    if (app.packageName == packageName)
-                        app.copy(status = newStatus, currentVersion = installedVersion, downloadProgress = 0f)
-                    else app
-                }
-                _state.value = currentState.copy(apps = updatedApps)
+            val settledApps = settleEntries(currentState.apps, packageName)
+            val changed = settledApps.zip(currentState.apps).any { (after, before) ->
+                after.packageName == packageName && after.status != before.status
+            }
+            if (changed) {
+                _state.value = currentState.copy(apps = settledApps)
                 showToast(stringProvider.getString(R.string.app_status_updated))
             }
         }

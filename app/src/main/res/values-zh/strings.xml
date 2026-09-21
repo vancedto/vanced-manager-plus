@@ -45,6 +45,7 @@
     <string name="download_failed_memory">下载失败，内存不足。请关闭其他应用并重试。</string>
     <string name="download_failed_storage">下载失败，存储空间不足。请释放空间并重试。</string>
     <string name="download_cancelled">下载已取消</string>
+    <string name="download_file_missing">下载的文件已不存在，请重试。</string>
     <string name="installation_started">安装已开始</string>
     <string name="installation_completed">安装成功完成</string>
     <string name="installation_failed_start">启动安装失败</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">%1$d 个应用有可用更新。是否立即更新？</string>
     <string name="update_selected">更新 (%1$d)</string>
     <string name="skip_today">今天跳过</string>
+    <string name="update_prompt_dont_show_again">不再显示</string>
+    <string name="update_prompt_turned_off">已关闭更新弹窗 — 可在设置中重新开启</string>
     <string name="update_prompt_muted">已关闭 %1$s 的更新提示</string>
     <string name="update_prompt_unmuted">已开启 %1$s 的更新提示</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">从这些热门应用开始 — 取消勾选你不想要的：</string>
     <string name="suggestions_install">安装 (%1$d)</string>
     <string name="suggestions_skip">跳过</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">应用来源</string>
+    <string name="show_community_apps">显示社区应用</string>
+    <string name="show_community_apps_description">同时列出由社区开发者修补的应用，而不仅限于 ReVanced 和 Morphe</string>
+    <string name="app_source_title">应用应来自哪里？</string>
+    <string name="app_source_message">除了 ReVanced 和 Morphe 的官方仓库外，目录还包含由社区开发者修补的应用。您可以稍后在设置中更改。</string>
+    <string name="app_source_option_all">全部应用（ReVanced、Morphe + 社区）</string>
+    <string name="app_source_option_official">仅官方（ReVanced 和 Morphe）</string>
+    <string name="app_source_continue">继续</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">收藏</string>

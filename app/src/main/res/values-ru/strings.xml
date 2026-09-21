@@ -45,6 +45,7 @@
     <string name="download_failed_memory">Скачивание не удалось из-за нехватки памяти. Закройте другие приложения и попробуйте снова.</string>
     <string name="download_failed_storage">Скачивание не удалось из-за нехватки места. Освободите место и попробуйте снова.</string>
     <string name="download_cancelled">Скачивание отменено</string>
+    <string name="download_file_missing">Загруженный файл больше недоступен. Попробуйте снова.</string>
     <string name="installation_started">Установка начата</string>
     <string name="installation_completed">Установка успешно завершена</string>
     <string name="installation_failed_start">Не удалось начать установку</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">Для %1$d приложений доступны обновления. Обновить их сейчас?</string>
     <string name="update_selected">Обновить (%1$d)</string>
     <string name="skip_today">Пропустить сегодня</string>
+    <string name="update_prompt_dont_show_again">Больше не показывать</string>
+    <string name="update_prompt_turned_off">Окно обновлений выключено — включите его снова в настройках</string>
     <string name="update_prompt_muted">Предложения обновлений для %1$s отключены</string>
     <string name="update_prompt_unmuted">Предложения обновлений для %1$s включены</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">Начните с этих популярных приложений — снимите отметку с ненужных:</string>
     <string name="suggestions_install">Установить (%1$d)</string>
     <string name="suggestions_skip">Пропустить</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">Источники приложений</string>
+    <string name="show_community_apps">Показывать приложения сообщества</string>
+    <string name="show_community_apps_description">Показывать также приложения, пропатченные разработчиками сообщества, а не только ReVanced и Morphe</string>
+    <string name="app_source_title">Откуда брать приложения?</string>
+    <string name="app_source_message">Помимо официальных репозиториев ReVanced и Morphe, каталог содержит приложения, пропатченные разработчиками сообщества. Это можно изменить позже в настройках.</string>
+    <string name="app_source_option_all">Все приложения (ReVanced, Morphe + сообщество)</string>
+    <string name="app_source_option_official">Только официальные (ReVanced и Morphe)</string>
+    <string name="app_source_continue">Продолжить</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Избранное</string>

@@ -1,6 +1,8 @@
 package com.revanced.net.revancedmanager.presentation.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -153,9 +155,11 @@ fun ProgressDialog(
 
 /**
  * "N updates available" prompt: every app with an update listed with its icon and version change,
- * each tickable, plus the choices to snooze for today or dismiss.
+ * each tickable, plus the choices to snooze for today, dismiss, or never ask again.
  *
- * Everything starts ticked, so the common answer — update the lot — is still one tap.
+ * Everything starts ticked, so the common answer — update the lot — is still one tap. Alongside
+ * snooze and cancel sits a "don't show again" button, the inverse of "Update popup on launch" in
+ * Settings, so the other common answer — never ask me this — is one tap, right where the asking happens.
  */
 @Composable
 fun UpdatePromptDialog(dialogState: DialogState.UpdatePrompt) {
@@ -209,7 +213,15 @@ fun UpdatePromptDialog(dialogState: DialogState.UpdatePrompt) {
             }
         },
         dismissButton = {
-            Row {
+            FlowRow(
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(
+                    onClick = dialogState.onTurnOff,
+                    modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
+                ) {
+                    Text(stringResource(R.string.update_prompt_dont_show_again))
+                }
                 TextButton(
                     onClick = dialogState.onSkipToday,
                     modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))

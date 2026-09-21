@@ -10,7 +10,12 @@ data class AppConfig(
     val debugModeEnabled: Boolean = false,
     val autoDeleteApkEnabled: Boolean = true, // Delete the downloaded APK after a successful install
     val autoUpdateCheckEnabled: Boolean = true, // Daily background update check + notification
-    val showUpdatePromptEnabled: Boolean = true // "N updates available" popup after launch refresh
+    val showUpdatePromptEnabled: Boolean = true, // "N updates available" popup after launch refresh
+    /**
+     * List apps patched by community providers, not only ReVanced and Morphe. Asked once on first
+     * run (AppSourceDialog), then a switch in Settings. See [RevancedApp.isCommunityContribution].
+     */
+    val showCommunityApps: Boolean = true
 )
 
 /**

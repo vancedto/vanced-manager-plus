@@ -45,6 +45,7 @@
     <string name="download_failed_memory">메모리 부족으로 다운로드 실패. 다른 앱을 종료하고 다시 시도하세요.</string>
     <string name="download_failed_storage">저장공간 부족으로 다운로드 실패. 공간을 확보하고 다시 시도하세요.</string>
     <string name="download_cancelled">다운로드 취소됨</string>
+    <string name="download_file_missing">다운로드한 파일을 더 이상 사용할 수 없습니다. 다시 시도해 주세요.</string>
     <string name="installation_started">설치 시작됨</string>
     <string name="installation_completed">설치 성공적으로 완료됨</string>
     <string name="installation_failed_start">설치 시작 실패</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">%1$d개 앱에 업데이트가 있습니다. 지금 업데이트하시겠습니까?</string>
     <string name="update_selected">업데이트 (%1$d)</string>
     <string name="skip_today">오늘 건너뛰기</string>
+    <string name="update_prompt_dont_show_again">다시 표시 안 함</string>
+    <string name="update_prompt_turned_off">업데이트 팝업을 껐습니다 — 설정에서 다시 켤 수 있습니다</string>
     <string name="update_prompt_muted">%1$s의 업데이트 알림을 껐습니다</string>
     <string name="update_prompt_unmuted">%1$s의 업데이트 알림을 켰습니다</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">인기 앱으로 시작하세요 — 원하지 않는 항목은 체크 해제하세요:</string>
     <string name="suggestions_install">설치 (%1$d)</string>
     <string name="suggestions_skip">건너뛰기</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">앱 출처</string>
+    <string name="show_community_apps">커뮤니티 앱 표시</string>
+    <string name="show_community_apps_description">ReVanced와 Morphe뿐 아니라 커뮤니티 개발자가 패치한 앱도 함께 표시합니다</string>
+    <string name="app_source_title">앱을 어디에서 가져올까요?</string>
+    <string name="app_source_message">공식 ReVanced 및 Morphe 저장소 외에도 카탈로그에는 커뮤니티 개발자가 패치한 앱이 포함되어 있습니다. 나중에 설정에서 변경할 수 있습니다.</string>
+    <string name="app_source_option_all">모든 앱 (ReVanced, Morphe + 커뮤니티)</string>
+    <string name="app_source_option_official">공식만 (ReVanced 및 Morphe)</string>
+    <string name="app_source_continue">계속</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">즐겨찾기</string>

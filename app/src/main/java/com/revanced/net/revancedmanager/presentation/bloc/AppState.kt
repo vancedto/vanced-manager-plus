@@ -3,6 +3,7 @@ package com.revanced.net.revancedmanager.presentation.bloc
 import com.revanced.net.revancedmanager.domain.model.AppConfig
 import com.revanced.net.revancedmanager.domain.model.AppStatus
 import com.revanced.net.revancedmanager.domain.model.RevancedApp
+import com.revanced.net.revancedmanager.domain.model.visibleFor
 
 /**
  * Represents the different states of the main app screen
@@ -18,7 +19,9 @@ sealed class AppState {
         val config: AppConfig = AppConfig(),
         val isRefreshing: Boolean = false,
         /** First-run suggestions to show in a popup; null = popup hidden. */
-        val suggestedApps: List<RevancedApp>? = null
+        val suggestedApps: List<RevancedApp>? = null,
+        /** First-run "where should apps come from?" dialog is on screen. Outranks every other popup. */
+        val askAppSource: Boolean = false
     ) : AppState() {
         /** Number of apps currently being downloaded, installed or uninstalled. */
         val processingCount: Int
@@ -32,7 +35,9 @@ sealed class AppState {
             get() = sorted(filtered())
 
         private fun filtered(): List<RevancedApp> {
-                val searched = if (searchQuery.isBlank()) apps else apps.filter { app ->
+                // Source choice first: a hidden community app must not surface through search.
+                val visible = apps.visibleFor(config)
+                val searched = if (searchQuery.isBlank()) visible else visible.filter { app ->
                     app.title.contains(searchQuery, ignoreCase = true) ||
                     app.packageName.contains(searchQuery, ignoreCase = true)
                 }
@@ -117,7 +122,9 @@ sealed class DialogState {
         val apps: List<RevancedApp>,
         val onUpdateSelected: (List<String>) -> Unit,
         val onSkipToday: () -> Unit,
-        val onDismiss: () -> Unit
+        val onDismiss: () -> Unit,
+        /** Switch the popup off for good — the same setting as "Update popup on launch". */
+        val onTurnOff: () -> Unit
     ) : DialogState()
 }
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Material Symbols "list_arrow" (Google, Apache License 2.0).
+
+  Not available through material-icons-extended: that artifact ships the classic
+  Material Icons set, and list_arrow only exists in Material Symbols. The source
+  SVG uses the Symbols viewBox "0 -960 960 960", so the path is shifted back into
+  the 0..960 box with a translateY group rather than being rewritten by hand.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960"
+    android:autoMirrored="true">
+    <group android:translateY="960">
+        <path
+            android:fillColor="@android:color/white"
+            android:pathData="M240,-160 L80,-320 l56,-56 64,62 v-446 h80 v446 l64,-62 56,56 -160,160 Z m240,-40 v-80 h400 v80 H480 Z m0,-240 v-80 h400 v80 H480 Z m0,-240 v-80 h400 v80 H480 Z" />
+    </group>
+</vector>

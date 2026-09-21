@@ -45,6 +45,7 @@
     <string name="download_failed_memory">Download aufgrund von unzureichendem Speicher fehlgeschlagen. Schließen Sie andere Apps und versuchen Sie es erneut.</string>
     <string name="download_failed_storage">Download aufgrund von unzureichendem Speicherplatz fehlgeschlagen. Geben Sie Speicherplatz frei und versuchen Sie es erneut.</string>
     <string name="download_cancelled">Download abgebrochen</string>
+    <string name="download_file_missing">Die heruntergeladene Datei ist nicht mehr verfügbar. Bitte versuche es erneut.</string>
     <string name="installation_started">Installation gestartet</string>
     <string name="installation_completed">Installation erfolgreich abgeschlossen</string>
     <string name="installation_failed_start">Installation konnte nicht gestartet werden</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">Für %1$d App(s) sind Updates verfügbar. Möchtest du sie jetzt aktualisieren?</string>
     <string name="update_selected">Aktualisieren (%1$d)</string>
     <string name="skip_today">Heute überspringen</string>
+    <string name="update_prompt_dont_show_again">Nicht mehr anzeigen</string>
+    <string name="update_prompt_turned_off">Update-Popup ausgeschaltet — in den Einstellungen wieder einschalten</string>
     <string name="update_prompt_muted">Update-Vorschläge für %1$s deaktiviert</string>
     <string name="update_prompt_unmuted">Update-Vorschläge für %1$s aktiviert</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">Starte mit diesen beliebten Apps — entferne die Häkchen bei allem, was du nicht möchtest:</string>
     <string name="suggestions_install">Installieren (%1$d)</string>
     <string name="suggestions_skip">Überspringen</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">App-Quellen</string>
+    <string name="show_community_apps">Community-Apps anzeigen</string>
+    <string name="show_community_apps_description">Auch Apps auflisten, die von Community-Entwicklern gepatcht wurden, nicht nur ReVanced und Morphe</string>
+    <string name="app_source_title">Woher sollen die Apps kommen?</string>
+    <string name="app_source_message">Neben den offiziellen ReVanced- und Morphe-Repos enthält der Katalog Apps, die von Community-Entwicklern gepatcht wurden. Du kannst das später in den Einstellungen ändern.</string>
+    <string name="app_source_option_all">Alle Apps (ReVanced, Morphe + Community)</string>
+    <string name="app_source_option_official">Nur offizielle (ReVanced &amp; Morphe)</string>
+    <string name="app_source_continue">Weiter</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favoriten</string>

@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.data.manager.DownloadState
+import com.revanced.net.revancedmanager.data.manager.short
 import com.revanced.net.revancedmanager.domain.model.AppStatus
 import com.revanced.net.revancedmanager.domain.model.RevancedApp
+import com.revanced.net.revancedmanager.domain.model.visibleFor
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.io.File
@@ -16,6 +18,11 @@ import java.io.File
 // Downloads are WorkManager work. The single collector below is the only
 // signal path: progress, completion, failure, and cancellation all arrive as
 // WorkInfo updates — including work that survived a process death or reboot.
+//
+// Terminal states are claimed through downloadManager.claimTerminal, which is process-wide.
+// It has to be: the guard used to be a ViewModel field, and when more than one AppBloc was alive
+// each one claimed the same finished download separately — one deleted the APK as a replay while
+// the others, the visible one included, then found no file and left the card stuck at 98 %.
 
 internal fun AppBloc.observeDownloads() {
     downloadManager.downloads
@@ -36,36 +43,84 @@ private fun AppBloc.handleDownloadUpdate(download: DownloadState) {
             updateAppProgress(download.packageName, download.progress)
         }
 
-        WorkInfo.State.SUCCEEDED -> if (handledDownloads.add(download.id)) {
+        // The side effects of a finished download — queueing the install, deleting the APK,
+        // pruning the record, raising a toast — happen once, for whoever claims the work id.
+        // Reconciling this instance's own card does not: see releaseDownloadingCard.
+        WorkInfo.State.SUCCEEDED -> if (downloadManager.claimTerminal(download.id)) {
             val filePath = download.filePath
-            if (filePath != null && File(filePath).exists()) {
-                handleDownloadCompleted(download.packageName, filePath)
+            val file = filePath?.let { File(it) }
+            if (file != null && file.exists()) {
+                handleDownloadCompleted(download.packageName, filePath, download.id.short())
             } else {
-                Log.w(TAG_BLOC, "Completed download has no file, dropping: ${download.packageName}")
-                downloadManager.pruneFinishedWork()
+                handleDownloadFileMissing(download.packageName, filePath, download.id.short())
             }
+        } else {
+            releaseDownloadingCard(download.packageName)
         }
 
-        WorkInfo.State.FAILED -> if (handledDownloads.add(download.id)) {
+        WorkInfo.State.FAILED -> if (downloadManager.claimTerminal(download.id)) {
+            Log.e(
+                TAG_BLOC,
+                "Download work ${download.id.short()} FAILED: ${download.packageName} " +
+                    "raw=${download.error}"
+            )
             handleDownloadFailed(download.packageName, buildDownloadErrorMessage(download.error))
+        } else {
+            releaseDownloadingCard(download.packageName)
         }
 
-        WorkInfo.State.CANCELLED -> if (handledDownloads.add(download.id)) {
+        WorkInfo.State.CANCELLED -> {
             // Feedback is handled where the cancel was requested (cancelDownload
-            // or a REPLACE re-enqueue) — nothing to do here.
+            // or a REPLACE re-enqueue) — nothing to do here beyond leaving a trace, so a
+            // cancellation is not mistaken for a download that vanished without explanation.
+            if (downloadManager.claimTerminal(download.id)) {
+                Log.i(
+                    TAG_BLOC,
+                    "Download work ${download.id.short()} CANCELLED: ${download.packageName} " +
+                        "(feedback handled at the cancel site)"
+                )
+            }
+            releaseDownloadingCard(download.packageName)
         }
     }
 }
 
+/**
+ * Take a card out of DOWNLOADING when this instance is not the one handling the finished work.
+ *
+ * DOWNLOADING is the one status a finished download can leave dangling with nothing left to
+ * complete it, and that dangling card — frozen at 98 % with only Cancel to escape — was the whole
+ * bug. Claiming the work id decides who runs the side effects; it must not also decide whose card
+ * gets unstuck, or a handler in another instance leaves the visible one hanging.
+ *
+ * Deliberately narrow. A repeat emission of the same finished WorkInfo also lands here, and by
+ * then this instance may have legitimately moved on to READY_TO_INSTALL or INSTALLING — statuses
+ * an install is still driving, which must not be reset out from under it.
+ */
+private fun AppBloc.releaseDownloadingCard(packageName: String) {
+    if (packageName in pendingInstalls) return
+    val currentStatus = (_state.value as? AppState.Success)
+        ?.apps?.find { it.packageName == packageName }?.status
+    if (currentStatus != AppStatus.DOWNLOADING) return
+
+    Log.i(
+        TAG_BLOC,
+        "[$blocId] Releasing stale DOWNLOADING card for $packageName " +
+            "(its work finished under another handler)"
+    )
+    updateAppStatus(packageName, resolveActualStatus(packageName))
+    updateAppProgress(packageName, 0f)
+}
+
 internal fun AppBloc.downloadApp(packageName: String, downloadUrl: String) {
-    Log.i(TAG_BLOC, "Starting download: $packageName")
+    Log.i(TAG_BLOC, "[$blocId] Starting download: $packageName")
 
     // Drop any install still queued for a stale APK of this package
     pendingInstalls.remove(packageName)
 
     // Remember that this one was asked for, so completing it installs even when the app is
     // already up to date — which is exactly what choosing another architecture means.
-    userRequestedDownloads.add(packageName)
+    downloadManager.markUserRequested(packageName)
 
     updateAppStatus(packageName, AppStatus.DOWNLOADING)
     updateAppProgress(packageName, 0f)
@@ -78,13 +133,13 @@ internal fun AppBloc.downloadApp(packageName: String, downloadUrl: String) {
 
 /**
  * Download every app that has an update available, skipping the ones the user muted in the detail
- * screen — an app kept out of the prompt and the notification should not be updated by the
- * notification's "Update all" action either.
+ * screen and the ones hidden by the source choice — an app kept out of the prompt and the
+ * notification should not be updated by the notification's "Update all" action either.
  */
 internal fun AppBloc.updateAllApps() {
-    val appsToUpdate = (_state.value as? AppState.Success)
-        ?.apps?.filter { it.status == AppStatus.UPDATE_AVAILABLE && it.updatePromptEnabled }
-        ?: return
+    val state = _state.value as? AppState.Success ?: return
+    val appsToUpdate = state.apps.visibleFor(state.config)
+        .filter { it.status == AppStatus.UPDATE_AVAILABLE && it.updatePromptEnabled }
     updateApps(appsToUpdate)
 }
 
@@ -108,9 +163,15 @@ private fun AppBloc.updateApps(appsToUpdate: List<RevancedApp>) {
     appsToUpdate.forEach { downloadApp(it.packageName, it.downloadUrl) }
 }
 
-internal fun AppBloc.handleDownloadCompleted(packageName: String, filePath: String) {
+internal fun AppBloc.handleDownloadCompleted(
+    packageName: String,
+    filePath: String,
+    workId: String = "?"
+) {
     val app = (_state.value as? AppState.Success)?.apps?.find { it.packageName == packageName }
-    val wasRequestedByUser = userRequestedDownloads.remove(packageName)
+    val wasRequestedByUser = downloadManager.consumeUserRequested(packageName)
+    val alreadyInstalled = appManager.isApkAlreadyInstalled(filePath)
+    val apkSize = runCatching { File(filePath).length() }.getOrDefault(-1L)
 
     // Work records replayed after a restart can point at an app that has since been installed —
     // don't install the same build again. A download the user just started is never a replay, and
@@ -124,15 +185,57 @@ internal fun AppBloc.handleDownloadCompleted(packageName: String, filePath: Stri
     // the leftover download was replayed on every launch.
     // null means the file is not a package PackageManager can read, so PackageInstaller would
     // reject it too — treat it like nothing left to install rather than committing a doomed session.
-    if (!wasRequestedByUser && appManager.isApkAlreadyInstalled(filePath) != false) {
-        Log.i(TAG_BLOC, "Replayed download installs nothing new, skipping: $packageName")
+    if (!wasRequestedByUser && alreadyInstalled != false) {
+        Log.i(
+            TAG_BLOC,
+            "[$blocId] Replayed download installs nothing new, skipping: $packageName " +
+                "work=$workId wasRequestedByUser=false " +
+                "isApkAlreadyInstalled=${alreadyInstalled ?: "null (APK unreadable)"} " +
+                "apkSize=$apkSize"
+        )
         finishReplayedDownload(packageName)
         return
     }
 
-    Log.i(TAG_BLOC, "Download completed, queueing for installation: $packageName -> $filePath")
+    Log.i(
+        TAG_BLOC,
+        "[$blocId] Download completed, queueing for installation: $packageName -> $filePath " +
+            "work=$workId wasRequestedByUser=$wasRequestedByUser " +
+            "isApkAlreadyInstalled=${alreadyInstalled ?: "null"} apkSize=$apkSize"
+    )
     queueInstallation(packageName, filePath, app?.title ?: packageName)
     showToast(stringProvider.getString(R.string.download_completed_installing))
+}
+
+/**
+ * A download WorkManager reports as SUCCEEDED whose APK is not on disk.
+ *
+ * This used to be a bare log-and-return, which is what actually froze the UI: the card kept
+ * AppStatus.DOWNLOADING and its last progress value (98 %) forever, with no way out but Cancel.
+ * Whatever the cause, the card has to go back to a real status — an in-flight status that nothing
+ * will ever complete is worse than an error.
+ */
+private fun AppBloc.handleDownloadFileMissing(
+    packageName: String,
+    filePath: String?,
+    workId: String
+) {
+    val wasRequestedByUser = downloadManager.consumeUserRequested(packageName)
+    Log.w(
+        TAG_BLOC,
+        "[$blocId] Completed download has no file, dropping: $packageName work=$workId " +
+            "filePath=${filePath ?: "<none reported>"} wasRequestedByUser=$wasRequestedByUser"
+    )
+
+    updateAppStatus(packageName, resolveActualStatus(packageName))
+    updateAppProgress(packageName, 0f)
+    downloadManager.pruneFinishedWork()
+
+    // Only worth interrupting the user when they were waiting on this particular download.
+    // A replayed record losing its file is routine cleanup, not something to report.
+    if (wasRequestedByUser) {
+        showError(stringProvider.getString(R.string.download_file_missing))
+    }
 }
 
 /**
@@ -148,11 +251,13 @@ private fun AppBloc.finishReplayedDownload(packageName: String) {
         deleteDownloadedApk(packageName)
     }
     updateAppStatus(packageName, resolveActualStatus(packageName))
+    // Without this the card keeps the progress value the abandoned download reached.
+    updateAppProgress(packageName, 0f)
 }
 
 internal fun AppBloc.handleDownloadFailed(packageName: String, error: String) {
-    Log.e(TAG_BLOC, "Download failed: $packageName - $error")
-    userRequestedDownloads.remove(packageName)
+    Log.e(TAG_BLOC, "[$blocId] Download failed: $packageName - $error")
+    downloadManager.clearUserRequested(packageName)
     updateAppStatus(packageName, resolveActualStatus(packageName))
     updateAppProgress(packageName, 0f)
     showError(error)
@@ -160,8 +265,8 @@ internal fun AppBloc.handleDownloadFailed(packageName: String, error: String) {
 }
 
 internal fun AppBloc.cancelDownload(packageName: String) {
-    Log.i(TAG_BLOC, "Cancelling download: $packageName")
-    userRequestedDownloads.remove(packageName)
+    Log.i(TAG_BLOC, "[$blocId] Cancelling download: $packageName")
+    downloadManager.clearUserRequested(packageName)
     downloadManager.cancel(packageName)
 
     val restoredStatus = resolveActualStatus(packageName)

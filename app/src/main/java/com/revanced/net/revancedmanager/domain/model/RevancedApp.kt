@@ -1,5 +1,7 @@
 package com.revanced.net.revancedmanager.domain.model
 
+import com.revanced.net.revancedmanager.config.Config
+
 /**
  * Domain model representing a ReVanced application
  *
@@ -69,7 +71,42 @@ data class RevancedApp(
      * The install is still offered, because on the devices this actually happens to it usually
      * works; it is flagged so the UI can say so instead of presenting it as the right build.
      */
-    val isBestEffortVariant: Boolean = false
+    val isBestEffortVariant: Boolean = false,
+    /**
+     * Which installed versions of [packageName] are this entry's own builds. Null for the usual
+     * one-entry-per-package case, where whatever is installed is by definition this entry's.
+     *
+     * Set only where two catalog entries are alternatives for the same package — MicroG RE (6.x,
+     * 7.x) and ReVanced GmsCore (0.3.x) both install as app.revanced.android.gms. Install status is
+     * a property of the package (one slot, one build), but *which entry* that build belongs to is
+     * decided by this band: see `PackageOwnership`.
+     */
+    val installedVersionRange: InstalledVersionRange? = null
+) {
+    /**
+     * True for an app patched by a community provider rather than the ReVanced or Morphe teams.
+     *
+     * An app with no provider is not a community contribution: nobody patched it (MicroG, NewPipe,
+     * SmartTube), so it stays visible whatever the user chose.
+     */
+    val isCommunityContribution: Boolean
+        get() = provider != null && provider !in Config.MAINSTREAM_PROVIDERS
+}
+
+/**
+ * The apps the user has chosen to see. The single definition of "hidden", so the main list, the
+ * update prompt, "Update all" and the background update check cannot disagree about it: an app the
+ * user asked not to see must not come back as an update notification.
+ */
+fun List<RevancedApp>.visibleFor(config: AppConfig): List<RevancedApp> =
+    if (config.showCommunityApps) this else filterNot { it.isCommunityContribution }
+
+/**
+ * A half-open version band `[min, max)`; a null bound is open on that side.
+ */
+data class InstalledVersionRange(
+    val min: String? = null,
+    val max: String? = null
 )
 
 /**

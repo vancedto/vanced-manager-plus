@@ -45,6 +45,7 @@
     <string name="download_failed_memory">فشل التحميل بسبب عدم كفاية الذاكرة. يرجى إغلاق التطبيقات الأخرى والمحاولة مرة أخرى.</string>
     <string name="download_failed_storage">فشل التحميل بسبب عدم كفاية مساحة التخزين. يرجى تحرير بعض المساحة والمحاولة مرة أخرى.</string>
     <string name="download_cancelled">تم إلغاء التحميل</string>
+    <string name="download_file_missing">لم يعد الملف الذي تم تنزيله متوفرًا. يُرجى المحاولة مرة أخرى.</string>
     <string name="installation_started">بدأ التثبيت</string>
     <string name="installation_completed">اكتمل التثبيت بنجاح</string>
     <string name="installation_failed_start">فشل في بدء التثبيت</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">يتوفر تحديث لـ %1$d تطبيق. هل تريد تحديثها الآن؟</string>
     <string name="update_selected">تحديث (%1$d)</string>
     <string name="skip_today">تخطي اليوم</string>
+    <string name="update_prompt_dont_show_again">عدم الإظهار مرة أخرى</string>
+    <string name="update_prompt_turned_off">تم إيقاف نافذة التحديثات — أعد تفعيلها من الإعدادات</string>
     <string name="update_prompt_muted">تم إيقاف اقتراحات التحديث لـ %1$s</string>
     <string name="update_prompt_unmuted">تم تفعيل اقتراحات التحديث لـ %1$s</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">ابدأ بهذه التطبيقات الشائعة — ألغِ تحديد ما لا تريده:</string>
     <string name="suggestions_install">تثبيت (%1$d)</string>
     <string name="suggestions_skip">تخطي</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">مصادر التطبيقات</string>
+    <string name="show_community_apps">إظهار تطبيقات المجتمع</string>
+    <string name="show_community_apps_description">عرض التطبيقات المعدّلة من مطوّري المجتمع أيضًا، وليس ReVanced وMorphe فقط</string>
+    <string name="app_source_title">من أين تُجلب التطبيقات؟</string>
+    <string name="app_source_message">إلى جانب مستودعات ReVanced وMorphe الرسمية، يتضمن الفهرس تطبيقات معدّلة من مطوّري المجتمع. يمكنك تغيير ذلك لاحقًا من الإعدادات.</string>
+    <string name="app_source_option_all">كل التطبيقات (ReVanced وMorphe + المجتمع)</string>
+    <string name="app_source_option_official">الرسمية فقط (ReVanced وMorphe)</string>
+    <string name="app_source_continue">متابعة</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">المفضلة</string>

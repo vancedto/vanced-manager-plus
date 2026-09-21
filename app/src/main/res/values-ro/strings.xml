@@ -45,6 +45,7 @@
     <string name="download_failed_memory">Descărcare eșuată din cauza memoriei insuficiente. Închideți alte aplicații și încercați din nou.</string>
     <string name="download_failed_storage">Descărcare eșuată din cauza spațiului insuficient. Eliberați spațiu și încercați din nou.</string>
     <string name="download_cancelled">Descărcare anulată</string>
+    <string name="download_file_missing">Fișierul descărcat nu mai este disponibil. Încearcă din nou.</string>
     <string name="installation_started">Instalare începută</string>
     <string name="installation_completed">Instalare completată cu succes</string>
     <string name="installation_failed_start">Nu s-a putut începe instalarea</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">%1$d aplicații au actualizări disponibile. Vrei să le actualizezi acum?</string>
     <string name="update_selected">Actualizează (%1$d)</string>
     <string name="skip_today">Sari peste azi</string>
+    <string name="update_prompt_dont_show_again">Nu mai afișa</string>
+    <string name="update_prompt_turned_off">Fereastra de actualizare a fost dezactivată — reactiveaz-o din Setări</string>
     <string name="update_prompt_muted">Sugestiile de actualizare pentru %1$s au fost dezactivate</string>
     <string name="update_prompt_unmuted">Sugestiile de actualizare pentru %1$s au fost activate</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">Începe cu aceste aplicații populare — debifează cele pe care nu le vrei:</string>
     <string name="suggestions_install">Instalează (%1$d)</string>
     <string name="suggestions_skip">Sari peste</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">Surse de aplicații</string>
+    <string name="show_community_apps">Afișează aplicațiile comunității</string>
+    <string name="show_community_apps_description">Listează și aplicațiile patch-uite de dezvoltatori din comunitate, nu doar ReVanced și Morphe</string>
+    <string name="app_source_title">De unde să provină aplicațiile?</string>
+    <string name="app_source_message">Pe lângă depozitele oficiale ReVanced și Morphe, catalogul include aplicații patch-uite de dezvoltatori din comunitate. Poți schimba asta mai târziu în Setări.</string>
+    <string name="app_source_option_all">Toate aplicațiile (ReVanced, Morphe + comunitate)</string>
+    <string name="app_source_option_official">Doar oficiale (ReVanced și Morphe)</string>
+    <string name="app_source_continue">Continuă</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Favorite</string>

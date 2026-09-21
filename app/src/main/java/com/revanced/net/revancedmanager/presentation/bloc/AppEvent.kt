@@ -67,4 +67,7 @@ sealed class AppEvent {
     // First-run suggestions events
     data class InstallSuggestedApps(val appIds: List<String>) : AppEvent()
     data object DismissSuggestions : AppEvent()
+
+    /** Answer to the first-run "where should apps come from?" dialog. */
+    data class ChooseAppSource(val showCommunityApps: Boolean) : AppEvent()
 }

@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.io.File
-import java.util.UUID
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 /** Tag used by all AppBloc extension files. */
@@ -66,22 +66,23 @@ class AppBloc @Inject constructor(
     val toastMessage: StateFlow<String?> = _toastMessage.asStateFlow()
 
     // ---- Download tracking ----
-    /** Work IDs whose terminal state (success/failure/cancel) was already processed. */
-    internal val handledDownloads = mutableSetOf<UUID>()
+    // The work-id and user-requested guards used to live here as ViewModel fields. They now
+    // belong to AppDownloadManager (@Singleton) instead: they describe a download, not an
+    // observer of one, and while more than one AppBloc was alive each instance passed its own
+    // copy of the guard for the same finished work — see AppDownloadManager's class doc.
 
-    /**
-     * Packages whose download the user asked for during this session.
-     *
-     * Tells a deliberate download apart from a WorkManager record replayed after a restart, which
-     * is the only thing the "already up to date" guard in handleDownloadCompleted is meant to
-     * catch. Without it, choosing a different architecture for an app that is already up to date
-     * downloads the file and then silently discards it.
-     */
-    internal val userRequestedDownloads = mutableSetOf<String>()
+    /** Short identity for log lines, so duplicate instances are visible in one line. */
+    internal val blocId: String = Integer.toHexString(System.identityHashCode(this)).takeLast(4)
 
     // ---- Install queue ----
     internal val installRequests = Channel<PendingInstallation>(Channel.UNLIMITED)
-    /** Packages queued for install or currently installing. */
+    /**
+     * Packages queued for install or currently installing.
+     *
+     * Stays a ViewModel field, unlike the download guards: this is one instance's own install
+     * queue, drained by that instance's [startInstallationProcessor], and there is only ever one
+     * live AppBloc now that MainActivity is singleTop.
+     */
     internal val pendingInstalls = mutableSetOf<String>()
     internal val installationRetries = mutableMapOf<String, Int>()
 
@@ -113,8 +114,26 @@ class AppBloc @Inject constructor(
         val appName: String
     )
 
+    companion object {
+        /** Live AppBloc count, used only to make a duplicate-instance bug obvious in the log. */
+        private val liveInstances = AtomicInteger(0)
+    }
+
     init {
-        Log.i(TAG_BLOC, "AppBloc initialized")
+        val liveCount = liveInstances.incrementAndGet()
+        Log.i(TAG_BLOC, "[$blocId] AppBloc initialized (live instances: $liveCount)")
+        if (liveCount > 1) {
+            // Every extra instance collects the shared download flow and drives its own install
+            // queue. That is the bug this warning exists to catch: notification PendingIntents
+            // without FLAG_ACTIVITY_SINGLE_TOP (or a MainActivity that is not singleTop) stack a
+            // second activity, whose predecessor is stopped rather than destroyed, so onCleared()
+            // never runs and its AppBloc stays alive.
+            Log.w(
+                TAG_BLOC,
+                "[$blocId] $liveCount AppBloc instances are alive at once — expected exactly 1. " +
+                    "A second MainActivity was almost certainly stacked on the task."
+            )
+        }
         // Sessions left over from a killed process would otherwise linger forever (and hold
         // storage); nothing in this process owns them yet, so they are safe to abandon.
         packageInstaller.abandonOrphanedSessions()
@@ -147,6 +166,8 @@ class AppBloc @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        val remaining = liveInstances.decrementAndGet()
+        Log.i(TAG_BLOC, "[$blocId] AppBloc cleared (live instances: $remaining)")
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
         packageChangedReceiver.unregister()
     }
@@ -163,13 +184,19 @@ class AppBloc @Inject constructor(
                             is PackageEvent.Updated -> event.packageName
                             else -> return@onEach
                         }
-                        Log.i(TAG_BLOC, "System event: Package installed/updated: $packageName")
+                        Log.i(TAG_BLOC, "[$blocId] System event: Package installed/updated: $packageName")
                         pendingUninstallChecks.remove(packageName)
                         val installedVersion = appManager.getInstalledVersion(packageName)
-                        if (installedVersion != null) handleInstallationSuccess(packageName, installedVersion)
+                        if (installedVersion != null) {
+                            handleInstallationSuccess(
+                                packageName,
+                                installedVersion,
+                                source = "PACKAGE_ADDED broadcast"
+                            )
+                        }
                     }
                     is PackageEvent.Uninstalled -> {
-                        Log.i(TAG_BLOC, "System event: Package uninstalled: ${event.packageName}")
+                        Log.i(TAG_BLOC, "[$blocId] System event: Package uninstalled: ${event.packageName}")
                         pendingUninstallChecks.remove(event.packageName)
                         handlePendingReinstall(event.packageName)
                     }
@@ -275,6 +302,7 @@ class AppBloc @Inject constructor(
             is AppEvent.ToggleUpdatePrompt -> toggleUpdatePrompt(event.appId)
             is AppEvent.InstallSuggestedApps -> installSuggestedApps(event.appIds)
             is AppEvent.DismissSuggestions -> dismissSuggestions()
+            is AppEvent.ChooseAppSource -> chooseAppSource(event.showCommunityApps)
         }
     }
 

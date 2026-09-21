@@ -45,6 +45,7 @@
     <string name="download_failed_memory">अपर्याप्त मेमोरी के कारण डाउनलोड असफल। अन्य ऐप्स बंद करें और पुनः प्रयास करें।</string>
     <string name="download_failed_storage">अपर्याप्त स्टोरेज स्पेस के कारण डाउनलोड असफल। स्थान खाली करें और पुनः प्रयास करें।</string>
     <string name="download_cancelled">डाउनलोड रद्द किया गया</string>
+    <string name="download_file_missing">डाउनलोड की गई फ़ाइल अफ उपलब्ध नहीं है। कृपया दोबारा कोशिश करें।</string>
     <string name="installation_started">इंस्टॉलेशन शुरू</string>
     <string name="installation_completed">इंस्टॉलेशन सफलतापूर्वक पूरा</string>
     <string name="installation_failed_start">इंस्टॉलेशन शुरू करने में असफल</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">%1$d ऐप के अपडेट उपलब्ध हैं। क्या आप उन्हें अभी अपडेट करना चाहते हैं?</string>
     <string name="update_selected">अपडेट करें (%1$d)</string>
     <string name="skip_today">आज छोड़ें</string>
+    <string name="update_prompt_dont_show_again">दोबारा न दिखाएँ</string>
+    <string name="update_prompt_turned_off">अपडेट पॉपअप बंद किया गया — सेटिंग्स में फिर से चालू करें</string>
     <string name="update_prompt_muted">%1$s के लिए अपडेट सुझाव बंद कर दिए गए</string>
     <string name="update_prompt_unmuted">%1$s के लिए अपडेट सुझाव चालू कर दिए गए</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">इन लोकप्रिय ऐप से शुरू करें — जो नहीं चाहिए उन्हें अनचेक करें:</string>
     <string name="suggestions_install">इंस्टॉल करें (%1$d)</string>
     <string name="suggestions_skip">छोड़ें</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">ऐप स्रोत</string>
+    <string name="show_community_apps">समुदाय के ऐप दिखाएँ</string>
+    <string name="show_community_apps_description">केवल ReVanced और Morphe ही नहीं, समुदाय के डेवलपर्स द्वारा पैच किए गए ऐप भी सूचीबद्ध करें</string>
+    <string name="app_source_title">ऐप कहाँ से लिए जाएँ?</string>
+    <string name="app_source_message">ReVanced और Morphe के आधिकारिक रिपॉज़िटरी के अलावा, कैटलॉग में समुदाय के डेवलपर्स द्वारा पैच किए गए ऐप भी हैं। आप इसे बाद में सेटिंग्स में बदल सकते हैं।</string>
+    <string name="app_source_option_all">सभी ऐप (ReVanced, Morphe + समुदाय)</string>
+    <string name="app_source_option_official">केवल आधिकारिक (ReVanced और Morphe)</string>
+    <string name="app_source_continue">जारी रखें</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">पसंदीदा</string>

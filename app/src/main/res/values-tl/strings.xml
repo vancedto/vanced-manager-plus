@@ -45,6 +45,7 @@
     <string name="download_failed_memory">Nabigo ang download dahil kulang ang memory. Isara ang ibang apps at subukan ulit.</string>
     <string name="download_failed_storage">Nabigo ang download dahil kulang ang storage space. Mag-free up ng space at subukan ulit.</string>
     <string name="download_cancelled">Kinansela ang download</string>
+    <string name="download_file_missing">Wala na ang na-download na file. Pakisubukang muli.</string>
     <string name="installation_started">Nagsimula ang pag-install</string>
     <string name="installation_completed">Matagumpay na natapos ang pag-install</string>
     <string name="installation_failed_start">Hindi magsimula ang pag-install</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">May available na update ang %1$d (na) app. Gusto mo ba silang i-update ngayon?</string>
     <string name="update_selected">I-update (%1$d)</string>
     <string name="skip_today">Laktawan ngayon</string>
+    <string name="update_prompt_dont_show_again">Huwag nang ipakita muli</string>
+    <string name="update_prompt_turned_off">Na-off ang popup ng update — i-on muli sa Mga Setting</string>
     <string name="update_prompt_muted">Naka-off na ang mga suhestiyon ng update para sa %1$s</string>
     <string name="update_prompt_unmuted">Naka-on na ang mga suhestiyon ng update para sa %1$s</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">Magsimula sa mga sikat na app na ito — alisin sa check ang ayaw mo:</string>
     <string name="suggestions_install">I-install (%1$d)</string>
     <string name="suggestions_skip">Laktawan</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">Pinagmulan ng app</string>
+    <string name="show_community_apps">Ipakita ang mga app ng komunidad</string>
+    <string name="show_community_apps_description">Ilista rin ang mga app na na-patch ng mga developer ng komunidad, hindi lang ReVanced at Morphe</string>
+    <string name="app_source_title">Saan dapat manggaling ang mga app?</string>
+    <string name="app_source_message">Bukod sa opisyal na repo ng ReVanced at Morphe, kasama sa katalogo ang mga app na na-patch ng mga developer ng komunidad. Puwede mo itong baguhin sa Mga Setting.</string>
+    <string name="app_source_option_all">Lahat ng app (ReVanced, Morphe + komunidad)</string>
+    <string name="app_source_option_official">Opisyal lang (ReVanced at Morphe)</string>
+    <string name="app_source_continue">Magpatuloy</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Mga Paborito</string>

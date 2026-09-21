@@ -45,6 +45,7 @@
     <string name="download_failed_memory">অপর্যাপ্ত মেমরির কারণে ডাউনলোড ব্যর্থ। অন্য অ্যাপ বন্ধ করুন এবং আবার চেষ্টা করুন।</string>
     <string name="download_failed_storage">অপর্যাপ্ত স্টোরেজের কারণে ডাউনলোড ব্যর্থ। স্থান খালি করুন এবং আবার চেষ্টা করুন।</string>
     <string name="download_cancelled">ডাউনলোড বাতিল</string>
+    <string name="download_file_missing">ডাউনলোড করা ফাইলটি আর নেই। অনুগ্রহ করে আবার চেষ্টা করুন।</string>
     <string name="installation_started">ইনস্টল শুরু</string>
     <string name="installation_completed">ইনস্টল সফলভাবে সম্পন্ন</string>
     <string name="installation_failed_start">ইনস্টল শুরু করতে ব্যর্থ</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">%1$dটি অ্যাপের আপডেট উপলব্ধ। এখনই আপডেট করতে চান?</string>
     <string name="update_selected">আপডেট (%1$d)</string>
     <string name="skip_today">আজ বাদ দিন</string>
+    <string name="update_prompt_dont_show_again">আর দেখাবেন না</string>
+    <string name="update_prompt_turned_off">আপডেট পপআপ বন্ধ করা হয়েছে — সেটিংসে আবার চালু করুন</string>
     <string name="update_prompt_muted">%1$s-এর আপডেট পরামর্শ বন্ধ করা হয়েছে</string>
     <string name="update_prompt_unmuted">%1$s-এর আপডেট পরামর্শ চালু করা হয়েছে</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">এই জনপ্রিয় অ্যাপগুলো দিয়ে শুরু করুন — যেগুলো চান না সেগুলোর টিক তুলে দিন:</string>
     <string name="suggestions_install">ইনস্টল করুন (%1$d)</string>
     <string name="suggestions_skip">বাদ দিন</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">অ্যাপের উৎস</string>
+    <string name="show_community_apps">কমিউনিটি অ্যাপ দেখান</string>
+    <string name="show_community_apps_description">শুধু ReVanced ও Morphe নয়, কমিউনিটি ডেভেলপারদের প্যাচ করা অ্যাপও তালিকায় দেখান</string>
+    <string name="app_source_title">অ্যাপ কোথা থেকে আসবে?</string>
+    <string name="app_source_message">ReVanced ও Morphe-এর অফিসিয়াল রিপো ছাড়াও ক্যাটালগে কমিউনিটি ডেভেলপারদের প্যাচ করা অ্যাপ রয়েছে। আপনি পরে সেটিংসে এটি বদলাতে পারবেন।</string>
+    <string name="app_source_option_all">সব অ্যাপ (ReVanced, Morphe + কমিউনিটি)</string>
+    <string name="app_source_option_official">শুধু অফিসিয়াল (ReVanced ও Morphe)</string>
+    <string name="app_source_continue">চালিয়ে যান</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">প্রিয়</string>

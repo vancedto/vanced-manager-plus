@@ -67,6 +67,7 @@ fun SettingsScreen(
     var autoDeleteApk by remember(currentConfig) { mutableStateOf(currentConfig.autoDeleteApkEnabled) }
     var autoUpdateCheck by remember(currentConfig) { mutableStateOf(currentConfig.autoUpdateCheckEnabled) }
     var showUpdatePrompt by remember(currentConfig) { mutableStateOf(currentConfig.showUpdatePromptEnabled) }
+    var showCommunityApps by remember(currentConfig) { mutableStateOf(currentConfig.showCommunityApps) }
     var showResetConfirm by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -128,6 +129,16 @@ fun SettingsScreen(
                     title = stringResource(R.string.compact_mode),
                     checked = compactMode,
                     onCheckedChange = { compactMode = it },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+
+                // App sources section
+                SettingsSectionHeader(stringResource(R.string.settings_section_sources))
+                SettingsSwitchRow(
+                    title = stringResource(R.string.show_community_apps),
+                    subtitle = stringResource(R.string.show_community_apps_description),
+                    checked = showCommunityApps,
+                    onCheckedChange = { showCommunityApps = it },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
 
@@ -223,7 +234,8 @@ fun SettingsScreen(
                                 debugModeEnabled = debugMode,
                                 autoDeleteApkEnabled = autoDeleteApk,
                                 autoUpdateCheckEnabled = autoUpdateCheck,
-                                showUpdatePromptEnabled = showUpdatePrompt
+                                showUpdatePromptEnabled = showUpdatePrompt,
+                                showCommunityApps = showCommunityApps
                             )
                         )
                     },

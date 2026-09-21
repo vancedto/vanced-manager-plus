@@ -45,6 +45,7 @@
     <string name="download_failed_memory">Stahování selhalo kvůli nedostatku paměti. Zavřete prosím ostatní aplikace a zkuste to znovu.</string>
     <string name="download_failed_storage">Stahování selhalo kvůli nedostatku úložného prostoru. Uvolněte prosím místo a zkuste to znovu.</string>
     <string name="download_cancelled">Stahování zrušeno</string>
+    <string name="download_file_missing">Stažený soubor už není dostupný. Zkuste to prosím znovu.</string>
     <string name="installation_started">Instalace zahájena</string>
     <string name="installation_completed">Instalace úspěšně dokončena</string>
     <string name="installation_failed_start">Nepodařilo se zahájit instalaci</string>
@@ -126,6 +127,8 @@
     <string name="update_prompt_message">%1$d aplikací má dostupné aktualizace. Chcete je nyní aktualizovat?</string>
     <string name="update_selected">Aktualizovat (%1$d)</string>
     <string name="skip_today">Přeskočit dnes</string>
+    <string name="update_prompt_dont_show_again">Znovu nezobrazovat</string>
+    <string name="update_prompt_turned_off">Okno aktualizací vypnuto — znovu zapnete v Nastavení</string>
     <string name="update_prompt_muted">Návrhy aktualizací pro %1$s vypnuty</string>
     <string name="update_prompt_unmuted">Návrhy aktualizací pro %1$s zapnuty</string>
 
@@ -144,6 +147,16 @@
     <string name="suggestions_message">Začněte s těmito oblíbenými aplikacemi — odškrtněte ty, které nechcete:</string>
     <string name="suggestions_install">Instalovat (%1$d)</string>
     <string name="suggestions_skip">Přeskočit</string>
+
+    <!-- App sources (first-run choice + Settings switch) -->
+    <string name="settings_section_sources">Zdroje aplikací</string>
+    <string name="show_community_apps">Zobrazit komunitní aplikace</string>
+    <string name="show_community_apps_description">Zobrazovat i aplikace upravené komunitními vývojáři, nejen ReVanced a Morphe</string>
+    <string name="app_source_title">Odkud mají aplikace pocházet?</string>
+    <string name="app_source_message">Kromě oficiálních repozitářů ReVanced a Morphe obsahuje katalog aplikace upravené komunitními vývojáři. Později to můžete změnit v Nastavení.</string>
+    <string name="app_source_option_all">Všechny aplikace (ReVanced, Morphe + komunita)</string>
+    <string name="app_source_option_official">Pouze oficiální (ReVanced a Morphe)</string>
+    <string name="app_source_continue">Pokračovat</string>
 
     <!-- Favorites -->
     <string name="filter_favorites">Oblíbené</string>

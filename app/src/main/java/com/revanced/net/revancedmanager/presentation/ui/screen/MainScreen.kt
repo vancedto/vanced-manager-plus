@@ -34,11 +34,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Coffee
-import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Refresh
@@ -56,6 +55,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Scaffold
@@ -85,6 +85,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -105,6 +106,7 @@ import com.revanced.net.revancedmanager.presentation.bloc.shareDebugLogs
 import com.revanced.net.revancedmanager.presentation.ui.components.AppCard
 import com.revanced.net.revancedmanager.presentation.ui.components.AppDialogHost
 import com.revanced.net.revancedmanager.presentation.ui.components.ProcessingIndicatorButton
+import com.revanced.net.revancedmanager.presentation.ui.components.AppSourceDialog
 import com.revanced.net.revancedmanager.presentation.ui.components.SuggestionsDialog
 import com.revanced.net.revancedmanager.presentation.ui.components.tvFocusBorder
 import com.revanced.net.revancedmanager.presentation.ui.theme.noiseBackground
@@ -277,7 +279,17 @@ fun MainScreen(
                             AnimatedVisibility(visible = processingCount > 0) {
                                 ProcessingIndicatorButton(
                                     count = processingCount,
-                                    onClick = { viewModel.handleEvent(AppEvent.SetFilter(AppFilterOption.PROCESSING)) }
+                                    onClick = {
+                                        // Same toggle rule as the chips: tapping it while
+                                        // already filtered to processing goes back to all
+                                        val current = successState?.filterOption
+                                        viewModel.handleEvent(
+                                            AppEvent.SetFilter(
+                                                if (current == AppFilterOption.PROCESSING) AppFilterOption.ALL
+                                                else AppFilterOption.PROCESSING
+                                            )
+                                        )
+                                    }
                                 )
                             }
                             if (successState != null) {
@@ -307,11 +319,14 @@ fun MainScreen(
                                             .tvFocusBorder(shape = RoundedCornerShape(50))
                                     ) {
                                         Icon(
-                                            imageVector = Icons.Filled.FilterList,
+                                            imageVector = Icons.Filled.FilterAlt,
                                             contentDescription = stringResource(R.string.filter_label),
                                             modifier = Modifier.size(20.dp),
+                                            // LocalContentColor is what the untinted action
+                                            // icons (search/refresh/settings) already use, so
+                                            // the inactive state matches them exactly
                                             tint = if (isFilterActive) MaterialTheme.colorScheme.primary
-                                                   else MaterialTheme.colorScheme.onSurface
+                                                   else LocalContentColor.current
                                         )
                                     }
                                 }
@@ -407,7 +422,8 @@ fun MainScreen(
                     currentState.apps,
                     currentState.searchQuery,
                     currentState.filterOption,
-                    currentState.sortOption
+                    currentState.sortOption,
+                    currentState.config.showCommunityApps
                 ) {
                     currentState.filteredApps
                 }
@@ -424,6 +440,14 @@ fun MainScreen(
                     listState = listState,
                     modifier = Modifier.padding(paddingValues)
                 )
+
+                // First-run app source question — decides what the suggestions popup and the
+                // update prompt may list, so it comes before both.
+                if (currentState.askAppSource) {
+                    AppSourceDialog(
+                        onChoose = { viewModel.handleEvent(AppEvent.ChooseAppSource(it)) }
+                    )
+                }
 
                 // First-run suggestions popup (takes precedence over other dialogs)
                 currentState.suggestedApps?.let { suggestions ->
@@ -756,6 +780,11 @@ private fun FilterChipsRow(
             selectedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
         )
         val chipFocusShape = RoundedCornerShape(8.dp)
+        // Tapping the chip that is already applied clears the filter instead of re-applying it,
+        // so "Favorites" -> "Favorites" lands back on the full list without a trip to "All".
+        val onChipClick: (AppFilterOption) -> Unit = { option ->
+            onFilterChange(if (filterOption == option) AppFilterOption.ALL else option)
+        }
         FilterChip(
             selected = filterOption == AppFilterOption.ALL,
             onClick = { onFilterChange(AppFilterOption.ALL) },
@@ -766,7 +795,7 @@ private fun FilterChipsRow(
         )
         FilterChip(
             selected = filterOption == AppFilterOption.INSTALLED,
-            onClick = { onFilterChange(AppFilterOption.INSTALLED) },
+            onClick = { onChipClick(AppFilterOption.INSTALLED) },
             label = { Text(text = stringResource(R.string.filter_installed), style = MaterialTheme.typography.labelSmall) },
             colors = chipColors,
             border = chipBorder,
@@ -774,7 +803,7 @@ private fun FilterChipsRow(
         )
         FilterChip(
             selected = filterOption == AppFilterOption.NOT_INSTALLED,
-            onClick = { onFilterChange(AppFilterOption.NOT_INSTALLED) },
+            onClick = { onChipClick(AppFilterOption.NOT_INSTALLED) },
             label = { Text(text = stringResource(R.string.filter_not_installed), style = MaterialTheme.typography.labelSmall) },
             colors = chipColors,
             border = chipBorder,
@@ -782,7 +811,7 @@ private fun FilterChipsRow(
         )
         FilterChip(
             selected = filterOption == AppFilterOption.UPDATES_AVAILABLE,
-            onClick = { onFilterChange(AppFilterOption.UPDATES_AVAILABLE) },
+            onClick = { onChipClick(AppFilterOption.UPDATES_AVAILABLE) },
             label = { Text(text = stringResource(R.string.filter_updates), style = MaterialTheme.typography.labelSmall) },
             colors = chipColors,
             border = chipBorder,
@@ -790,7 +819,7 @@ private fun FilterChipsRow(
         )
         FilterChip(
             selected = filterOption == AppFilterOption.FAVORITES,
-            onClick = { onFilterChange(AppFilterOption.FAVORITES) },
+            onClick = { onChipClick(AppFilterOption.FAVORITES) },
             label = { Text(text = stringResource(R.string.filter_favorites), style = MaterialTheme.typography.labelSmall) },
             colors = chipColors,
             border = chipBorder,
@@ -800,7 +829,7 @@ private fun FilterChipsRow(
         if (processingCount > 0 || filterOption == AppFilterOption.PROCESSING) {
             FilterChip(
                 selected = filterOption == AppFilterOption.PROCESSING,
-                onClick = { onFilterChange(AppFilterOption.PROCESSING) },
+                onClick = { onChipClick(AppFilterOption.PROCESSING) },
                 label = {
                     Text(
                         text = stringResource(R.string.filter_processing, processingCount),
@@ -838,11 +867,13 @@ private fun SortControl(
                 .tvFocusBorder(shape = RoundedCornerShape(50))
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.Sort,
+                // Material Symbols "list_arrow"; not in material-icons-extended, so it ships
+                // as a local vector drawable
+                painter = painterResource(id = R.drawable.ic_list_arrow),
                 contentDescription = stringResource(R.string.sort_label),
                 modifier = Modifier.size(20.dp),
                 tint = if (isActive) MaterialTheme.colorScheme.primary
-                       else MaterialTheme.colorScheme.onSurface
+                       else LocalContentColor.current
             )
         }
 
