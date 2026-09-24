@@ -55,7 +55,7 @@ fun SuggestionsDialog(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                LazyColumn(modifier = Modifier.heightIn(max = 320.dp)) {
+                LazyColumn(modifier = Modifier.heightIn(max = dialogListMaxHeight())) {
                     items(items = suggestedApps, key = { it.id }) { app ->
                         AppCheckRow(
                             app = app,

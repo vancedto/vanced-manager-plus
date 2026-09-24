@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.kotlin.ksp) apply false
-    id("com.github.ben-manes.versions") version "0.50.0"
+    alias(libs.plugins.ben.manes.versions)
 }
 
 // Configure the versions plugin

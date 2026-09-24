@@ -8,6 +8,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.revanced.net.revancedmanager.R
+import com.revanced.net.revancedmanager.core.common.InFlightAttribution
 import com.revanced.net.revancedmanager.core.common.StringProvider
 import com.revanced.net.revancedmanager.data.local.preferences.PreferencesManager
 import com.revanced.net.revancedmanager.data.manager.AppDownloadManager
@@ -18,6 +19,7 @@ import com.revanced.net.revancedmanager.data.manager.PackageEvent
 import com.revanced.net.revancedmanager.data.manager.RevancedPackageInstaller
 import com.revanced.net.revancedmanager.data.manager.UninstallationResult
 import com.revanced.net.revancedmanager.domain.model.AppStatus
+import com.revanced.net.revancedmanager.domain.model.RevancedApp
 import com.revanced.net.revancedmanager.domain.usecase.AppManagementUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -87,6 +89,22 @@ class AppBloc @Inject constructor(
     internal val installationRetries = mutableMapOf<String, Int>()
 
     /**
+     * packageName -> id of the catalog entry whose button started the operation now in flight.
+     *
+     * There is one operation per package — one download, one APK on disk, one installer session —
+     * but it was started from one entry, and that is the row that should show it. MicroG RE and
+     * ReVanced GmsCore are both `app.revanced.android.gms`; without this, updating RE spun both.
+     *
+     * Written where an operation starts, re-seeded from the download work's own tag so it survives
+     * process death, and cleared in exactly one place: [settleEntries], the single terminal
+     * re-derivation. Not cleared by a settled [updateAppStatus], because the failure paths write
+     * the settled status *before* reading the title and download URL for the dialog they raise.
+     *
+     * Absent means the initiator is unknown — see [InFlightAttribution] for what that falls back to.
+     */
+    internal val inFlightInitiators = mutableMapOf<String, String>()
+
+    /**
      * Install-failure dialogs waiting their turn. There is a single dialogState for the whole
      * app, so during a batch update each new failure dialog used to overwrite the previous one —
      * the user only ever saw (and answered) the last failure, and the rest vanished without a
@@ -103,6 +121,16 @@ class AppBloc @Inject constructor(
     internal var updatePromptShownThisSession = false
     /** Set when the update notification's "Update all" action opened the app. */
     internal var pendingUpdateAllRequest = false
+
+    // ---- Download gate ----
+    /** Downloads held back until the user grants "Install unknown apps"; see requestDownloads. */
+    internal var downloadsAwaitingPermission: List<RevancedApp> = emptyList()
+    /**
+     * Set once the user has been sent to the permission screen, so only the return from *that*
+     * trip resumes the held downloads — not any other trip to the background while the dialog
+     * is still up.
+     */
+    internal var installPermissionScreenOpened = false
 
     // ---- Uninstall / reinstall tracking ----
     internal val pendingReinstalls = mutableMapOf<String, String>()  // packageName -> apkPath (retry flow)
@@ -154,6 +182,7 @@ class AppBloc @Inject constructor(
         Log.i(TAG_BLOC, "APP MOVED TO FOREGROUND — was backgrounded: $wasAppBackgrounded")
         if (wasAppBackgrounded) {
             checkPendingUninstallsOnForeground()
+            resumeDownloadsAwaitingPermission()
         }
         wasAppBackgrounded = false
     }
@@ -237,8 +266,11 @@ class AppBloc @Inject constructor(
     internal fun handlePendingReinstall(packageName: String) {
         val pendingApkPath = pendingReinstalls.remove(packageName)
         if (pendingApkPath != null) {
+            // Still the same operation — the install that asked for this uninstall is next, so the
+            // initiator recorded for it stays.
             installApp(packageName, pendingApkPath)
         } else {
+            inFlightInitiators.remove(packageName)
             updateAppStatus(packageName, AppStatus.NOT_INSTALLED)
             showToast(stringProvider.getString(R.string.uninstallation_completed))
         }
@@ -273,15 +305,17 @@ class AppBloc @Inject constructor(
             is AppEvent.LoadAppsFromCacheFirst -> loadAppsFromCacheFirst()
             is AppEvent.BackgroundRefreshApps -> backgroundRefreshApps()
             is AppEvent.UpdateSingleApp -> updateSingleApp(event.app)
-            is AppEvent.DownloadApp -> downloadApp(event.packageName, event.downloadUrl)
+            is AppEvent.DownloadApp -> requestDownload(event.appId, event.packageName, event.downloadUrl)
+            is AppEvent.StartDownloads -> startDownloads(event.appIds)
+            is AppEvent.InstallPermissionAnswer -> answerInstallPermission(event.openSettings)
             is AppEvent.CancelDownload -> cancelDownload(event.packageName)
             is AppEvent.CancelInstallation -> cancelInstallation(event.packageName)
             is AppEvent.InstallApp -> installApp(event.packageName, event.apkFilePath)
             is AppEvent.RetryInstallation -> retryInstallation(event.packageName, event.apkFilePath, event.shouldUninstallFirst)
             is AppEvent.ConfirmUninstallBeforeReinstall -> confirmUninstallBeforeReinstall(event.packageName, event.apkFilePath)
-            is AppEvent.UninstallApp -> uninstallApp(event.packageName)
-            is AppEvent.ShowReinstallConfirmation -> showReinstallConfirmation(event.packageName)
-            is AppEvent.ReinstallApp -> reinstallApp(event.packageName)
+            is AppEvent.UninstallApp -> uninstallApp(event.packageName, event.confirmed)
+            is AppEvent.ShowReinstallConfirmation -> showReinstallConfirmation(event.appId, event.packageName)
+            is AppEvent.ReinstallApp -> reinstallApp(event.appId, event.packageName)
             is AppEvent.OpenApp -> openApp(event.packageName)
             is AppEvent.UpdateAppProgress -> updateAppProgress(event.packageName, event.progress)
             is AppEvent.UpdateAppStatus -> updateAppStatus(event.packageName, event.status)

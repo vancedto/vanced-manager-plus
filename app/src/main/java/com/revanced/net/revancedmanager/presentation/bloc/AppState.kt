@@ -34,27 +34,47 @@ sealed class AppState {
         val filteredApps: List<RevancedApp>
             get() = sorted(filtered())
 
-        private fun filtered(): List<RevancedApp> {
-                // Source choice first: a hidden community app must not surface through search.
-                val visible = apps.visibleFor(config)
-                val searched = if (searchQuery.isBlank()) visible else visible.filter { app ->
-                    app.title.contains(searchQuery, ignoreCase = true) ||
-                    app.packageName.contains(searchQuery, ignoreCase = true)
+        /**
+         * How many apps each filter chip would show under the current search — the same set
+         * [filteredApps] draws from, so a chip's number is always the length of the list it opens.
+         */
+        val filterCounts: Map<AppFilterOption, Int>
+            get() {
+                val searched = searched()
+                return AppFilterOption.entries.associateWith { option ->
+                    searched.count { matches(it, option) }
                 }
-                return when (filterOption) {
-                    AppFilterOption.ALL -> searched
-                    AppFilterOption.INSTALLED -> searched.filter {
-                        it.status != AppStatus.NOT_INSTALLED && it.status != AppStatus.UNKNOWN
-                    }
-                    AppFilterOption.NOT_INSTALLED -> searched.filter {
-                        it.status == AppStatus.NOT_INSTALLED
-                    }
-                    AppFilterOption.UPDATES_AVAILABLE -> searched.filter {
-                        it.status == AppStatus.UPDATE_AVAILABLE
-                    }
-                    AppFilterOption.FAVORITES -> searched.filter { it.isFavorite }
-                    AppFilterOption.PROCESSING -> searched.filter { it.status in PROCESSING_STATUSES }
-                }
+            }
+
+        /**
+         * What the "Update all" action would download: visible apps with an update, minus the ones
+         * muted in the detail screen — the same rule as `AppBloc.updateAllApps`.
+         */
+        val updatableCount: Int
+            get() = apps.visibleFor(config).count {
+                it.status == AppStatus.UPDATE_AVAILABLE && it.updatePromptEnabled
+            }
+
+        private fun filtered(): List<RevancedApp> =
+            searched().filter { matches(it, filterOption) }
+
+        private fun searched(): List<RevancedApp> {
+            // Source choice first: a hidden community app must not surface through search.
+            val visible = apps.visibleFor(config)
+            return if (searchQuery.isBlank()) visible else visible.filter { app ->
+                app.title.contains(searchQuery, ignoreCase = true) ||
+                app.packageName.contains(searchQuery, ignoreCase = true)
+            }
+        }
+
+        private fun matches(app: RevancedApp, option: AppFilterOption): Boolean = when (option) {
+            AppFilterOption.ALL -> true
+            AppFilterOption.INSTALLED ->
+                app.status != AppStatus.NOT_INSTALLED && app.status != AppStatus.UNKNOWN
+            AppFilterOption.NOT_INSTALLED -> app.status == AppStatus.NOT_INSTALLED
+            AppFilterOption.UPDATES_AVAILABLE -> app.status == AppStatus.UPDATE_AVAILABLE
+            AppFilterOption.FAVORITES -> app.isFavorite
+            AppFilterOption.PROCESSING -> app.status in PROCESSING_STATUSES
         }
 
         /**

@@ -197,4 +197,25 @@
     <string name="search_close">Cerrar búsqueda</string>
     <string name="clear_search">Borrar búsqueda</string>
     <string name="scroll_to_top">Volver arriba</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">Descargando… %1$d%%</string>
+    <string name="download_notification_channel_name">Descargas de apps</string>
+    <string name="download_notification_channel_description">Progreso de descarga</string>
+    <string name="visit_website">Visitar vanced.to</string>
+    <string name="source_code">Código fuente</string>
+    <string name="open_url_failed">No se pudo abrir el enlace</string>
+    <string name="refresh">Actualizar</string>
+    <string name="updates_banner">%1$d actualización(es) disponible(s)</string>
+    <string name="install_permission_title">Permitir instalar apps</string>
+    <string name="install_permission_message">Android necesita tu permiso para que esta app pueda instalar o actualizar otras apps. En la siguiente pantalla, activa «Permitir de esta fuente» y vuelve: la descarga empezará sola.</string>
+    <string name="install_permission_open">Abrir ajustes</string>
+    <string name="install_permission_denied">Instalar apps sigue sin estar permitido, así que no se descargó nada.</string>
+    <string name="microg_required_title">Se necesita MicroG</string>
+    <string name="microg_required_message">%1$s necesita MicroG para iniciar sesión con tu cuenta de Google, y MicroG aún no está instalado. ¿Instalar también %2$s?</string>
+    <string name="microg_install_both">Instalar ambos</string>
+    <string name="microg_skip">Omitir MicroG</string>
+    <string name="install_microg">Instalar MicroG</string>
+    <string name="microg_uninstall_title">¿Desinstalar MicroG?</string>
+    <string name="microg_uninstall_message">Estas apps inician sesión en Google a través de MicroG y no podrán hacerlo sin él: %1$s</string>
+    <string name="microg_uninstall_confirm">Desinstalar de todos modos</string>
 </resources>

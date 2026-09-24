@@ -119,6 +119,20 @@ fun AppActionButtons(
                     compact = compact,
                     modifier = Modifier.weight(1f)
                 )
+                // An app with a pending update is still an installed app. Without this the only
+                // way to remove one was to update it first — or leave the manager for the system
+                // settings. The card keeps its two buttons; the detail screen has the room.
+                // (No Re-install here: re-installing downloads the latest build, which is Update.)
+                if (!compact) {
+                    ActionButton(
+                        text = stringResource(R.string.uninstall),
+                        icon = Icons.Default.Delete,
+                        onClick = onUninstallClick,
+                        color = MaterialTheme.colorScheme.uninstallColor,
+                        compact = compact,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
             AppStatus.UP_TO_DATE -> {
                 ActionButton(
@@ -189,8 +203,10 @@ fun AppActionButtons(
                 // An install that hangs — a swallowed confirmation notification, a ROM that
                 // silently drops the session — used to freeze the whole sequential queue with no
                 // way out. After a grace period the button turns into a cancel.
-                var cancellable by remember(app.packageName) { mutableStateOf(false) }
-                LaunchedEffect(app.packageName) {
+                // Keyed by entry, not package: two entries can share one, and only one of them is
+                // the install this timer is about.
+                var cancellable by remember(app.id) { mutableStateOf(false) }
+                LaunchedEffect(app.id) {
                     delay(STUCK_INSTALL_GRACE_MS)
                     cancellable = true
                 }

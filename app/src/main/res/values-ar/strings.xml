@@ -197,4 +197,25 @@
     <string name="search_close">إغلاق البحث</string>
     <string name="clear_search">مسح البحث</string>
     <string name="scroll_to_top">العودة إلى الأعلى</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">جارٍ التنزيل… %1$d%%</string>
+    <string name="download_notification_channel_name">تنزيلات التطبيقات</string>
+    <string name="download_notification_channel_description">تقدم التنزيل</string>
+    <string name="visit_website">زيارة vanced.to</string>
+    <string name="source_code">الشيفرة المصدرية</string>
+    <string name="open_url_failed">تعذّر فتح الرابط</string>
+    <string name="refresh">تحديث</string>
+    <string name="updates_banner">تتوفر %1$d تحديثات</string>
+    <string name="install_permission_title">السماح بتثبيت التطبيقات</string>
+    <string name="install_permission_message">يحتاج Android إلى إذنك قبل أن يتمكن هذا التطبيق من تثبيت تطبيقات أخرى أو تحديثها. في الشاشة التالية، فعّل «السماح من هذا المصدر» ثم عُد — سيبدأ التنزيل تلقائيًا.</string>
+    <string name="install_permission_open">فتح الإعدادات</string>
+    <string name="install_permission_denied">لا يزال تثبيت التطبيقات غير مسموح به، لذلك لم يتم تنزيل أي شيء.</string>
+    <string name="microg_required_title">MicroG مطلوب</string>
+    <string name="microg_required_message">يحتاج %1$s إلى MicroG لتسجيل الدخول إلى حساب Google، وMicroG غير مثبت بعد. هل تريد تثبيت %2$s أيضًا؟</string>
+    <string name="microg_install_both">تثبيت الاثنين</string>
+    <string name="microg_skip">تخطي MicroG</string>
+    <string name="install_microg">تثبيت MicroG</string>
+    <string name="microg_uninstall_title">إلغاء تثبيت MicroG؟</string>
+    <string name="microg_uninstall_message">تسجّل هذه التطبيقات الدخول إلى Google عبر MicroG ولن تتمكن من ذلك بدونه: %1$s</string>
+    <string name="microg_uninstall_confirm">إلغاء التثبيت على أي حال</string>
 </resources>

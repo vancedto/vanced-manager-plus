@@ -197,4 +197,25 @@
     <string name="search_close">Închide căutarea</string>
     <string name="clear_search">Șterge căutarea</string>
     <string name="scroll_to_top">Înapoi sus</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">Se descarcă… %1$d%%</string>
+    <string name="download_notification_channel_name">Descărcări aplicații</string>
+    <string name="download_notification_channel_description">Progresul descărcării</string>
+    <string name="visit_website">Vizitează vanced.to</string>
+    <string name="source_code">Cod sursă</string>
+    <string name="open_url_failed">Linkul nu a putut fi deschis</string>
+    <string name="refresh">Reîmprospătează</string>
+    <string name="updates_banner">%1$d actualizări disponibile</string>
+    <string name="install_permission_title">Permite instalarea aplicațiilor</string>
+    <string name="install_permission_message">Android are nevoie de permisiunea ta înainte ca această aplicație să poată instala sau actualiza alte aplicații. Pe ecranul următor, activează „Permite din această sursă”, apoi revino — descărcarea va porni singură.</string>
+    <string name="install_permission_open">Deschide setările</string>
+    <string name="install_permission_denied">Instalarea aplicațiilor încă nu este permisă, așa că nu s-a descărcat nimic.</string>
+    <string name="microg_required_title">MicroG necesar</string>
+    <string name="microg_required_message">%1$s are nevoie de MicroG pentru a te conecta la contul Google, iar MicroG nu este încă instalat. Instalezi și %2$s?</string>
+    <string name="microg_install_both">Instalează ambele</string>
+    <string name="microg_skip">Omite MicroG</string>
+    <string name="install_microg">Instalează MicroG</string>
+    <string name="microg_uninstall_title">Dezinstalezi MicroG?</string>
+    <string name="microg_uninstall_message">Aceste aplicații se conectează la Google prin MicroG și nu se vor mai putea conecta fără el: %1$s</string>
+    <string name="microg_uninstall_confirm">Dezinstalează oricum</string>
 </resources>

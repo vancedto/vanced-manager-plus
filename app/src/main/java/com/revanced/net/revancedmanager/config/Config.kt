@@ -32,7 +32,7 @@ object Config {
     val SUGGESTED_PACKAGES = listOf(
         "app.morphe.android.youtube",             // YouTube Morphe
         "app.morphe.android.apps.youtube.music",  // YouTube Music Morphe
-        "app.revanced.android.gms",                 // MicroG (required by the two above)
+        MICROG_PACKAGE,                             // MicroG (required by the two above)
         "app.morphe.android.apps.photos"            // Google Photos Morphe
     )
 
@@ -47,4 +47,17 @@ object Config {
      * always shown — MicroG in particular is required by the Morphe YouTube builds.
      */
     val MAINSTREAM_PROVIDERS = setOf("morphe", "revanced")
+
+    /**
+     * The package every MicroG build installs as. Apps flagged `requireMicroG` need *a* build of it
+     * — any of the catalog's MicroG entries satisfies that — so "is MicroG installed" is a question
+     * about this package, not about one entry.
+     */
+    const val MICROG_PACKAGE = "app.revanced.android.gms"
+
+    /**
+     * The MicroG entry installed alongside an app that needs it, when none is on the device.
+     * Falls back to the first MicroG entry in catalog order if this one is ever missing.
+     */
+    const val MICROG_PREFERRED_SLUG = "microg-re"
 }

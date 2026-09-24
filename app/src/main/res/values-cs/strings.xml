@@ -197,4 +197,25 @@
     <string name="search_close">Zavřít hledání</string>
     <string name="clear_search">Vymazat hledání</string>
     <string name="scroll_to_top">Zpět nahoru</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">Stahování… %1$d %%</string>
+    <string name="download_notification_channel_name">Stahování aplikací</string>
+    <string name="download_notification_channel_description">Průběh stahování</string>
+    <string name="visit_website">Navštívit vanced.to</string>
+    <string name="source_code">Zdrojový kód</string>
+    <string name="open_url_failed">Odkaz se nepodařilo otevřít</string>
+    <string name="refresh">Obnovit</string>
+    <string name="updates_banner">Dostupné aktualizace: %1$d</string>
+    <string name="install_permission_title">Povolit instalaci aplikací</string>
+    <string name="install_permission_message">Android potřebuje vaše svolení, než tato aplikace bude moci instalovat nebo aktualizovat jiné aplikace. Na další obrazovce zapněte „Povolit z tohoto zdroje“ a vraťte se — stahování se spustí samo.</string>
+    <string name="install_permission_open">Otevřít nastavení</string>
+    <string name="install_permission_denied">Instalace aplikací stále není povolena, proto se nic nestáhlo.</string>
+    <string name="microg_required_title">Je potřeba MicroG</string>
+    <string name="microg_required_message">%1$s potřebuje MicroG k přihlášení k účtu Google a MicroG zatím není nainstalováno. Nainstalovat také %2$s?</string>
+    <string name="microg_install_both">Nainstalovat obojí</string>
+    <string name="microg_skip">Přeskočit MicroG</string>
+    <string name="install_microg">Nainstalovat MicroG</string>
+    <string name="microg_uninstall_title">Odinstalovat MicroG?</string>
+    <string name="microg_uninstall_message">Tyto aplikace se přihlašují ke Googlu přes MicroG a bez něj se nepřihlásí: %1$s</string>
+    <string name="microg_uninstall_confirm">Přesto odinstalovat</string>
 </resources>

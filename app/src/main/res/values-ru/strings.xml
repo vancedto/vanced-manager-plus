@@ -197,4 +197,25 @@
     <string name="search_close">Закрыть поиск</string>
     <string name="clear_search">Очистить поиск</string>
     <string name="scroll_to_top">Наверх</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">Загрузка… %1$d%%</string>
+    <string name="download_notification_channel_name">Загрузки приложений</string>
+    <string name="download_notification_channel_description">Ход загрузки</string>
+    <string name="visit_website">Перейти на vanced.to</string>
+    <string name="source_code">Исходный код</string>
+    <string name="open_url_failed">Не удалось открыть ссылку</string>
+    <string name="refresh">Обновить</string>
+    <string name="updates_banner">Доступно обновлений: %1$d</string>
+    <string name="install_permission_title">Разрешите установку приложений</string>
+    <string name="install_permission_message">Android нужно ваше разрешение, чтобы это приложение могло устанавливать и обновлять другие приложения. На следующем экране включите «Разрешить установку из этого источника» и вернитесь — загрузка начнётся сама.</string>
+    <string name="install_permission_open">Открыть настройки</string>
+    <string name="install_permission_denied">Установка приложений по-прежнему не разрешена, поэтому ничего не было загружено.</string>
+    <string name="microg_required_title">Нужен MicroG</string>
+    <string name="microg_required_message">Приложению %1$s нужен MicroG для входа в аккаунт Google, а MicroG ещё не установлен. Установить также %2$s?</string>
+    <string name="microg_install_both">Установить оба</string>
+    <string name="microg_skip">Пропустить MicroG</string>
+    <string name="install_microg">Установить MicroG</string>
+    <string name="microg_uninstall_title">Удалить MicroG?</string>
+    <string name="microg_uninstall_message">Эти приложения входят в Google через MicroG и без него не смогут войти: %1$s</string>
+    <string name="microg_uninstall_confirm">Всё равно удалить</string>
 </resources>

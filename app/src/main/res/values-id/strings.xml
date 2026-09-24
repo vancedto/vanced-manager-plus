@@ -197,4 +197,25 @@
     <string name="search_close">Tutup pencarian</string>
     <string name="clear_search">Hapus pencarian</string>
     <string name="scroll_to_top">Kembali ke atas</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">Mengunduh… %1$d%%</string>
+    <string name="download_notification_channel_name">Unduhan aplikasi</string>
+    <string name="download_notification_channel_description">Progres unduhan</string>
+    <string name="visit_website">Kunjungi vanced.to</string>
+    <string name="source_code">Kode sumber</string>
+    <string name="open_url_failed">Tidak dapat membuka tautan</string>
+    <string name="refresh">Muat ulang</string>
+    <string name="updates_banner">%1$d pembaruan tersedia</string>
+    <string name="install_permission_title">Izinkan pemasangan aplikasi</string>
+    <string name="install_permission_message">Android memerlukan izin Anda sebelum aplikasi ini dapat memasang atau memperbarui aplikasi lain. Di layar berikutnya, aktifkan “Izinkan dari sumber ini”, lalu kembali — unduhan akan dimulai sendiri.</string>
+    <string name="install_permission_open">Buka setelan</string>
+    <string name="install_permission_denied">Pemasangan aplikasi masih belum diizinkan, jadi tidak ada yang diunduh.</string>
+    <string name="microg_required_title">MicroG diperlukan</string>
+    <string name="microg_required_message">%1$s memerlukan MicroG untuk masuk ke akun Google Anda, dan MicroG belum terpasang. Pasang %2$s juga?</string>
+    <string name="microg_install_both">Pasang keduanya</string>
+    <string name="microg_skip">Lewati MicroG</string>
+    <string name="install_microg">Pasang MicroG</string>
+    <string name="microg_uninstall_title">Copot MicroG?</string>
+    <string name="microg_uninstall_message">Aplikasi ini masuk ke Google melalui MicroG dan tidak akan bisa masuk tanpanya: %1$s</string>
+    <string name="microg_uninstall_confirm">Tetap copot</string>
 </resources>

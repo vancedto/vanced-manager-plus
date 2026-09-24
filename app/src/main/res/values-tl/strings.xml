@@ -197,4 +197,25 @@
     <string name="search_close">Isara ang paghahanap</string>
     <string name="clear_search">I-clear ang paghahanap</string>
     <string name="scroll_to_top">Bumalik sa itaas</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">Nagda-download… %1$d%%</string>
+    <string name="download_notification_channel_name">Mga download ng app</string>
+    <string name="download_notification_channel_description">Progreso ng download</string>
+    <string name="visit_website">Bisitahin ang vanced.to</string>
+    <string name="source_code">Source code</string>
+    <string name="open_url_failed">Hindi mabuksan ang link</string>
+    <string name="refresh">I-refresh</string>
+    <string name="updates_banner">%1$d update ang available</string>
+    <string name="install_permission_title">Payagan ang pag-install ng app</string>
+    <string name="install_permission_message">Kailangan ng Android ang iyong pahintulot bago makapag-install o makapag-update ang app na ito ng ibang app. Sa susunod na screen, i-on ang “Payagan mula sa source na ito”, saka bumalik — kusang magsisimula ang download.</string>
+    <string name="install_permission_open">Buksan ang settings</string>
+    <string name="install_permission_denied">Hindi pa rin pinapayagan ang pag-install ng app, kaya walang na-download.</string>
+    <string name="microg_required_title">Kailangan ang MicroG</string>
+    <string name="microg_required_message">Kailangan ng %1$s ang MicroG para mag-sign in sa iyong Google account, at hindi pa naka-install ang MicroG. I-install din ang %2$s?</string>
+    <string name="microg_install_both">I-install pareho</string>
+    <string name="microg_skip">Laktawan ang MicroG</string>
+    <string name="install_microg">I-install ang MicroG</string>
+    <string name="microg_uninstall_title">I-uninstall ang MicroG?</string>
+    <string name="microg_uninstall_message">Nagsa-sign in sa Google ang mga app na ito sa pamamagitan ng MicroG at hindi na makakapag-sign in kung wala ito: %1$s</string>
+    <string name="microg_uninstall_confirm">I-uninstall pa rin</string>
 </resources>

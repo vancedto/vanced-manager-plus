@@ -197,4 +197,25 @@
     <string name="search_close">Chiudi ricerca</string>
     <string name="clear_search">Cancella ricerca</string>
     <string name="scroll_to_top">Torna in alto</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">Download in corso… %1$d%%</string>
+    <string name="download_notification_channel_name">Download app</string>
+    <string name="download_notification_channel_description">Avanzamento download</string>
+    <string name="visit_website">Visita vanced.to</string>
+    <string name="source_code">Codice sorgente</string>
+    <string name="open_url_failed">Impossibile aprire il link</string>
+    <string name="refresh">Aggiorna</string>
+    <string name="updates_banner">%1$d aggiornamento/i disponibile/i</string>
+    <string name="install_permission_title">Consenti installazione app</string>
+    <string name="install_permission_message">Android ha bisogno del tuo permesso perché questa app possa installare o aggiornare altre app. Nella schermata successiva attiva «Consenti da questa fonte», poi torna indietro: il download partirà da solo.</string>
+    <string name="install_permission_open">Apri impostazioni</string>
+    <string name="install_permission_denied">L\'installazione di app non è ancora consentita, quindi non è stato scaricato nulla.</string>
+    <string name="microg_required_title">MicroG necessario</string>
+    <string name="microg_required_message">%1$s ha bisogno di MicroG per accedere al tuo account Google e MicroG non è ancora installato. Installare anche %2$s?</string>
+    <string name="microg_install_both">Installa entrambi</string>
+    <string name="microg_skip">Salta MicroG</string>
+    <string name="install_microg">Installa MicroG</string>
+    <string name="microg_uninstall_title">Disinstallare MicroG?</string>
+    <string name="microg_uninstall_message">Queste app accedono a Google tramite MicroG e senza di esso non potranno più farlo: %1$s</string>
+    <string name="microg_uninstall_confirm">Disinstalla comunque</string>
 </resources>

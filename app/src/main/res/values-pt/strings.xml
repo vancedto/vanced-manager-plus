@@ -197,4 +197,25 @@
     <string name="search_close">Fechar pesquisa</string>
     <string name="clear_search">Limpar pesquisa</string>
     <string name="scroll_to_top">Voltar ao topo</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">Baixando… %1$d%%</string>
+    <string name="download_notification_channel_name">Downloads de apps</string>
+    <string name="download_notification_channel_description">Progresso do download</string>
+    <string name="visit_website">Visitar vanced.to</string>
+    <string name="source_code">Código-fonte</string>
+    <string name="open_url_failed">Não foi possível abrir o link</string>
+    <string name="refresh">Atualizar</string>
+    <string name="updates_banner">%1$d atualização(ões) disponível(is)</string>
+    <string name="install_permission_title">Permitir instalação de apps</string>
+    <string name="install_permission_message">O Android precisa da sua permissão para que este app possa instalar ou atualizar outros apps. Na próxima tela, ative “Permitir desta fonte” e volte — o download começará sozinho.</string>
+    <string name="install_permission_open">Abrir configurações</string>
+    <string name="install_permission_denied">A instalação de apps ainda não foi permitida, então nada foi baixado.</string>
+    <string name="microg_required_title">MicroG necessário</string>
+    <string name="microg_required_message">%1$s precisa do MicroG para entrar na sua conta Google, e o MicroG ainda não está instalado. Instalar %2$s também?</string>
+    <string name="microg_install_both">Instalar ambos</string>
+    <string name="microg_skip">Pular MicroG</string>
+    <string name="install_microg">Instalar MicroG</string>
+    <string name="microg_uninstall_title">Desinstalar o MicroG?</string>
+    <string name="microg_uninstall_message">Estes apps entram no Google pelo MicroG e não conseguirão entrar sem ele: %1$s</string>
+    <string name="microg_uninstall_confirm">Desinstalar mesmo assim</string>
 </resources>

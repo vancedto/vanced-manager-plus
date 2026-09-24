@@ -4,6 +4,9 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import com.revanced.net.revancedmanager.R
+import com.revanced.net.revancedmanager.config.Config
+import com.revanced.net.revancedmanager.core.common.InFlightAttribution
+import com.revanced.net.revancedmanager.core.common.MicroGRequirement
 import com.revanced.net.revancedmanager.data.manager.DownloadState
 import com.revanced.net.revancedmanager.data.manager.short
 import com.revanced.net.revancedmanager.domain.model.AppStatus
@@ -35,8 +38,8 @@ private fun AppBloc.handleDownloadUpdate(download: DownloadState) {
         WorkInfo.State.ENQUEUED,
         WorkInfo.State.BLOCKED,
         WorkInfo.State.RUNNING -> {
-            val currentStatus = (_state.value as? AppState.Success)
-                ?.apps?.find { it.packageName == download.packageName }?.status
+            download.appId?.let { inFlightInitiators[download.packageName] = it }
+            val currentStatus = inFlightEntry(download.packageName)?.status
             if (currentStatus != null && currentStatus != AppStatus.DOWNLOADING) {
                 updateAppStatus(download.packageName, AppStatus.DOWNLOADING)
             }
@@ -47,6 +50,9 @@ private fun AppBloc.handleDownloadUpdate(download: DownloadState) {
         // pruning the record, raising a toast — happen once, for whoever claims the work id.
         // Reconciling this instance's own card does not: see releaseDownloadingCard.
         WorkInfo.State.SUCCEEDED -> if (downloadManager.claimTerminal(download.id)) {
+            // Seed here as well as on RUNNING: a download that finished while the process was dead
+            // is replayed straight to SUCCEEDED, and the install it queues needs to know whose it is.
+            download.appId?.let { inFlightInitiators[download.packageName] = it }
             val filePath = download.filePath
             val file = filePath?.let { File(it) }
             if (file != null && file.exists()) {
@@ -55,7 +61,7 @@ private fun AppBloc.handleDownloadUpdate(download: DownloadState) {
                 handleDownloadFileMissing(download.packageName, filePath, download.id.short())
             }
         } else {
-            releaseDownloadingCard(download.packageName)
+            releaseDownloadingCard(download.packageName, download.appId)
         }
 
         WorkInfo.State.FAILED -> if (downloadManager.claimTerminal(download.id)) {
@@ -66,7 +72,7 @@ private fun AppBloc.handleDownloadUpdate(download: DownloadState) {
             )
             handleDownloadFailed(download.packageName, buildDownloadErrorMessage(download.error))
         } else {
-            releaseDownloadingCard(download.packageName)
+            releaseDownloadingCard(download.packageName, download.appId)
         }
 
         WorkInfo.State.CANCELLED -> {
@@ -80,7 +86,7 @@ private fun AppBloc.handleDownloadUpdate(download: DownloadState) {
                         "(feedback handled at the cancel site)"
                 )
             }
-            releaseDownloadingCard(download.packageName)
+            releaseDownloadingCard(download.packageName, download.appId)
         }
     }
 }
@@ -97,10 +103,13 @@ private fun AppBloc.handleDownloadUpdate(download: DownloadState) {
  * then this instance may have legitimately moved on to READY_TO_INSTALL or INSTALLING — statuses
  * an install is still driving, which must not be reset out from under it.
  */
-private fun AppBloc.releaseDownloadingCard(packageName: String) {
+private fun AppBloc.releaseDownloadingCard(packageName: String, appId: String?) {
     if (packageName in pendingInstalls) return
-    val currentStatus = (_state.value as? AppState.Success)
-        ?.apps?.find { it.packageName == packageName }?.status
+    // A CANCELLED emission for work that REPLACE superseded arrives after the replacement has
+    // already claimed the package. Releasing then would take the card of the download that is
+    // genuinely running.
+    if (appId != null && inFlightInitiators[packageName]?.let { it != appId } == true) return
+    val currentStatus = inFlightEntry(packageName)?.status
     if (currentStatus != AppStatus.DOWNLOADING) return
 
     Log.i(
@@ -112,8 +121,146 @@ private fun AppBloc.releaseDownloadingCard(packageName: String) {
     updateAppProgress(packageName, 0f)
 }
 
-internal fun AppBloc.downloadApp(packageName: String, downloadUrl: String) {
-    Log.i(TAG_BLOC, "[$blocId] Starting download: $packageName")
+// ============= DOWNLOAD GATE =============
+//
+// Two things used to go wrong only after the download had finished, when the user had long
+// stopped watching: the install bounced off the "Install unknown apps" permission halfway through
+// a batch, and an app that needs MicroG installed fine and then failed at the Google sign-in.
+// Both are asked about here, before anything is fetched — once per batch, not once per app.
+
+/** A download the user asked for by pressing a button: goes through the gate. */
+internal fun AppBloc.requestDownload(appId: String, packageName: String, downloadUrl: String) {
+    // "Download again" in an install-failure dialog arrives here, and nothing else closed that
+    // dialog — it stayed up over the download it had just started. From a card or the detail
+    // screen there is no dialog open (it would be modal), so this is a no-op there.
+    dismissDialog()
+    val app = (_state.value as? AppState.Success)?.apps?.find { it.id == appId }
+    if (app == null) {
+        // Entry gone from the list (a refresh dropped it): nothing to ask about, just fetch it.
+        downloadApp(appId, packageName, downloadUrl)
+        return
+    }
+    requestDownloads(listOf(app))
+}
+
+/**
+ * Start downloads for [apps] once nothing stands in their way.
+ *
+ * [permissionChecked] and [microGAnswered] say which questions are already behind this batch, so
+ * a batch resumed after one question is not asked it again.
+ */
+internal fun AppBloc.requestDownloads(
+    apps: List<RevancedApp>,
+    permissionChecked: Boolean = false,
+    microGAnswered: Boolean = false
+) {
+    if (apps.isEmpty()) return
+
+    if (!permissionChecked && !appManager.canInstallPackages()) {
+        Log.i(TAG_BLOC, "[$blocId] Install permission missing — holding ${apps.size} download(s)")
+        downloadsAwaitingPermission = (downloadsAwaitingPermission + apps).distinctBy { it.id }
+        showConfirmationDialog(
+            title = stringProvider.getString(R.string.install_permission_title),
+            message = stringProvider.getString(R.string.install_permission_message),
+            onConfirm = AppEvent.InstallPermissionAnswer(openSettings = true),
+            onCancel = AppEvent.InstallPermissionAnswer(openSettings = false),
+            confirmLabel = stringProvider.getString(R.string.install_permission_open)
+        )
+        return
+    }
+
+    if (!microGAnswered) {
+        val catalog = (_state.value as? AppState.Success)?.apps.orEmpty()
+        val microG = MicroGRequirement.preferredEntry(catalog)
+        val microGPresent = appManager.isAppInstalled(Config.MICROG_PACKAGE) ||
+            catalog.any {
+                it.packageName == Config.MICROG_PACKAGE && it.status in InFlightAttribution.IN_FLIGHT_STATUSES
+            }
+        if (microG != null && MicroGRequirement.shouldOffer(apps, microGPresent)) {
+            val needing = apps.first { it.requiresMicroG }
+            val ids = apps.map { it.id }
+            Log.i(TAG_BLOC, "[$blocId] ${needing.packageName} needs MicroG, none installed — offering ${microG.id}")
+            showConfirmationDialog(
+                title = stringProvider.getString(R.string.microg_required_title),
+                message = stringProvider.getString(R.string.microg_required_message, needing.title, microG.title),
+                // MicroG first, so its download starts ahead of the app that needs it
+                onConfirm = AppEvent.StartDownloads(listOf(microG.id) + ids),
+                // Declining — or tapping outside — still fetches what the user actually asked for
+                onCancel = AppEvent.StartDownloads(ids),
+                confirmLabel = stringProvider.getString(R.string.microg_install_both),
+                cancelLabel = stringProvider.getString(R.string.microg_skip)
+            )
+            return
+        }
+    }
+
+    apps.forEach { downloadApp(it.id, it.packageName, it.downloadUrl) }
+}
+
+/** The MicroG dialog's answer: the batch to fetch, with MicroG leading it if it was accepted. */
+internal fun AppBloc.startDownloads(appIds: List<String>) {
+    dismissDialog()
+    val catalog = (_state.value as? AppState.Success)?.apps.orEmpty()
+    val apps = appIds.mapNotNull { id -> catalog.find { it.id == id } }
+    requestDownloads(apps, permissionChecked = true, microGAnswered = true)
+}
+
+internal fun AppBloc.answerInstallPermission(openSettings: Boolean) {
+    dismissDialog()
+    if (!openSettings) {
+        Log.i(TAG_BLOC, "[$blocId] Install permission declined — dropping held downloads")
+        downloadsAwaitingPermission = emptyList()
+        return
+    }
+    if (appManager.openInstallPermissionSettings()) {
+        // Picked up in resumeDownloadsAwaitingPermission when the user comes back
+        installPermissionScreenOpened = true
+    } else {
+        // No settings screen on this device: let the install ask for the permission itself
+        val held = downloadsAwaitingPermission
+        downloadsAwaitingPermission = emptyList()
+        requestDownloads(held, permissionChecked = true)
+    }
+}
+
+/** Back from the permission screen: fetch what was held if the permission was granted. */
+internal fun AppBloc.resumeDownloadsAwaitingPermission() {
+    if (!installPermissionScreenOpened) return
+    installPermissionScreenOpened = false
+    val held = downloadsAwaitingPermission
+    downloadsAwaitingPermission = emptyList()
+    if (held.isEmpty()) return
+
+    if (appManager.canInstallPackages()) {
+        Log.i(TAG_BLOC, "[$blocId] Install permission granted — resuming ${held.size} download(s)")
+        requestDownloads(held, permissionChecked = true)
+    } else {
+        Log.i(TAG_BLOC, "[$blocId] Returned without the install permission — ${held.size} download(s) dropped")
+        showToast(stringProvider.getString(R.string.install_permission_denied))
+    }
+}
+
+/**
+ * Start (or restart) the download of [packageName], on behalf of catalog entry [appId].
+ *
+ * [appId] is what puts the spinner on the row the user pressed and nowhere else. The download
+ * itself stays per package — one unique work name, one APK path — because the device has one
+ * install slot for it.
+ */
+internal fun AppBloc.downloadApp(appId: String, packageName: String, downloadUrl: String) {
+    Log.i(TAG_BLOC, "[$blocId] Starting download: $packageName (entry $appId)")
+
+    // A different entry of this package may be mid-download; the REPLACE below is about to cancel
+    // its work, so hand its card back to whatever is really installed before claiming the package.
+    val previous = inFlightInitiators[packageName]
+    if (previous != null && previous != appId) {
+        Log.i(TAG_BLOC, "[$blocId] Entry $appId supersedes $previous for $packageName")
+        val currentState = _state.value
+        if (currentState is AppState.Success) {
+            _state.value = currentState.copy(apps = settleEntries(currentState.apps, packageName))
+        }
+    }
+    inFlightInitiators[packageName] = appId
 
     // Drop any install still queued for a stale APK of this package
     pendingInstalls.remove(packageName)
@@ -127,8 +274,8 @@ internal fun AppBloc.downloadApp(packageName: String, downloadUrl: String) {
     showToast(stringProvider.getString(R.string.download_starting))
 
     val appName = (_state.value as? AppState.Success)
-        ?.apps?.find { it.packageName == packageName }?.title ?: packageName
-    downloadManager.download(packageName, downloadUrl, appName)
+        ?.apps?.find { it.id == appId }?.title ?: packageName
+    downloadManager.download(appId, packageName, downloadUrl, appName)
 }
 
 /**
@@ -160,7 +307,7 @@ private fun AppBloc.updateApps(appsToUpdate: List<RevancedApp>) {
 
     Log.i(TAG_BLOC, "Updating ${appsToUpdate.size} app(s)")
     showToast(stringProvider.getString(R.string.update_all_started, appsToUpdate.size))
-    appsToUpdate.forEach { downloadApp(it.packageName, it.downloadUrl) }
+    requestDownloads(appsToUpdate)
 }
 
 internal fun AppBloc.handleDownloadCompleted(
@@ -168,7 +315,7 @@ internal fun AppBloc.handleDownloadCompleted(
     filePath: String,
     workId: String = "?"
 ) {
-    val app = (_state.value as? AppState.Success)?.apps?.find { it.packageName == packageName }
+    val app = inFlightEntry(packageName)
     val wasRequestedByUser = downloadManager.consumeUserRequested(packageName)
     val alreadyInstalled = appManager.isApkAlreadyInstalled(filePath)
     val apkSize = runCatching { File(filePath).length() }.getOrDefault(-1L)

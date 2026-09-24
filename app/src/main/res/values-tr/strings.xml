@@ -197,4 +197,25 @@
     <string name="search_close">Aramayı kapat</string>
     <string name="clear_search">Aramayı temizle</string>
     <string name="scroll_to_top">Başa dön</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">İndiriliyor… %%%1$d</string>
+    <string name="download_notification_channel_name">Uygulama indirmeleri</string>
+    <string name="download_notification_channel_description">İndirme ilerlemesi</string>
+    <string name="visit_website">vanced.to\'yu ziyaret et</string>
+    <string name="source_code">Kaynak kodu</string>
+    <string name="open_url_failed">Bağlantı açılamadı</string>
+    <string name="refresh">Yenile</string>
+    <string name="updates_banner">%1$d güncelleme mevcut</string>
+    <string name="install_permission_title">Uygulama yüklemeye izin ver</string>
+    <string name="install_permission_message">Bu uygulamanın başka uygulamaları yükleyebilmesi veya güncelleyebilmesi için Android\'in izninize ihtiyacı var. Sonraki ekranda “Bu kaynaktan izin ver” seçeneğini açın ve geri dönün — indirme kendiliğinden başlayacak.</string>
+    <string name="install_permission_open">Ayarları aç</string>
+    <string name="install_permission_denied">Uygulama yüklemeye hâlâ izin verilmiyor, bu yüzden hiçbir şey indirilmedi.</string>
+    <string name="microg_required_title">MicroG gerekli</string>
+    <string name="microg_required_message">%1$s, Google hesabınızla oturum açmak için MicroG\'ye ihtiyaç duyuyor ve MicroG henüz yüklü değil. %2$s de yüklensin mi?</string>
+    <string name="microg_install_both">İkisini de yükle</string>
+    <string name="microg_skip">MicroG\'yi atla</string>
+    <string name="install_microg">MicroG\'yi yükle</string>
+    <string name="microg_uninstall_title">MicroG kaldırılsın mı?</string>
+    <string name="microg_uninstall_message">Bu uygulamalar Google\'a MicroG üzerinden giriş yapıyor ve o olmadan giriş yapamayacak: %1$s</string>
+    <string name="microg_uninstall_confirm">Yine de kaldır</string>
 </resources>

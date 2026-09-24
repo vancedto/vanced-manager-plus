@@ -34,6 +34,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowCircleUp
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Coffee
@@ -92,7 +93,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.presentation.bloc.AppBloc
 import com.revanced.net.revancedmanager.presentation.bloc.AppEvent
@@ -110,6 +111,7 @@ import com.revanced.net.revancedmanager.presentation.ui.components.AppSourceDial
 import com.revanced.net.revancedmanager.presentation.ui.components.SuggestionsDialog
 import com.revanced.net.revancedmanager.presentation.ui.components.tvFocusBorder
 import com.revanced.net.revancedmanager.presentation.ui.theme.noiseBackground
+import com.revanced.net.revancedmanager.presentation.ui.theme.updateColor
 
 /**
  * Main screen of the ReVanced Manager app
@@ -343,7 +345,7 @@ fun MainScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Refresh,
-                                    contentDescription = stringResource(R.string.retry),
+                                    contentDescription = stringResource(R.string.refresh),
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -374,10 +376,18 @@ fun MainScreen(
                     exit = shrinkVertically() + fadeOut()
                 ) {
                     if (successState != null) {
+                        val filterCounts = remember(
+                            successState.apps,
+                            successState.searchQuery,
+                            successState.config.showCommunityApps
+                        ) {
+                            successState.filterCounts
+                        }
                         FilterChipsRow(
                             filterOption = successState.filterOption,
                             onFilterChange = { viewModel.handleEvent(AppEvent.SetFilter(it)) },
                             processingCount = successState.processingCount,
+                            counts = filterCounts,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp, vertical = 4.dp)
@@ -427,11 +437,15 @@ fun MainScreen(
                 ) {
                     currentState.filteredApps
                 }
+                val updatableCount = remember(currentState.apps, currentState.config.showCommunityApps) {
+                    currentState.updatableCount
+                }
 
                 AppListScreen(
                     apps = filtered,
                     searchQuery = currentState.searchQuery,
                     filterOption = currentState.filterOption,
+                    updatableCount = updatableCount,
                     onEvent = viewModel::handleEvent,
                     onOpenDetail = onOpenDetail,
                     isCompactMode = currentState.config.compactMode,
@@ -546,6 +560,7 @@ private fun AppListScreen(
     apps: List<com.revanced.net.revancedmanager.domain.model.RevancedApp>,
     searchQuery: String = "",
     filterOption: AppFilterOption = AppFilterOption.ALL,
+    updatableCount: Int = 0,
     onEvent: (AppEvent) -> Unit,
     onOpenDetail: (String) -> Unit = {},
     isCompactMode: Boolean = false,
@@ -566,7 +581,23 @@ private fun AppListScreen(
             modifier = Modifier.fillMaxSize()
         ) {
 
-        // App cards
+        // "Update all" used to be reachable only from the launch prompt and the daily
+        // notification: dismiss the prompt once and the only way left was updating app by app.
+        // Shown on the views where updates are what the user is looking at.
+        val showUpdateBanner = updatableCount > 0 && searchQuery.isBlank() && filterOption in setOf(
+            AppFilterOption.ALL,
+            AppFilterOption.INSTALLED,
+            AppFilterOption.UPDATES_AVAILABLE
+        )
+        if (showUpdateBanner) {
+            item(key = "update_all_banner", contentType = "banner") {
+                UpdateAllBanner(
+                    count = updatableCount,
+                    onUpdateAll = { onEvent(AppEvent.UpdateAllApps) }
+                )
+            }
+        }
+
         // Empty state when no apps match search
         if (apps.isEmpty()) {
             item {
@@ -604,13 +635,13 @@ private fun AppListScreen(
             AppCard(
                 app = app,
                 onDownloadClick = {
-                    onEvent(AppEvent.DownloadApp(app.packageName, app.downloadUrl))
+                    onEvent(AppEvent.DownloadApp(app.id, app.packageName, app.downloadUrl))
                 },
                 onUninstallClick = {
                     onEvent(AppEvent.UninstallApp(app.packageName))
                 },
                 onReinstallClick = {
-                    onEvent(AppEvent.ShowReinstallConfirmation(app.packageName))
+                    onEvent(AppEvent.ShowReinstallConfirmation(app.id, app.packageName))
                 },
                 onOpenClick = {
                     onEvent(AppEvent.OpenApp(app.packageName))
@@ -701,12 +732,12 @@ private fun SupportButtons(
         ) {
             Icon(
                 imageVector = Icons.Filled.Language,
-                contentDescription = "Visit website",
+                contentDescription = null,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Visit vanced.to",
+                text = stringResource(R.string.visit_website),
                 style = MaterialTheme.typography.labelLarge
             )
         }
@@ -725,12 +756,63 @@ private fun SupportButtons(
         ) {
             Icon(
                 imageVector = Icons.Filled.Code,
-                contentDescription = "Github",
+                contentDescription = null,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Source code",
+                text = stringResource(R.string.source_code),
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+    }
+}
+
+/**
+ * "N updates available · Update all", at the top of the list.
+ */
+@Composable
+private fun UpdateAllBanner(
+    count: Int,
+    onUpdateAll: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 14.dp, vertical = 6.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.updateColor.copy(alpha = 0.14f))
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Filled.ArrowCircleUp,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.updateColor,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = stringResource(R.string.updates_banner, count),
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.weight(1f),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Button(
+            onClick = onUpdateAll,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.updateColor,
+                contentColor = Color.White
+            ),
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(10.dp))
+        ) {
+            Text(
+                text = stringResource(R.string.update_all),
                 style = MaterialTheme.typography.labelLarge
             )
         }
@@ -748,7 +830,7 @@ private fun launchUrl(context: Context, url: String) {
         }
         context.startActivity(intent)
     } catch (e: Exception) {
-        Toast.makeText(context, "Failed to open URL", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.open_url_failed), Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -760,8 +842,15 @@ private fun FilterChipsRow(
     filterOption: AppFilterOption,
     onFilterChange: (AppFilterOption) -> Unit,
     processingCount: Int,
+    counts: Map<AppFilterOption, Int>,
     modifier: Modifier = Modifier
 ) {
+    // "Installed (12)": the number is the length of the list behind the chip, so an empty filter
+    // shows as empty before it is tapped
+    @Composable
+    fun label(labelRes: Int, option: AppFilterOption): String =
+        stringResource(R.string.filter_with_count, stringResource(labelRes), counts[option] ?: 0)
+
     Row(
         modifier = modifier
             .horizontalScroll(rememberScrollState()),
@@ -788,7 +877,7 @@ private fun FilterChipsRow(
         FilterChip(
             selected = filterOption == AppFilterOption.ALL,
             onClick = { onFilterChange(AppFilterOption.ALL) },
-            label = { Text(text = stringResource(R.string.filter_all), style = MaterialTheme.typography.labelSmall) },
+            label = { Text(text = label(R.string.filter_all, AppFilterOption.ALL), style = MaterialTheme.typography.labelSmall) },
             colors = chipColors,
             border = chipBorder,
             modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
@@ -796,7 +885,7 @@ private fun FilterChipsRow(
         FilterChip(
             selected = filterOption == AppFilterOption.INSTALLED,
             onClick = { onChipClick(AppFilterOption.INSTALLED) },
-            label = { Text(text = stringResource(R.string.filter_installed), style = MaterialTheme.typography.labelSmall) },
+            label = { Text(text = label(R.string.filter_installed, AppFilterOption.INSTALLED), style = MaterialTheme.typography.labelSmall) },
             colors = chipColors,
             border = chipBorder,
             modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
@@ -804,7 +893,7 @@ private fun FilterChipsRow(
         FilterChip(
             selected = filterOption == AppFilterOption.NOT_INSTALLED,
             onClick = { onChipClick(AppFilterOption.NOT_INSTALLED) },
-            label = { Text(text = stringResource(R.string.filter_not_installed), style = MaterialTheme.typography.labelSmall) },
+            label = { Text(text = label(R.string.filter_not_installed, AppFilterOption.NOT_INSTALLED), style = MaterialTheme.typography.labelSmall) },
             colors = chipColors,
             border = chipBorder,
             modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
@@ -812,7 +901,7 @@ private fun FilterChipsRow(
         FilterChip(
             selected = filterOption == AppFilterOption.UPDATES_AVAILABLE,
             onClick = { onChipClick(AppFilterOption.UPDATES_AVAILABLE) },
-            label = { Text(text = stringResource(R.string.filter_updates), style = MaterialTheme.typography.labelSmall) },
+            label = { Text(text = label(R.string.filter_updates, AppFilterOption.UPDATES_AVAILABLE), style = MaterialTheme.typography.labelSmall) },
             colors = chipColors,
             border = chipBorder,
             modifier = Modifier.tvFocusBorder(shape = chipFocusShape),
@@ -820,7 +909,7 @@ private fun FilterChipsRow(
         FilterChip(
             selected = filterOption == AppFilterOption.FAVORITES,
             onClick = { onChipClick(AppFilterOption.FAVORITES) },
-            label = { Text(text = stringResource(R.string.filter_favorites), style = MaterialTheme.typography.labelSmall) },
+            label = { Text(text = label(R.string.filter_favorites, AppFilterOption.FAVORITES), style = MaterialTheme.typography.labelSmall) },
             colors = chipColors,
             border = chipBorder,
             modifier = Modifier.tvFocusBorder(shape = chipFocusShape),

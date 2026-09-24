@@ -197,4 +197,25 @@
     <string name="search_close">검색 닫기</string>
     <string name="clear_search">검색 지우기</string>
     <string name="scroll_to_top">맨 위로</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">다운로드 중… %1$d%%</string>
+    <string name="download_notification_channel_name">앱 다운로드</string>
+    <string name="download_notification_channel_description">다운로드 진행률</string>
+    <string name="visit_website">vanced.to 방문</string>
+    <string name="source_code">소스 코드</string>
+    <string name="open_url_failed">링크를 열 수 없습니다</string>
+    <string name="refresh">새로고침</string>
+    <string name="updates_banner">업데이트 %1$d개 있음</string>
+    <string name="install_permission_title">앱 설치 허용</string>
+    <string name="install_permission_message">이 앱이 다른 앱을 설치하거나 업데이트하려면 Android에서 권한을 허용해야 합니다. 다음 화면에서 “이 출처 허용”을 켠 뒤 돌아오면 다운로드가 자동으로 시작됩니다.</string>
+    <string name="install_permission_open">설정 열기</string>
+    <string name="install_permission_denied">아직 앱 설치가 허용되지 않아 아무것도 다운로드하지 않았습니다.</string>
+    <string name="microg_required_title">MicroG 필요</string>
+    <string name="microg_required_message">%1$s 앱은 Google 계정에 로그인하려면 MicroG가 필요한데, 아직 MicroG가 설치되어 있지 않습니다. %2$s도 함께 설치할까요?</string>
+    <string name="microg_install_both">둘 다 설치</string>
+    <string name="microg_skip">MicroG 건너뛰기</string>
+    <string name="install_microg">MicroG 설치</string>
+    <string name="microg_uninstall_title">MicroG를 제거할까요?</string>
+    <string name="microg_uninstall_message">다음 앱은 MicroG를 통해 Google에 로그인하므로 제거하면 로그인할 수 없습니다: %1$s</string>
+    <string name="microg_uninstall_confirm">그래도 제거</string>
 </resources>

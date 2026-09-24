@@ -29,9 +29,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
 import com.revanced.net.revancedmanager.domain.model.AppStatus
 import com.revanced.net.revancedmanager.domain.model.RevancedApp
 
@@ -162,15 +163,12 @@ fun AppCard(
 
             Spacer(modifier = Modifier.height(6.dp))
             
-            // Download progress indicator
-            if (app.status == AppStatus.DOWNLOADING && app.downloadProgress > 0) {
-                LinearProgressIndicator(
-                    progress = { app.downloadProgress },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(3.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
+            // Download progress: the bar is the one indicator for a download (the header spinner
+            // stays out of it). Indeterminate until the first byte count arrives, or for the whole
+            // transfer when the server sends no size — hiding the bar at 0 % made a download that
+            // had started look like one that had not.
+            if (app.status == AppStatus.DOWNLOADING) {
+                DownloadProgressBar(progress = app.downloadProgress, height = 3.dp)
                 Spacer(modifier = Modifier.height(4.dp))
             }
             
@@ -218,7 +216,10 @@ private fun AppStatusIndicator(
                 modifier = modifier.size(18.dp)
             )
         }
-        AppStatus.DOWNLOADING, AppStatus.INSTALLING, AppStatus.UNINSTALLING -> {
+        // Not DOWNLOADING: the progress bar under the description already says so, with the
+        // percentage on the button beside it. INSTALLING and UNINSTALLING have no bar, so they
+        // keep the spinner.
+        AppStatus.INSTALLING, AppStatus.UNINSTALLING -> {
             CircularProgressIndicator(
                 modifier = modifier.size(18.dp),
                 strokeWidth = 2.dp,
@@ -236,5 +237,28 @@ private fun AppStatusIndicator(
         else -> {
             // No indicator for NOT_INSTALLED or UNKNOWN
         }
+    }
+}
+
+/**
+ * Download progress as a thin bar: determinate once a fraction is known, indeterminate before
+ * that. Shared by the card and the detail screen.
+ */
+@Composable
+fun DownloadProgressBar(progress: Float, height: Dp, modifier: Modifier = Modifier) {
+    val barModifier = modifier
+        .fillMaxWidth()
+        .height(height)
+    if (progress > 0f) {
+        LinearProgressIndicator(
+            progress = { progress },
+            modifier = barModifier,
+            color = MaterialTheme.colorScheme.primary
+        )
+    } else {
+        LinearProgressIndicator(
+            modifier = barModifier,
+            color = MaterialTheme.colorScheme.primary
+        )
     }
 }

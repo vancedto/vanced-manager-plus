@@ -1,37 +1,32 @@
-import java.io.FileInputStream
 import java.util.Properties
-import java.io.FileOutputStream
 
-val keystorePropertiesFile = rootProject.file("keystore.properties")
-val keystoreProperties = Properties()
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+fun loadProps(file: File): Properties = Properties().apply {
+    if (file.exists()) file.inputStream().use { load(it) }
 }
 
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = loadProps(keystorePropertiesFile)
+
+val versionPropsFile = rootProject.file("version.properties")
+
 // Function to load version properties
-fun loadVersionProps(): Properties {
-    val versionPropsFile = project.rootProject.file("version.properties")
+fun loadVersionProps(versionPropsFile: File): Properties {
+    if (versionPropsFile.exists()) return loadProps(versionPropsFile)
+
+    // Initialize with default values if file doesn't exist
     val versionProps = Properties()
-
-    if (versionPropsFile.exists()) {
-        versionProps.load(FileInputStream(versionPropsFile))
-    } else {
-        // Initialize with default values if file doesn't exist
-        versionProps["VERSION_CODE"] = "1"
-        versionProps["VERSION_NAME_MAJOR"] = "2"
-        versionProps["VERSION_NAME_MINOR"] = "0"
-        versionProps["VERSION_NAME_PATCH"] = "0"
-        versionProps.store(FileOutputStream(versionPropsFile), null)
-    }
-
+    versionProps["VERSION_CODE"] = "1"
+    versionProps["VERSION_NAME_MAJOR"] = "2"
+    versionProps["VERSION_NAME_MINOR"] = "0"
+    versionProps["VERSION_NAME_PATCH"] = "0"
+    versionPropsFile.outputStream().use { versionProps.store(it, null) }
     return versionProps
 }
 // Load version properties
-val versionProps = loadVersionProps()
+val versionProps = loadVersionProps(versionPropsFile)
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
@@ -41,7 +36,7 @@ plugins {
 
 android {
     namespace = "com.revanced.net.revancedmanager"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.revanced.net.revancedmanager"
@@ -54,9 +49,6 @@ android {
 
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
     }
     signingConfigs {
         create("release") {
@@ -67,9 +59,6 @@ android {
         }
     }
     buildTypes {
-        debug {
-            isDebuggable = true
-        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -84,9 +73,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     buildFeatures {
         compose = true
     }
@@ -97,9 +83,6 @@ android {
             // in Robolectric or wrapping every log call.
             isReturnDefaultValues = true
         }
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
     }
     packaging {
         resources {
@@ -113,13 +96,15 @@ tasks.register("incrementVersion") {
     group = "versioning"
     description = "Increments version code and patch version"
 
+    // Resolved while configuring: touching Task.project (or the build script) inside doLast is
+    // deprecated, fails in Gradle 10 and rules out the configuration cache.
+    val propsFile = versionPropsFile
+
     doLast {
         println("[VERSION] Starting version increment process...")
-        
-        val versionPropsFile = project.rootProject.file("version.properties")
-        val versionProps = loadVersionProps()
-        
-        println("[FILE] Loading version properties from: ${versionPropsFile.absolutePath}")
+        println("[FILE] Loading version properties from: ${propsFile.absolutePath}")
+
+        val versionProps = Properties().apply { propsFile.inputStream().use { load(it) } }
 
         // Get current versions
         val currentVersionCode = versionProps["VERSION_CODE"].toString().toInt()
@@ -141,7 +126,7 @@ tasks.register("incrementVersion") {
 
         // Save updated properties
         println("[SAVE] Saving updated version properties...")
-        versionProps.store(FileOutputStream(versionPropsFile), null)
+        propsFile.outputStream().use { versionProps.store(it, null) }
 
         val newVersionName = "${currentMajor}.${currentMinor}.${newPatch}"
         println("[SUCCESS] Version successfully incremented!")
@@ -151,138 +136,77 @@ tasks.register("incrementVersion") {
 }
 
 
-tasks.register("revancedRelease") {
-    description = "Builds release APK, increments version, and copies to apk directory"
+// Builds the variant's APK, copies it into apk/ under a versioned name, then bumps the version.
+// The debug variant bumps too on purpose: every test build gets a higher versionCode, so it
+// installs over the previous one on the test device.
+fun registerRevancedBuild(taskName: String, variant: String, label: String, apkPrefix: String) {
+    // Captured at configuration time so doLast doesn't reach back into the android extension
+    val versionName = android.defaultConfig.versionName
+    val sourceFile = layout.buildDirectory.file("outputs/apk/$variant/app-$variant.apk")
+    val destinationDir = project.rootDir.resolve("apk")
+    val apkName = "${apkPrefix}v${versionName}.apk"
 
-    // Make sure this task runs after assembleRelease
-    dependsOn("assembleRelease")
+    tasks.register(taskName) {
+        description = "Builds $variant APK, increments version, and copies to apk directory"
+        dependsOn("assemble${variant.replaceFirstChar { it.uppercase() }}")
+        finalizedBy("incrementVersion")
 
-    finalizedBy("incrementVersion")
-    doLast {
-        println("[RELEASE] Starting ReVanced Release Build Process...")
-        println("---------------------------------------------------")
-        
-        // Get the version name from android config
-        val versionName = android.defaultConfig.versionName
-        println("[INFO] Build version: ${versionName}")
+        doLast {
+            println("[$label] Starting ReVanced $variant build process...")
+            println("---------------------------------------------------")
+            println("[INFO] Build version: $versionName")
 
-        // Define source and destination files
-        val sourceFile = layout.buildDirectory.file("outputs/apk/release/app-release.apk")
-        val destinationDir = project.rootDir.resolve("apk")
-        val destinationFile = destinationDir.resolve("vanced.to_revanced_manager_plus_v${versionName}.apk")
+            val source = sourceFile.get().asFile
+            val destinationFile = destinationDir.resolve(apkName)
+            println("[SOURCE] Source APK: ${source.absolutePath}")
+            println("[TARGET] Destination directory: ${destinationDir.absolutePath}")
+            println("[FILE] Final APK name: $apkName")
 
-        println("[SOURCE] Source APK: ${sourceFile.get().asFile.absolutePath}")
-        println("[TARGET] Destination directory: ${destinationDir.absolutePath}")
-        println("[FILE] Final APK name: vanced.to_revanced_manager_plus_v${versionName}.apk")
+            if (!source.exists()) {
+                println("[ERROR] Source APK file not found: ${source.absolutePath}")
+                throw GradleException("Source APK file not found")
+            }
 
-        // Create destination directory if it doesn't exist
-        if (!destinationDir.exists()) {
-            println("[CREATE] Creating destination directory...")
             destinationDir.mkdirs()
-        } else {
-            println("[EXISTS] Destination directory already exists")
+            println("[COPY] Copying and renaming APK file...")
+            source.copyTo(destinationFile, overwrite = true)
+
+            val fileSizeBytes = destinationFile.length()
+            val fileSizeMB = fileSizeBytes / (1024.0 * 1024.0)
+            println("[SUCCESS] ${variant.uppercase()} BUILD COMPLETED SUCCESSFULLY!")
+            println("---------------------------------------------------")
+            println("[LOCATION] APK Location: ${destinationFile.absolutePath}")
+            println("[SIZE] File Size: ${String.format("%.2f", fileSizeMB)} MB (${fileSizeBytes} bytes)")
+            println("[VERSION] Version: $versionName")
+            println("---------------------------------------------------")
         }
-
-        // Check if source file exists
-        if (!sourceFile.get().asFile.exists()) {
-            println("[ERROR] Source APK file not found: ${sourceFile.get().asFile.absolutePath}")
-            throw Exception("Source APK file not found")
-        }
-
-        println("[COPY] Copying and renaming APK file...")
-        // Copy and rename the file
-        sourceFile.get().asFile.copyTo(destinationFile, overwrite = true)
-
-        // Get file size information
-        val fileSizeBytes = destinationFile.length()
-        val fileSizeMB = fileSizeBytes / (1024.0 * 1024.0)
-
-        println("[SUCCESS] RELEASE BUILD COMPLETED SUCCESSFULLY!")
-        println("---------------------------------------------------")
-        println("[LOCATION] APK Location: ${destinationFile.absolutePath}")
-        println("[SIZE] File Size: ${String.format("%.2f", fileSizeMB)} MB (${fileSizeBytes} bytes)")
-        println("[VERSION] Version: ${versionName}")
-        println("[READY] The release APK is ready for distribution!")
-        println("---------------------------------------------------")
     }
 }
 
-tasks.register("revancedDebug") {
-    description = "Builds debug APK, increments version, and copies to apk directory"
-
-    // Make sure this task runs after assembleDebug
-    dependsOn("assembleDebug")
-
-    finalizedBy("incrementVersion")
-    doLast {
-        println("[DEBUG] Starting ReVanced Debug Build Process...")
-        println("---------------------------------------------------")
-        
-        // Get the version name from android config
-        val versionName = android.defaultConfig.versionName
-        println("[INFO] Build version: ${versionName}")
-
-        // Define source and destination files
-        val sourceFile = layout.buildDirectory.file("outputs/apk/debug/app-debug.apk")
-        val destinationDir = project.rootDir.resolve("apk")
-        val destinationFile = destinationDir.resolve("vanced.to_revanced_manager_plus_debug_v${versionName}.apk")
-
-        println("[SOURCE] Source APK: ${sourceFile.get().asFile.absolutePath}")
-        println("[TARGET] Destination directory: ${destinationDir.absolutePath}")
-        println("[FILE] Final APK name: vanced.to_revanced_manager_plus_debug_v${versionName}.apk")
-
-        // Create destination directory if it doesn't exist
-        if (!destinationDir.exists()) {
-            println("[CREATE] Creating destination directory...")
-            destinationDir.mkdirs()
-        } else {
-            println("[EXISTS] Destination directory already exists")
-        }
-
-        // Check if source file exists
-        if (!sourceFile.get().asFile.exists()) {
-            println("[ERROR] Source APK file not found: ${sourceFile.get().asFile.absolutePath}")
-            throw Exception("Source APK file not found")
-        }
-
-        println("[COPY] Copying and renaming debug APK file...")
-        // Copy and rename the file
-        sourceFile.get().asFile.copyTo(destinationFile, overwrite = true)
-
-        // Get file size information
-        val fileSizeBytes = destinationFile.length()
-        val fileSizeMB = fileSizeBytes / (1024.0 * 1024.0)
-
-        println("[SUCCESS] DEBUG BUILD COMPLETED SUCCESSFULLY!")
-        println("---------------------------------------------------")
-        println("[LOCATION] Debug APK Location: ${destinationFile.absolutePath}")
-        println("[SIZE] File Size: ${String.format("%.2f", fileSizeMB)} MB (${fileSizeBytes} bytes)")
-        println("[VERSION] Version: ${versionName}")
-        println("[READY] The debug APK is ready for testing!")
-        println("---------------------------------------------------")
-    }
-}
+registerRevancedBuild("revancedRelease", "release", "RELEASE", "vanced.to_revanced_manager_plus_")
+registerRevancedBuild("revancedDebug", "debug", "DEBUG", "vanced.to_revanced_manager_plus_debug_")
 
 tasks.register("generateKeystore") {
     group = "security"
     description = "Generates a new keystore file with predefined credentials"
+
+    // Resolved while configuring, same reason as incrementVersion
+    val propsFile = keystorePropertiesFile
+    val appFolder = projectDir
 
     doLast {
         println("[KEYSTORE] Starting Keystore Generation Process...")
         println("---------------------------------------------------")
         
         // Load keystore properties
-        val keystorePropertiesFile = rootProject.file("keystore.properties")
-        println("[FILE] Loading keystore properties from: ${keystorePropertiesFile.absolutePath}")
+        println("[FILE] Loading keystore properties from: ${propsFile.absolutePath}")
         
-        if (!keystorePropertiesFile.exists()) {
-            println("[ERROR] Keystore properties file not found: ${keystorePropertiesFile.absolutePath}")
+        if (!propsFile.exists()) {
+            println("[ERROR] Keystore properties file not found: ${propsFile.absolutePath}")
             throw Exception("Keystore properties file not found")
         }
         
-        val keystoreProperties = Properties().apply {
-            load(FileInputStream(keystorePropertiesFile))
-        }
+        val keystoreProperties = Properties().apply { propsFile.inputStream().use { load(it) } }
 
         // Extract keystore details from properties
         val storePassword = keystoreProperties["storePassword"] as String
@@ -297,7 +221,6 @@ tasks.register("generateKeystore") {
         println("   [PASS] Key Password: ${"*".repeat(keyPassword.length)}")
 
         // Create keystore file in app folder
-        val appFolder = project.projectDir
         val keystoreFile = File(appFolder, storeFile)
         
         println("[TARGET] Target keystore location: ${keystoreFile.absolutePath}")
@@ -387,7 +310,7 @@ tasks.register("generateKeystore") {
 
 dependencies {
     // Core Android dependencies
-    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
@@ -406,7 +329,7 @@ dependencies {
 
     // Hilt Dependency Injection
     implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.lifecycle.viewmodel.compose)
     implementation(libs.hilt.work)
     ksp(libs.hilt.compiler)
     ksp(libs.androidx.hilt.compiler)
@@ -417,7 +340,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.process)
 
     // Coroutines
-    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
     // Serialization
@@ -428,10 +350,10 @@ dependencies {
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
 
     // Image loading
     implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     // Work Manager
     implementation(libs.androidx.work.runtime.ktx)

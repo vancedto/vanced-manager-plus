@@ -197,4 +197,25 @@
     <string name="search_close">Fermer la recherche</string>
     <string name="clear_search">Effacer la recherche</string>
     <string name="scroll_to_top">Haut de page</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">Téléchargement… %1$d%%</string>
+    <string name="download_notification_channel_name">Téléchargements d\'applis</string>
+    <string name="download_notification_channel_description">Progression du téléchargement</string>
+    <string name="visit_website">Visiter vanced.to</string>
+    <string name="source_code">Code source</string>
+    <string name="open_url_failed">Impossible d\'ouvrir le lien</string>
+    <string name="refresh">Actualiser</string>
+    <string name="updates_banner">%1$d mise(s) à jour disponible(s)</string>
+    <string name="install_permission_title">Autoriser l\'installation d\'applis</string>
+    <string name="install_permission_message">Android a besoin de votre autorisation pour que cette appli puisse installer ou mettre à jour d\'autres applis. Sur l\'écran suivant, activez « Autoriser cette source », puis revenez : le téléchargement démarrera tout seul.</string>
+    <string name="install_permission_open">Ouvrir les paramètres</string>
+    <string name="install_permission_denied">L\'installation d\'applis n\'est toujours pas autorisée, rien n\'a donc été téléchargé.</string>
+    <string name="microg_required_title">MicroG requis</string>
+    <string name="microg_required_message">%1$s a besoin de MicroG pour se connecter à votre compte Google, et MicroG n\'est pas encore installé. Installer aussi %2$s ?</string>
+    <string name="microg_install_both">Installer les deux</string>
+    <string name="microg_skip">Ignorer MicroG</string>
+    <string name="install_microg">Installer MicroG</string>
+    <string name="microg_uninstall_title">Désinstaller MicroG ?</string>
+    <string name="microg_uninstall_message">Ces applis se connectent à Google via MicroG et ne pourront plus le faire sans lui : %1$s</string>
+    <string name="microg_uninstall_confirm">Désinstaller quand même</string>
 </resources>

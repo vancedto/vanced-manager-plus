@@ -201,4 +201,25 @@
     <string name="search_close">Đóng tìm kiếm</string>
     <string name="clear_search">Xoá tìm kiếm</string>
     <string name="scroll_to_top">Về đầu trang</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">Đang tải… %1$d%%</string>
+    <string name="download_notification_channel_name">Tải ứng dụng</string>
+    <string name="download_notification_channel_description">Tiến trình tải</string>
+    <string name="visit_website">Truy cập vanced.to</string>
+    <string name="source_code">Mã nguồn</string>
+    <string name="open_url_failed">Không mở được liên kết</string>
+    <string name="refresh">Làm mới</string>
+    <string name="updates_banner">Có %1$d bản cập nhật</string>
+    <string name="install_permission_title">Cho phép cài ứng dụng</string>
+    <string name="install_permission_message">Android cần bạn cho phép trước khi ứng dụng này có thể cài hoặc cập nhật ứng dụng khác. Ở màn hình tiếp theo, hãy bật “Cho phép từ nguồn này”, rồi quay lại — việc tải sẽ tự bắt đầu.</string>
+    <string name="install_permission_open">Mở cài đặt</string>
+    <string name="install_permission_denied">Vẫn chưa được phép cài ứng dụng nên chưa có gì được tải.</string>
+    <string name="microg_required_title">Cần MicroG</string>
+    <string name="microg_required_message">%1$s cần MicroG để đăng nhập tài khoản Google, và máy chưa cài MicroG. Cài luôn %2$s chứ?</string>
+    <string name="microg_install_both">Cài cả hai</string>
+    <string name="microg_skip">Bỏ qua MicroG</string>
+    <string name="install_microg">Cài MicroG</string>
+    <string name="microg_uninstall_title">Gỡ MicroG?</string>
+    <string name="microg_uninstall_message">Các ứng dụng này đăng nhập Google qua MicroG và sẽ không đăng nhập được nữa nếu gỡ nó: %1$s</string>
+    <string name="microg_uninstall_confirm">Vẫn gỡ</string>
 </resources>

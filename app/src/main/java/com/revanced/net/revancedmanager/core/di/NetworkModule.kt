@@ -2,7 +2,7 @@ package com.revanced.net.revancedmanager.core.di
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

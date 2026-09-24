@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.config.Config
+import com.revanced.net.revancedmanager.core.common.InFlightAttribution
+import com.revanced.net.revancedmanager.core.common.MicroGRequirement
 import com.revanced.net.revancedmanager.core.common.PackageOwnership
 import com.revanced.net.revancedmanager.core.common.Result
 import com.revanced.net.revancedmanager.domain.model.AppConfig
@@ -328,48 +330,68 @@ internal fun AppBloc.pullToRefreshApps() {
 // ============= STATUS / PROGRESS UPDATES =============
 
 internal fun AppBloc.updateAppProgress(packageName: String, progress: Float) {
-    val currentState = _state.value
-    if (currentState is AppState.Success) {
-        _state.value = currentState.copy(
-            apps = currentState.apps.map { app ->
-                if (app.packageName == packageName) app.copy(downloadProgress = progress) else app
-            }
-        )
-    }
-}
-
-/**
- * Set the status of every entry of [packageName].
- *
- * An in-flight status (downloading, installing, uninstalling) is about the package — one download,
- * one installer session — so every entry sharing the package shows it. A settled status is about
- * a build that is or is not installed, and that build belongs to exactly one entry: the owner under
- * [PackageOwnership] gets [status], and any other entry for the package reads as not installed.
- * With one entry per package, which is every package but MicroG, the two cases are the same.
- */
-internal fun AppBloc.updateAppStatus(packageName: String, status: AppStatus) {
     val currentState = _state.value as? AppState.Success ?: return
-    val ownerId = if (status in SETTLED_STATUSES) ownerOf(currentState.apps, packageName)?.id else null
     _state.value = currentState.copy(
-        apps = currentState.apps.map { app ->
-            when {
-                app.packageName != packageName -> app
-                ownerId == null || app.id == ownerId -> app.copy(status = status)
-                else -> app.copy(status = AppStatus.NOT_INSTALLED, currentVersion = null)
-            }
-        }
+        apps = InFlightAttribution.applyProgress(
+            currentState.apps,
+            packageName,
+            progress,
+            inFlightInitiators[packageName]
+        )
     )
 }
 
-/** Statuses that describe what is installed rather than what is happening. */
-private val SETTLED_STATUSES = setOf(
-    AppStatus.NOT_INSTALLED,
-    AppStatus.UP_TO_DATE,
-    AppStatus.UPDATE_AVAILABLE,
-    AppStatus.UNKNOWN
-)
+/**
+ * Set the status of the entries of [packageName] it belongs to.
+ *
+ * A settled status is about a build that is or is not installed, and that build belongs to exactly
+ * one entry: the owner under [PackageOwnership] gets [status], and any other entry for the package
+ * reads as not installed. An in-flight status (downloading, installing, uninstalling) is about an
+ * operation, and the operation was started from one entry — the one recorded in
+ * [AppBloc.inFlightInitiators]. With one entry per package, which is every package but MicroG, the
+ * two cases are the same.
+ *
+ * See [InFlightAttribution] for the rule itself, including what an unrecorded initiator falls
+ * back to.
+ */
+internal fun AppBloc.updateAppStatus(packageName: String, status: AppStatus) {
+    val currentState = _state.value as? AppState.Success ?: return
+    _state.value = currentState.copy(
+        apps = InFlightAttribution.applyStatus(
+            currentState.apps,
+            packageName,
+            status,
+            inFlightInitiators[packageName],
+            // Only the settled branch needs it, and reading it is a PackageManager round trip —
+            // an in-flight write should not pay for one.
+            if (status in InFlightAttribution.SETTLED_STATUSES) {
+                appManager.getInstalledVersion(packageName)
+            } else null
+        )
+    )
+}
 
 // ============= HELPERS =============
+
+/**
+ * The entry an in-flight status for [packageName] belongs to.
+ *
+ * The recorded initiator, else whichever entry of the package is currently showing an in-flight
+ * status, else the first. Callers use it to read "what is this package's card doing", which is
+ * only a well-formed question about one entry — and no longer about the *first* entry, now that
+ * only the initiator carries the in-flight status. Looking it up by package instead would return
+ * the sibling's settled status: at releaseDownloadingCard that reads as "not downloading", and
+ * the card that really is downloading never gets released.
+ */
+internal fun AppBloc.inFlightEntry(packageName: String): RevancedApp? {
+    val entries = (_state.value as? AppState.Success)?.apps.orEmpty()
+        .filter { it.packageName == packageName }
+    if (entries.isEmpty()) return null
+    val initiatorId = inFlightInitiators[packageName]
+    return entries.firstOrNull { it.id == initiatorId }
+        ?: entries.firstOrNull { it.status in InFlightAttribution.IN_FLIGHT_STATUSES }
+        ?: entries.first()
+}
 
 /**
  * The entry among [apps] that owns whatever is installed as [packageName], or null when nothing
@@ -384,8 +406,12 @@ internal fun AppBloc.ownerOf(apps: List<RevancedApp>, packageName: String): Reva
  * Re-derive version and status for every entry of [packageName] from what is actually installed,
  * clearing any download progress. The bloc-side twin of the repository's withInstallStatus, for
  * the moments a flow settles — install finished, package event, status refresh.
+ *
+ * Also the one place [AppBloc.inFlightInitiators] is cleared: nothing is in flight for the package
+ * once this has run, and every terminal path reaches it.
  */
 internal fun AppBloc.settleEntries(apps: List<RevancedApp>, packageName: String): List<RevancedApp> {
+    inFlightInitiators.remove(packageName)
     val entries = apps.filter { it.packageName == packageName }
     if (entries.isEmpty()) return apps
     val installedVersion = appManager.getInstalledVersion(packageName)
@@ -428,17 +454,27 @@ internal fun AppBloc.mergeInFlightState(newApps: List<RevancedApp>): List<Revanc
             it.status == AppStatus.INSTALLING ||
             it.status == AppStatus.UNINSTALLING
         }
-        .associateBy { it.packageName }
+        // Keyed by entry, not by package: carrying it over by package would hand the spinner back
+        // to both MicroG rows on the next refresh, undoing what updateAppStatus just got right.
+        .associateBy { it.id }
     if (inFlight.isEmpty() && pendingInstalls.isEmpty()) return newApps
     return newApps.map { app ->
-        val old = inFlight[app.packageName]
+        val old = inFlight[app.id]
         when {
             old != null -> app.copy(status = old.status, downloadProgress = old.downloadProgress)
-            app.packageName in pendingInstalls -> app.copy(status = AppStatus.INSTALLING)
+            app.packageName in pendingInstalls && ownsInFlight(app) ->
+                app.copy(status = AppStatus.INSTALLING)
             else -> app
         }
     }
 }
+
+/**
+ * Whether an in-flight operation on [app]'s package belongs to [app] — the same rule
+ * [InFlightAttribution] applies, for the callers that carry state over rather than write it.
+ */
+internal fun AppBloc.ownsInFlight(app: RevancedApp): Boolean =
+    inFlightInitiators[app.packageName]?.let { it == app.id } ?: true
 
 /** Safely load AppConfig from preferences, falling back to DARK/ENGLISH. */
 internal fun AppBloc.loadConfigSafely(): AppConfig = try {
@@ -512,9 +548,12 @@ private fun AppBloc.maybeShowSuggestions() {
 
     // SUGGESTED_PACKAGES names packages, and a package can have several catalog entries — the
     // catalog has four MicroG builds. Offer one per package, the first in catalog order, or the
-    // popup would list four MicroGs and ticking one would install all four over each other.
+    // popup would list four MicroGs and ticking one would install all four over each other. For
+    // MicroG that one is the same entry the download gate offers alongside an app that needs it.
+    val microG = MicroGRequirement.preferredEntry(state.apps)
     val suggestions = state.apps
         .filter { it.packageName in Config.SUGGESTED_PACKAGES && it.status == AppStatus.NOT_INSTALLED }
+        .filter { it.packageName != Config.MICROG_PACKAGE || it.id == microG?.id }
         .distinctBy { it.packageName }
         .sortedBy { Config.SUGGESTED_PACKAGES.indexOf(it.packageName) }
 
@@ -592,7 +631,7 @@ internal fun AppBloc.installSuggestedApps(appIds: List<String>) {
     _state.value = state.copy(suggestedApps = null)
 
     Log.i(TAG_BLOC, "Installing ${selected.size} suggested app(s)")
-    selected.forEach { downloadApp(it.packageName, it.downloadUrl) }
+    requestDownloads(selected)
 }
 
 /** Close the first-run suggestions popup without installing anything. */

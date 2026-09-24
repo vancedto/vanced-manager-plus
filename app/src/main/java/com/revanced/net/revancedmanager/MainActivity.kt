@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.revanced.net.revancedmanager.domain.model.ThemeMode
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.revanced.net.revancedmanager.core.common.LocaleHelper
 import com.revanced.net.revancedmanager.data.local.preferences.PreferencesManager
 import com.revanced.net.revancedmanager.presentation.bloc.AppBloc

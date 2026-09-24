@@ -197,4 +197,25 @@
     <string name="search_close">Zamknij wyszukiwanie</string>
     <string name="clear_search">Wyczyść wyszukiwanie</string>
     <string name="scroll_to_top">Wróć na górę</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">Pobieranie… %1$d%%</string>
+    <string name="download_notification_channel_name">Pobieranie aplikacji</string>
+    <string name="download_notification_channel_description">Postęp pobierania</string>
+    <string name="visit_website">Odwiedź vanced.to</string>
+    <string name="source_code">Kod źródłowy</string>
+    <string name="open_url_failed">Nie udało się otworzyć linku</string>
+    <string name="refresh">Odśwież</string>
+    <string name="updates_banner">Dostępne aktualizacje: %1$d</string>
+    <string name="install_permission_title">Zezwól na instalowanie aplikacji</string>
+    <string name="install_permission_message">Android potrzebuje Twojej zgody, zanim ta aplikacja będzie mogła instalować lub aktualizować inne aplikacje. Na następnym ekranie włącz „Zezwalaj z tego źródła”, a potem wróć — pobieranie rozpocznie się samo.</string>
+    <string name="install_permission_open">Otwórz ustawienia</string>
+    <string name="install_permission_denied">Instalowanie aplikacji nadal nie jest dozwolone, więc nic nie zostało pobrane.</string>
+    <string name="microg_required_title">Wymagany MicroG</string>
+    <string name="microg_required_message">%1$s potrzebuje MicroG, aby zalogować się na konto Google, a MicroG nie jest jeszcze zainstalowany. Zainstalować też %2$s?</string>
+    <string name="microg_install_both">Zainstaluj oba</string>
+    <string name="microg_skip">Pomiń MicroG</string>
+    <string name="install_microg">Zainstaluj MicroG</string>
+    <string name="microg_uninstall_title">Odinstalować MicroG?</string>
+    <string name="microg_uninstall_message">Te aplikacje logują się do Google przez MicroG i bez niego nie będą mogły się zalogować: %1$s</string>
+    <string name="microg_uninstall_confirm">Odinstaluj mimo to</string>
 </resources>

@@ -34,7 +34,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -55,8 +54,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.revanced.net.revancedmanager.R
+import com.revanced.net.revancedmanager.config.Config
+import com.revanced.net.revancedmanager.core.common.MicroGRequirement
 import com.revanced.net.revancedmanager.domain.model.AppStatus
 import com.revanced.net.revancedmanager.domain.model.AppVariant
 import com.revanced.net.revancedmanager.domain.model.RevancedApp
@@ -65,6 +66,7 @@ import com.revanced.net.revancedmanager.presentation.bloc.AppEvent
 import com.revanced.net.revancedmanager.presentation.bloc.AppState
 import com.revanced.net.revancedmanager.presentation.ui.components.AppActionButtons
 import com.revanced.net.revancedmanager.presentation.ui.components.AppDialogHost
+import com.revanced.net.revancedmanager.presentation.ui.components.DownloadProgressBar
 import com.revanced.net.revancedmanager.presentation.ui.components.SettingsSwitchRow
 import com.revanced.net.revancedmanager.presentation.ui.components.appMetaText
 import com.revanced.net.revancedmanager.presentation.ui.components.labelledValue
@@ -186,8 +188,19 @@ fun AppDetailScreen(
             return@Scaffold
         }
 
+        // Offered only while no build of MicroG is on the device or on its way there — every
+        // entry of the package reads NOT_INSTALLED — and only for an app that needs it.
+        val microGToInstall = successState?.apps
+            ?.takeIf { app.requiresMicroG }
+            ?.takeIf { apps ->
+                apps.filter { it.packageName == Config.MICROG_PACKAGE }
+                    .all { it.status == AppStatus.NOT_INSTALLED }
+            }
+            ?.let { MicroGRequirement.preferredEntry(it) }
+
         AppDetailContent(
             app = app,
+            microGToInstall = microGToInstall,
             onEvent = viewModel::handleEvent,
             modifier = Modifier.padding(paddingValues)
         )
@@ -204,6 +217,7 @@ fun AppDetailScreen(
 @Composable
 private fun AppDetailContent(
     app: RevancedApp,
+    microGToInstall: RevancedApp?,
     onEvent: (AppEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -219,22 +233,16 @@ private fun AppDetailContent(
         item {
             // Progress belongs above the actions: while downloading, the button is disabled and
             // the bar is the only thing that moves.
-            if (app.status == AppStatus.DOWNLOADING && app.downloadProgress > 0) {
-                LinearProgressIndicator(
-                    progress = { app.downloadProgress },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(4.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
+            if (app.status == AppStatus.DOWNLOADING) {
+                DownloadProgressBar(progress = app.downloadProgress, height = 4.dp)
                 Spacer(modifier = Modifier.height(12.dp))
             }
 
             AppActionButtons(
                 app = app,
-                onDownloadClick = { onEvent(AppEvent.DownloadApp(app.packageName, app.downloadUrl)) },
+                onDownloadClick = { onEvent(AppEvent.DownloadApp(app.id, app.packageName, app.downloadUrl)) },
                 onOpenClick = { onEvent(AppEvent.OpenApp(app.packageName)) },
-                onReinstallClick = { onEvent(AppEvent.ShowReinstallConfirmation(app.packageName)) },
+                onReinstallClick = { onEvent(AppEvent.ShowReinstallConfirmation(app.id, app.packageName)) },
                 onUninstallClick = { onEvent(AppEvent.UninstallApp(app.packageName)) },
                 onFavoriteToggle = { onEvent(AppEvent.ToggleFavorite(app.id)) },
                 onCancelDownload = { onEvent(AppEvent.CancelDownload(app.packageName)) },
@@ -255,7 +263,13 @@ private fun AppDetailContent(
         }
 
         if (app.requiresMicroG) {
-            item { MicroGCard() }
+            item {
+                MicroGCard(
+                    onInstallMicroG = microGToInstall?.let { microG ->
+                        { onEvent(AppEvent.DownloadApp(microG.id, microG.packageName, microG.downloadUrl)) }
+                    }
+                )
+            }
         }
 
         val description = app.longDescription.takeIf { it.isNotBlank() } ?: app.description
@@ -437,8 +451,12 @@ private fun ProviderBadge(provider: String) {
     )
 }
 
+/**
+ * The MicroG warning, with the install one tap away when MicroG is missing ([onInstallMicroG] is
+ * null once it is installed or on its way, and the warning stands alone).
+ */
 @Composable
-private fun MicroGCard() {
+private fun MicroGCard(onInstallMicroG: (() -> Unit)?) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -446,12 +464,22 @@ private fun MicroGCard() {
             containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)
         )
     ) {
-        Text(
-            text = "⚠️ " + stringResource(R.string.app_details_requires_microg),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(12.dp)
-        )
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                text = "⚠️ " + stringResource(R.string.app_details_requires_microg),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            if (onInstallMicroG != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = onInstallMicroG,
+                    modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
+                ) {
+                    Text(stringResource(R.string.install_microg))
+                }
+            }
+        }
     }
 }
 

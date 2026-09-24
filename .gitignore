@@ -14,6 +14,6 @@
 .cxx
 local.properties
 /apk/
-revanced-keystore.jks
 *.sample.txt
 .kotlin
+__pycache__

@@ -197,4 +197,25 @@
     <string name="search_close">Tutup carian</string>
     <string name="clear_search">Kosongkan carian</string>
     <string name="scroll_to_top">Kembali ke atas</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">Memuat turun… %1$d%%</string>
+    <string name="download_notification_channel_name">Muat turun apl</string>
+    <string name="download_notification_channel_description">Kemajuan muat turun</string>
+    <string name="visit_website">Lawati vanced.to</string>
+    <string name="source_code">Kod sumber</string>
+    <string name="open_url_failed">Tidak dapat membuka pautan</string>
+    <string name="refresh">Muat semula</string>
+    <string name="updates_banner">%1$d kemas kini tersedia</string>
+    <string name="install_permission_title">Benarkan pemasangan apl</string>
+    <string name="install_permission_message">Android memerlukan kebenaran anda sebelum apl ini boleh memasang atau mengemas kini apl lain. Pada skrin seterusnya, hidupkan “Benarkan daripada sumber ini”, kemudian kembali — muat turun akan bermula sendiri.</string>
+    <string name="install_permission_open">Buka tetapan</string>
+    <string name="install_permission_denied">Pemasangan apl masih tidak dibenarkan, jadi tiada apa-apa dimuat turun.</string>
+    <string name="microg_required_title">MicroG diperlukan</string>
+    <string name="microg_required_message">%1$s memerlukan MicroG untuk log masuk ke akaun Google anda, dan MicroG belum dipasang. Pasang %2$s juga?</string>
+    <string name="microg_install_both">Pasang kedua-duanya</string>
+    <string name="microg_skip">Langkau MicroG</string>
+    <string name="install_microg">Pasang MicroG</string>
+    <string name="microg_uninstall_title">Nyahpasang MicroG?</string>
+    <string name="microg_uninstall_message">Apl ini log masuk ke Google melalui MicroG dan tidak akan dapat log masuk tanpanya: %1$s</string>
+    <string name="microg_uninstall_confirm">Nyahpasang juga</string>
 </resources>

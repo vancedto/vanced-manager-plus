@@ -197,4 +197,25 @@
     <string name="search_close">অনুসন্ধান বন্ধ করুন</string>
     <string name="clear_search">অনুসন্ধান মুছুন</string>
     <string name="scroll_to_top">উপরে ফিরে যান</string>
+    <!-- Download gate, update banner, localized notification -->
+    <string name="download_notification_text">ডাউনলোড হচ্ছে… %1$d%%</string>
+    <string name="download_notification_channel_name">অ্যাপ ডাউনলোড</string>
+    <string name="download_notification_channel_description">ডাউনলোডের অগ্রগতি</string>
+    <string name="visit_website">vanced.to দেখুন</string>
+    <string name="source_code">সোর্স কোড</string>
+    <string name="open_url_failed">লিংক খোলা যায়নি</string>
+    <string name="refresh">রিফ্রেশ</string>
+    <string name="updates_banner">%1$dটি আপডেট উপলব্ধ</string>
+    <string name="install_permission_title">অ্যাপ ইনস্টলের অনুমতি দিন</string>
+    <string name="install_permission_message">এই অ্যাপ অন্য অ্যাপ ইনস্টল বা আপডেট করার আগে Android-এর আপনার অনুমতি প্রয়োজন। পরের স্ক্রিনে “এই উৎস থেকে অনুমতি দিন” চালু করুন, তারপর ফিরে আসুন — ডাউনলোড নিজে থেকেই শুরু হবে।</string>
+    <string name="install_permission_open">সেটিংস খুলুন</string>
+    <string name="install_permission_denied">অ্যাপ ইনস্টলের অনুমতি এখনও নেই, তাই কিছুই ডাউনলোড হয়নি।</string>
+    <string name="microg_required_title">MicroG প্রয়োজন</string>
+    <string name="microg_required_message">আপনার Google অ্যাকাউন্টে সাইন ইন করতে %1$s-এর MicroG প্রয়োজন, আর MicroG এখনও ইনস্টল করা নেই। %2$s-ও ইনস্টল করবেন?</string>
+    <string name="microg_install_both">দুটোই ইনস্টল করুন</string>
+    <string name="microg_skip">MicroG বাদ দিন</string>
+    <string name="install_microg">MicroG ইনস্টল করুন</string>
+    <string name="microg_uninstall_title">MicroG আনইনস্টল করবেন?</string>
+    <string name="microg_uninstall_message">এই অ্যাপগুলো MicroG-এর মাধ্যমে Google-এ সাইন ইন করে, এটি ছাড়া সাইন ইন করতে পারবে না: %1$s</string>
+    <string name="microg_uninstall_confirm">তবুও আনইনস্টল করুন</string>
 </resources>

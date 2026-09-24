@@ -3,6 +3,9 @@ package com.revanced.net.revancedmanager.presentation.bloc
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.revanced.net.revancedmanager.R
+import com.revanced.net.revancedmanager.config.Config
+import com.revanced.net.revancedmanager.core.common.InFlightAttribution
+import com.revanced.net.revancedmanager.core.common.MicroGRequirement
 import com.revanced.net.revancedmanager.core.common.PackageOwnership
 import com.revanced.net.revancedmanager.core.common.Result
 import com.revanced.net.revancedmanager.data.manager.InstallationResult
@@ -27,17 +30,8 @@ import java.io.File
 
 private const val INSTALL_RESULT_TIMEOUT_MS = 60_000L
 
-/** Statuses that mean work is already under way, so a status refresh must not overwrite them. */
-private val IN_FLIGHT_STATUSES = setOf(
-    AppStatus.DOWNLOADING,
-    AppStatus.READY_TO_INSTALL,
-    AppStatus.INSTALLING,
-    AppStatus.UNINSTALLING
-)
-
 internal fun AppBloc.installApp(packageName: String, apkFilePath: String) {
-    val appName = (_state.value as? AppState.Success)
-        ?.apps?.find { it.packageName == packageName }?.title ?: packageName
+    val appName = inFlightEntry(packageName)?.title ?: packageName
     queueInstallation(packageName, apkFilePath, appName)
 }
 
@@ -351,14 +345,19 @@ private fun AppBloc.confirmUninstallAndInstall(
     )
 }
 
-/** Offer to download the app again; falls back to a plain info dialog when the catalog entry is gone. */
+/**
+ * Offer to download the app again; falls back to a plain info dialog when the catalog entry is gone.
+ *
+ * Resolved through [inFlightEntry] rather than by package: two entries of one package are two
+ * differently-signed builds, so offering the first entry's URL would re-download the *other* app.
+ */
 private fun AppBloc.offerRedownload(packageName: String, message: String) {
-    val app = (_state.value as? AppState.Success)?.apps?.find { it.packageName == packageName }
+    val app = inFlightEntry(packageName)
     if (app != null) {
         enqueueConfirmationDialog(
             title = stringProvider.getString(R.string.installation_failed_title),
             message = message,
-            onConfirm = AppEvent.DownloadApp(packageName, app.downloadUrl),
+            onConfirm = AppEvent.DownloadApp(app.id, packageName, app.downloadUrl),
             onCancel = AppEvent.DismissDialog,
             confirmLabel = stringProvider.getString(R.string.download_again)
         )
@@ -367,9 +366,9 @@ private fun AppBloc.offerRedownload(packageName: String, message: String) {
     }
 }
 
+/** The title to put in a dialog about [packageName]'s current operation. */
 private fun AppBloc.appTitle(packageName: String): String =
-    (_state.value as? AppState.Success)?.apps?.find { it.packageName == packageName }?.title
-        ?: packageName
+    inFlightEntry(packageName)?.title ?: packageName
 
 /**
  * The way out of an install that never finishes (plan-08-14.md §2.5).
@@ -405,10 +404,11 @@ internal suspend fun AppBloc.updateSingleAppStatus(packageName: String) {
     try {
         val currentState = _state.value
         if (currentState is AppState.Success) {
-            // In-flight statuses are shared by every entry of the package, so any of them will do.
-            val appToUpdate = currentState.apps.find { it.packageName == packageName } ?: return
+            // Only the entry that started the operation carries an in-flight status, so asking the
+            // first entry of the package would read the sibling's settled one.
+            val appToUpdate = inFlightEntry(packageName) ?: return
 
-            if (appToUpdate.status in IN_FLIGHT_STATUSES) {
+            if (appToUpdate.status in InFlightAttribution.IN_FLIGHT_STATUSES) {
                 if (appToUpdate.status == AppStatus.UNINSTALLING) {
                     if (!appManager.isAppInstalled(packageName)) {
                         _state.value = currentState.copy(apps = settleEntries(currentState.apps, packageName))
@@ -519,7 +519,7 @@ internal fun AppBloc.retryInstallation(packageName: String, apkFilePath: String,
 internal fun AppBloc.confirmUninstallBeforeReinstall(packageName: String, apkFilePath: String) {
     val currentState = _state.value
     if (currentState is AppState.Success) {
-        val app = currentState.apps.find { it.packageName == packageName }
+        val app = inFlightEntry(packageName)
         app?.let {
             showConfirmationDialog(
                 title = stringProvider.getString(R.string.uninstall_required_title),
@@ -531,11 +531,34 @@ internal fun AppBloc.confirmUninstallBeforeReinstall(packageName: String, apkFil
     }
 }
 
-internal fun AppBloc.uninstallApp(packageName: String) {
+internal fun AppBloc.uninstallApp(packageName: String, confirmed: Boolean = false) {
     dismissDialog()
+
+    // Removing MicroG leaves every app that signs in through it installed but unable to reach the
+    // Google account — nothing on the system uninstall dialog says so. Name them first.
+    if (!confirmed && packageName == Config.MICROG_PACKAGE) {
+        val dependents = MicroGRequirement.dependents((_state.value as? AppState.Success)?.apps.orEmpty())
+        if (dependents.isNotEmpty()) {
+            val names = dependents.take(3).joinToString(", ") { it.title } +
+                if (dependents.size > 3) ", …" else ""
+            showConfirmationDialog(
+                title = stringProvider.getString(R.string.microg_uninstall_title),
+                message = stringProvider.getString(R.string.microg_uninstall_message, names),
+                onConfirm = AppEvent.UninstallApp(packageName, confirmed = true),
+                onCancel = AppEvent.DismissDialog,
+                confirmLabel = stringProvider.getString(R.string.microg_uninstall_confirm),
+                destructive = true
+            )
+            return
+        }
+    }
 
     viewModelScope.launch {
         try {
+            // An uninstall is about the build that is on the device, so the entry that owns that
+            // build is the one that shows UNINSTALLING — not every entry of the package.
+            val owner = ownerOf((_state.value as? AppState.Success)?.apps.orEmpty(), packageName)
+            if (owner != null) inFlightInitiators[packageName] = owner.id
             updateAppStatus(packageName, AppStatus.UNINSTALLING)
             pendingUninstallChecks.add(packageName)
 
@@ -566,27 +589,29 @@ internal fun AppBloc.uninstallApp(packageName: String) {
     }
 }
 
-internal fun AppBloc.showReinstallConfirmation(packageName: String) {
+internal fun AppBloc.showReinstallConfirmation(appId: String, packageName: String) {
     val currentState = _state.value
     if (currentState is AppState.Success) {
-        val app = currentState.apps.find { it.packageName == packageName }
+        val app = currentState.apps.find { it.id == appId }
         if (app != null) {
             handleEvent(AppEvent.ShowConfirmationDialog(
                 title = stringProvider.getString(R.string.reinstall_confirmation_title),
                 message = stringProvider.getString(R.string.reinstall_confirmation_message, app.title),
-                onConfirm = AppEvent.ReinstallApp(packageName),
+                onConfirm = AppEvent.ReinstallApp(appId, packageName),
                 onCancel = AppEvent.DismissDialog
             ))
         }
     }
 }
 
-internal fun AppBloc.reinstallApp(packageName: String) {
+internal fun AppBloc.reinstallApp(appId: String, packageName: String) {
     dismissDialog()
 
-    val app = (_state.value as? AppState.Success)?.apps?.find { it.packageName == packageName }
+    // By id, not by package: reinstalling MicroG RE must fetch RE's build, not whichever entry of
+    // app.revanced.android.gms the catalog happens to list first.
+    val app = (_state.value as? AppState.Success)?.apps?.find { it.id == appId }
     if (app == null) {
-        Log.w(TAG_BLOC, "reinstallApp: app not found in state — $packageName")
+        Log.w(TAG_BLOC, "reinstallApp: app not found in state — $appId ($packageName)")
         return
     }
 
@@ -596,7 +621,7 @@ internal fun AppBloc.reinstallApp(packageName: String) {
     // place and keeps its data; the installed version is only removed when the user says so in
     // the dialog runInstallation raises for a signature clash or a downgrade.
     showToast(stringProvider.getString(R.string.reinstall_started))
-    downloadApp(packageName, app.downloadUrl)
+    downloadApp(app.id, packageName, app.downloadUrl)
 }
 
 /**

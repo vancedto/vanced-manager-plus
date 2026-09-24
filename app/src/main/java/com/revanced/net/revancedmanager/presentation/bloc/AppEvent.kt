@@ -16,11 +16,24 @@ sealed class AppEvent {
     data object BackgroundRefreshApps : AppEvent()
     data class UpdateSingleApp(val app: com.revanced.net.revancedmanager.domain.model.RevancedApp) : AppEvent()
     
-    data class DownloadApp(val packageName: String, val downloadUrl: String) : AppEvent()
+    /**
+     * [appId] is the catalog entry whose button was pressed. Required rather than defaulted: two
+     * entries can share [packageName], and only the id says which row is asking — see
+     * `InFlightAttribution`.
+     */
+    data class DownloadApp(val appId: String, val packageName: String, val downloadUrl: String) : AppEvent()
+    /**
+     * Carry on with a batch of downloads once the MicroG question has been answered — MicroG's
+     * own entry leads [appIds] when the user chose to install it too.
+     */
+    data class StartDownloads(val appIds: List<String>) : AppEvent()
+    /** Answer to the "allow app installs" dialog shown before the first download. */
+    data class InstallPermissionAnswer(val openSettings: Boolean) : AppEvent()
     data class InstallApp(val packageName: String, val apkFilePath: String) : AppEvent()
-    data class UninstallApp(val packageName: String) : AppEvent()
-    data class ShowReinstallConfirmation(val packageName: String) : AppEvent()
-    data class ReinstallApp(val packageName: String) : AppEvent()
+    /** [confirmed] once the user has seen what uninstalling it would break (MicroG only). */
+    data class UninstallApp(val packageName: String, val confirmed: Boolean = false) : AppEvent()
+    data class ShowReinstallConfirmation(val appId: String, val packageName: String) : AppEvent()
+    data class ReinstallApp(val appId: String, val packageName: String) : AppEvent()
     data class OpenApp(val packageName: String) : AppEvent()
     data class UpdateAppProgress(val packageName: String, val progress: Float) : AppEvent()
     data class UpdateAppStatus(val packageName: String, val status: AppStatus) : AppEvent()
