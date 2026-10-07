@@ -219,6 +219,9 @@ internal fun AppBloc.backgroundRefreshApps() {
                 when (result) {
                     is Result.Loading -> Unit
                     is Result.Success -> {
+                        // The repository already falls back to the cache when the network fails,
+                        // so offline the prompt still shows — just after the network attempt.
+                        catalogRefreshedThisSession = true
                         val currentState = _state.value
                         if (currentState is AppState.Success) {
                             val updatedApps = useCases.appRepository.getUpdatedApps(currentState.apps, result.data)
@@ -264,6 +267,7 @@ internal fun AppBloc.loadApps(forceRefresh: Boolean) {
                 when (result) {
                     is Result.Loading -> _state.value = AppState.Loading
                     is Result.Success -> {
+                        catalogRefreshedThisSession = true
                         val config = loadConfigSafely()
                         _state.value = AppState.Success(mergeInFlightState(applyLocalFlags(result.data)), config = config)
                         onAppListLoaded()
@@ -300,6 +304,7 @@ internal fun AppBloc.pullToRefreshApps() {
                 when (result) {
                     is Result.Loading -> Unit // Keep the current list visible while refreshing
                     is Result.Success -> {
+                        catalogRefreshedThisSession = true
                         val config = loadConfigSafely()
                         val latest = _state.value as? AppState.Success
                         _state.value = AppState.Success(
@@ -491,9 +496,13 @@ internal fun AppBloc.loadConfigSafely(): AppConfig = try {
  * "Update all" request from the update notification first; otherwise asks
  * where apps should come from (once), then offers the first-run suggestions
  * popup, then the "updates available" prompt.
+ *
+ * The pending "Update all" is only consumed once the catalog has been refreshed this session;
+ * the cache-first load leaves it in place for the background refresh that follows, so it never
+ * downloads the stale URLs the cached catalog points at.
  */
 internal fun AppBloc.onAppListLoaded() {
-    if (pendingUpdateAllRequest) {
+    if (pendingUpdateAllRequest && catalogRefreshedThisSession) {
         pendingUpdateAllRequest = false
         // The user already chose to update everything — don't ask again.
         updatePromptShownThisSession = true
@@ -570,8 +579,14 @@ private fun AppBloc.maybeShowSuggestions() {
 /**
  * Show the "N updates available" prompt at most once per session, unless it
  * was snoozed for today, disabled in settings, or another popup is on screen.
+ *
+ * Never from the list read out of the on-disk cache at launch: that catalog may predate the
+ * builds published since, so the prompt would list the wrong apps and then count as shown for
+ * the session. It waits for [AppBloc.catalogRefreshedThisSession] — set once the background
+ * refresh (or any other network-backed load) has finished, even if it fell back to cache offline.
  */
 private fun AppBloc.maybeShowUpdatePrompt() {
+    if (!catalogRefreshedThisSession) return
     if (updatePromptShownThisSession) return
     val state = _state.value as? AppState.Success ?: return
     if (!state.config.showUpdatePromptEnabled) return

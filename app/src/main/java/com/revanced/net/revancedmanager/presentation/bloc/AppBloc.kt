@@ -3,6 +3,7 @@ package com.revanced.net.revancedmanager.presentation.bloc
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.ViewModel
@@ -24,6 +25,8 @@ import com.revanced.net.revancedmanager.domain.usecase.AppManagementUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -119,6 +122,12 @@ class AppBloc @Inject constructor(
     // ---- Launch prompts ----
     /** The "updates available" prompt is asked at most once per app session. */
     internal var updatePromptShownThisSession = false
+    /**
+     * Whether a load that went through the repository's network path has finished this session.
+     * The list read from the on-disk cache at launch can be stale, so the update prompt and a
+     * pending "Update all" wait for this rather than acting on outdated latest versions.
+     */
+    internal var catalogRefreshedThisSession = false
     /** Set when the update notification's "Update all" action opened the app. */
     internal var pendingUpdateAllRequest = false
 
@@ -135,6 +144,9 @@ class AppBloc @Inject constructor(
     // ---- Uninstall / reinstall tracking ----
     internal val pendingReinstalls = mutableMapOf<String, String>()  // packageName -> apkPath (retry flow)
     internal val pendingUninstallChecks = mutableSetOf<String>()
+    /** Uninstalls handed to the system uninstaller, which never reports a cancel (issue #60). */
+    internal val awaitingSystemUninstall = mutableSetOf<String>()
+    private var settleSystemUninstallsJob: Job? = null
 
     data class PendingInstallation(
         val packageName: String,
@@ -185,6 +197,13 @@ class AppBloc @Inject constructor(
             resumeDownloadsAwaitingPermission()
         }
         wasAppBackgrounded = false
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+        // The system uninstall dialog is usually translucent: the app only pauses under it, so
+        // onStart above never runs. Resuming is the one sign the dialog was answered.
+        if (awaitingSystemUninstall.isNotEmpty()) settleSystemUninstalls()
     }
 
     override fun onStop(owner: LifecycleOwner) {
@@ -240,19 +259,23 @@ class AppBloc @Inject constructor(
                 when (result) {
                     is UninstallationResult.Cancelled -> {
                         Log.i(TAG_BLOC, "Uninstall cancelled by user: ${result.packageName}")
-                        clearPendingReinstall(result.packageName)
-                        viewModelScope.launch { updateSingleAppStatus(result.packageName) }
+                        settleAbandonedUninstall(result.packageName)
                         showToast(stringProvider.getString(R.string.uninstallation_cancelled))
                     }
                     is UninstallationResult.Failed -> {
                         Log.w(TAG_BLOC, "Uninstall failed: ${result.packageName}, code=${result.statusCode}")
-                        clearPendingReinstall(result.packageName)
-                        viewModelScope.launch { updateSingleAppStatus(result.packageName) }
+                        settleAbandonedUninstall(result.packageName)
                         showError(stringProvider.getString(R.string.uninstallation_failed, result.message))
                     }
                     is UninstallationResult.Success -> {
                         // Handled by PackageChangedReceiver (PackageEvent.Uninstalled)
                         Log.i(TAG_BLOC, "Uninstall success confirmed via PackageInstaller: ${result.packageName}")
+                    }
+                    is UninstallationResult.HandedToSystem -> {
+                        // Stays UNINSTALLING: PACKAGE_REMOVED finishes it, settleSystemUninstalls()
+                        // catches a cancel.
+                        Log.i(TAG_BLOC, "Uninstall handed to the system uninstaller: ${result.packageName}")
+                        awaitingSystemUninstall.add(result.packageName)
                     }
                 }
             }
@@ -264,6 +287,7 @@ class AppBloc @Inject constructor(
      * install the already-downloaded-and-verified APK, or plain uninstall.
      */
     internal fun handlePendingReinstall(packageName: String) {
+        if (awaitingSystemUninstall.remove(packageName)) packageInstaller.systemUninstallSettled(packageName)
         val pendingApkPath = pendingReinstalls.remove(packageName)
         if (pendingApkPath != null) {
             // Still the same operation — the install that asked for this uninstall is next, so the
@@ -276,9 +300,22 @@ class AppBloc @Inject constructor(
         }
     }
 
+    /**
+     * An uninstall that ended with the app still installed (cancelled, refused, never started):
+     * its entries go back to their settled status. updateSingleAppStatus() can't do that — it
+     * leaves an UNINSTALLING entry alone until the package is gone, so the card kept spinning.
+     */
+    internal fun settleAbandonedUninstall(packageName: String) {
+        clearPendingReinstall(packageName)
+        (_state.value as? AppState.Success)?.let { current ->
+            _state.value = current.copy(apps = settleEntries(current.apps, packageName))
+        }
+    }
+
     internal fun clearPendingReinstall(packageName: String) {
         pendingReinstalls.remove(packageName)
         pendingUninstallChecks.remove(packageName)
+        if (awaitingSystemUninstall.remove(packageName)) packageInstaller.systemUninstallSettled(packageName)
     }
 
     // ---- Lifecycle helpers (background/foreground) ----
@@ -290,6 +327,38 @@ class AppBloc @Inject constructor(
                     Log.i(TAG_BLOC, "Background uninstall detected: $packageName")
                     pendingUninstallChecks.remove(packageName)
                     handlePendingReinstall(packageName)
+                }
+            }
+        }
+    }
+
+    /**
+     * The system uninstaller reports nothing back. Once the app is in front again, give
+     * PACKAGE_REMOVED a moment; a package still installed after that was cancelled.
+     */
+    private fun settleSystemUninstalls() {
+        settleSystemUninstallsJob?.cancel()
+        settleSystemUninstallsJob = viewModelScope.launch {
+            // PACKAGE_REMOVED takes confirmed uninstalls out of the set
+            repeat(3) {
+                if (awaitingSystemUninstall.isEmpty()) return@launch
+                delay(1_000)
+            }
+            // A failed PackageInstaller attempt hands over mid-way, so the app can resume for a moment
+            // between that dialog and the system one. Not in front any more → still deciding; the
+            // next onResume settles it.
+            if (!ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@launch
+            awaitingSystemUninstall.toList().forEach { packageName ->
+                if (!appManager.isAppInstalled(packageName)) {
+                    // Normally PACKAGE_REMOVED got here first and cleared it
+                    if (pendingUninstallChecks.remove(packageName)) {
+                        Log.i(TAG_BLOC, "System uninstall detected on resume: $packageName")
+                        handlePendingReinstall(packageName)
+                    }
+                } else {
+                    Log.i(TAG_BLOC, "System uninstall cancelled: $packageName")
+                    settleAbandonedUninstall(packageName)
+                    showToast(stringProvider.getString(R.string.uninstallation_cancelled))
                 }
             }
         }
@@ -344,10 +413,11 @@ class AppBloc @Inject constructor(
      * Called when the app was opened from the update notification's
      * "Update all" action. If the list is already on screen the update starts
      * immediately; otherwise it runs as soon as the list finishes loading
-     * (consumed in [onAppListLoaded]).
+     * (consumed in [onAppListLoaded]). A list that so far only came from the launch cache counts
+     * as not loaded yet, so the update never uses the cached catalog's stale URLs.
      */
     fun requestUpdateAll() {
-        if (_state.value is AppState.Success) {
+        if (_state.value is AppState.Success && catalogRefreshedThisSession) {
             updateAllApps()
         } else {
             pendingUpdateAllRequest = true

@@ -569,22 +569,19 @@ internal fun AppBloc.uninstallApp(packageName: String, confirmed: Boolean = fals
                         showToast(stringProvider.getString(R.string.uninstallation_started))
                         // Result delivered via setupUninstallListener() or PackageChangedReceiver
                     } else {
-                        pendingUninstallChecks.remove(packageName)
+                        settleAbandonedUninstall(packageName)
                         showError(stringProvider.getString(R.string.failed_start_uninstallation))
-                        updateSingleAppStatus(packageName)
                     }
                 }
                 is Result.Error -> {
-                    pendingUninstallChecks.remove(packageName)
+                    settleAbandonedUninstall(packageName)
                     showError(stringProvider.getString(R.string.uninstallation_failed, result.message))
-                    updateSingleAppStatus(packageName)
                 }
                 is Result.Loading -> Unit
             }
         } catch (e: Exception) {
-            pendingUninstallChecks.remove(packageName)
+            settleAbandonedUninstall(packageName)
             showError(stringProvider.getString(R.string.uninstallation_failed, e.message ?: ""))
-            updateSingleAppStatus(packageName)
         }
     }
 }

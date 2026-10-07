@@ -10,6 +10,11 @@ package com.revanced.net.revancedmanager.core.common
  * prerelease stays under its own release: on numbers alone "7.1.0-dev.5" reads as [7,1,0,5]
  * and beats the stable "7.1.0" at [7,1,0]. This mirrors ReVanced.Models BuildVersion.Comparer
  * on the server, so the site and this app agree on which build is newer.
+ *
+ * Whitespace and brackets count as separators, like a dot: some apps report a versionName such
+ * as "2.0.3 (41-d04e542)" for the build the server publishes as "2.0.3.41-d04e542". Split on dots
+ * alone the first reads as [2,0,3*] and ranks below [2,0,3,41*], so the app reported an update
+ * forever, even right after installing it.
  */
 object VersionComparator {
 
@@ -40,10 +45,14 @@ object VersionComparator {
 
     private val ZERO = Segment(0L, suffixed = false)
 
+    /** Runs of whitespace and brackets, read as a single dot. Mirrored in BuildVersion.Comparer. */
+    private val SEPARATORS = Regex("""[\s()\[\]]+""")
+
     private data class Segment(val number: Long, val suffixed: Boolean)
 
-    private fun parse(version: String): List<Segment> = version.split(".").map { part ->
-        val digits = part.takeWhile { it.isDigit() }
-        Segment(digits.toLongOrNull() ?: 0L, suffixed = digits.length < part.length)
-    }
+    private fun parse(version: String): List<Segment> =
+        version.replace(SEPARATORS, ".").trim('.').split(".").map { part ->
+            val digits = part.takeWhile { it.isDigit() }
+            Segment(digits.toLongOrNull() ?: 0L, suffixed = digits.length < part.length)
+        }
 }
