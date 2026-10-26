@@ -232,7 +232,6 @@ class AppBloc @Inject constructor(
                         val packageName = when (event) {
                             is PackageEvent.Installed -> event.packageName
                             is PackageEvent.Updated -> event.packageName
-                            else -> return@onEach
                         }
                         Log.i(TAG_BLOC, "[$blocId] System event: Package installed/updated: $packageName")
                         pendingUninstallChecks.remove(packageName)

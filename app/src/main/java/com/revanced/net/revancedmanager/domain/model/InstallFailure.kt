@@ -46,6 +46,10 @@ enum class InstallFailureReason(val uninstallCanHelp: Boolean) {
             val msg = message.orEmpty()
             fun has(vararg needles: String) = needles.any { msg.contains(it, ignoreCase = true) }
             return when {
+                // HyperOS reports its own refusal as ABORTED (issue #63) — the user never saw a
+                // dialog, so calling it a cancel would leave them nothing to act on.
+                has("Permission denied") -> BLOCKED
+
                 statusCode == PackageInstaller.STATUS_FAILURE_ABORTED ||
                     has("aborted", "cancelled", "user denied") -> ABORTED
 

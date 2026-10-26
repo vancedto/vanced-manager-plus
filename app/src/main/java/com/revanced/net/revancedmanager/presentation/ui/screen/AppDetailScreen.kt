@@ -191,8 +191,8 @@ fun AppDetailScreen(
 
         // Offered only while no build of MicroG is on the device or on its way there — every
         // entry of the package reads NOT_INSTALLED — and only for an app that needs it.
-        val microGToInstall = successState?.apps
-            ?.takeIf { app.requiresMicroG }
+        val microGToInstall = successState.apps
+            .takeIf { app.requiresMicroG }
             ?.takeIf { apps ->
                 apps.filter { it.packageName == Config.MICROG_PACKAGE }
                     .all { it.status == AppStatus.NOT_INSTALLED }
@@ -209,7 +209,7 @@ fun AppDetailScreen(
         // The bloc holds one dialog for the whole app, so a confirmation started from here has to
         // be drawn here too.
         AppDialogHost(
-            dialogState = successState?.dialogState,
+            dialogState = successState.dialogState,
             onEvent = viewModel::handleEvent
         )
     }

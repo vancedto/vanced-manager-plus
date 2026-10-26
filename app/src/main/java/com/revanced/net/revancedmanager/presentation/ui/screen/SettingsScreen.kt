@@ -1,5 +1,6 @@
 package com.revanced.net.revancedmanager.presentation.ui.screen
 
+import android.content.ClipData
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,10 +27,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -418,7 +419,7 @@ private fun DebugModeSection(
     var logViewerContent by remember { mutableStateOf("") }
     var isLoadingLogs by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
 
     // SAF: the user picks the destination, so no storage permission is needed.
     val saveLauncher = rememberLauncherForActivityResult(
@@ -552,7 +553,9 @@ private fun DebugModeSection(
                     TextButton(
                         enabled = logViewerContent.isNotEmpty(),
                         onClick = {
-                            clipboard.setText(AnnotatedString(logViewerContent))
+                            coroutineScope.launch {
+                                clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("debug logs", logViewerContent)))
+                            }
                             Toast.makeText(context, context.getString(R.string.debug_logs_copied), Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))

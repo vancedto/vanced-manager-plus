@@ -69,7 +69,15 @@ internal fun AppBloc.startInstallationProcessor() {
     }
 }
 
-private suspend fun AppBloc.runInstallation(request: AppBloc.PendingInstallation) = coroutineScope {
+/**
+ * @param confirmedRetry true for the one retry after the ROM refused a silent update (issue #63).
+ *   The installer has stopped asking for USER_ACTION_NOT_REQUIRED by then, so this attempt goes
+ *   through the system confirmation dialog.
+ */
+private suspend fun AppBloc.runInstallation(
+    request: AppBloc.PendingInstallation,
+    confirmedRetry: Boolean = false
+): Unit = coroutineScope {
     val packageName = request.packageName
     Log.i(TAG_BLOC, "Starting installation: ${request.appName} ($packageName)")
 
@@ -131,6 +139,18 @@ private suspend fun AppBloc.runInstallation(request: AppBloc.PendingInstallation
                 )
             }
             is InstallationResult.Failed -> {
+                // Retried here, inside this processor turn, so the next queued install can't
+                // start alongside it. The APK on disk is still good — no re-download.
+                if (result.silentInstallRefused && !confirmedRetry) {
+                    Log.i(
+                        TAG_BLOC,
+                        "[$blocId] ROM refused silent install of $packageName, retrying with system confirmation"
+                    )
+                    terminalResult.cancel()
+                    pendingActionToast.cancel()
+                    runInstallation(request, confirmedRetry = true)
+                    return@coroutineScope
+                }
                 val reason = InstallFailureReason.from(result.statusCode, result.error)
                 if (reason == InstallFailureReason.ABORTED) handleInstallationAborted(packageName, result.error)
                 else handleInstallationFailure(packageName, result.error, result.statusCode)
