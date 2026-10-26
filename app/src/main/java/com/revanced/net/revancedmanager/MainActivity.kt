@@ -75,6 +75,8 @@ class MainActivity : ComponentActivity() {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 
+        val storedThemeMode = preferencesManager.getThemeMode()
+
         setContent {
             val viewModel: AppBloc = hiltViewModel()
             val state by viewModel.state.collectAsState()
@@ -90,7 +92,7 @@ class MainActivity : ComponentActivity() {
             val themeMode = when (val currentState = state) {
                 is com.revanced.net.revancedmanager.presentation.bloc.AppState.Success -> currentState.config.themeMode
                 is com.revanced.net.revancedmanager.presentation.bloc.AppState.Error -> currentState.config.themeMode
-                else -> ThemeMode.SYSTEM
+                else -> storedThemeMode
             }
 
             // Keep system bar icons legible regardless of the app's chosen theme
@@ -152,14 +154,7 @@ class MainActivity : ComponentActivity() {
             val languageCode = sharedPrefs.getString("language", null)
             
             if (languageCode != null) {
-                // Handle language codes with country codes (e.g., es-ES -> es)
-                val cleanLanguageCode = if (languageCode.contains("-")) {
-                    languageCode.split("-")[0]
-                } else {
-                    languageCode
-                }
-                
-                val contextWithLanguage = LocaleHelper.setLocale(context, cleanLanguageCode)
+                val contextWithLanguage = LocaleHelper.setLocale(context, languageCode)
                 super.attachBaseContext(contextWithLanguage)
             } else {
                 super.attachBaseContext(newBase)

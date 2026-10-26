@@ -6,10 +6,4 @@
     <files-path
         name="internal_downloads"
         path="downloads/" />
-    <external-files-path
-        name="debug_logs"
-        path="debug_logs/" />
-    <files-path
-        name="internal_debug_logs"
-        path="debug_logs/" />
 </paths>

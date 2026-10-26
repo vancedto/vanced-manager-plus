@@ -90,10 +90,8 @@
     <string name="debug_mode">وضع التصحيح</string>
     <string name="debug_mode_description">حفظ سجلات مفصّلة لاستكشاف الأخطاء (7 أيام كحد أقصى)</string>
     <string name="debug_view_logs">عرض السجلات</string>
-    <string name="debug_share_logs">مشاركة السجلات</string>
     <string name="debug_logs_title">سجلات التصحيح</string>
     <string name="debug_no_logs_available">لا توجد سجلات.\nفعّل وضع التصحيح وكرّر المشكلة أولاً.</string>
-    <string name="debug_no_logs_to_share">لا توجد سجلات للمشاركة</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">رجوع</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">لا توجد ملفات APK مخزَّنة مؤقتًا</string>
     <string name="settings_clear_cache_confirm_title">مسح ذاكرة APK المؤقتة؟</string>
     <string name="settings_clear_cache_confirm_message">سيتم حذف جميع ملفات APK التي تم تنزيلها (%1$s). وسيتم تنزيلها مرة أخرى عند الحاجة.</string>
-    <string name="settings_cache_cleared">تم مسح %1$d ملف APK</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">تم مسح %1$d ملف APK</item>
+        <item quantity="other">تم مسح %1$d ملف APK</item>
+    </plurals>
     <string name="settings_reset_button">إعادة ضبط جميع الإعدادات</string>
     <string name="settings_reset_confirm_title">إعادة ضبط الإعدادات؟</string>
     <string name="settings_reset_confirm_message">ستُعاد جميع الإعدادات إلى قيمها الافتراضية. لا يمكن التراجع عن هذا.</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">تحديث الكل</string>
-    <string name="update_all_started">جارٍ تحديث %1$d تطبيق…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">جارٍ تحديث %1$d تطبيق…</item>
+        <item quantity="other">جارٍ تحديث %1$d تطبيق…</item>
+    </plurals>
     <string name="update_prompt_title">تحديثات متاحة</string>
-    <string name="update_prompt_message">يتوفر تحديث لـ %1$d تطبيق. هل تريد تحديثها الآن؟</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">يتوفر تحديث لـ %1$d تطبيق. هل تريد تحديثها الآن؟</item>
+        <item quantity="other">يتوفر تحديث لـ %1$d تطبيق. هل تريد تحديثها الآن؟</item>
+    </plurals>
     <string name="update_selected">تحديث (%1$d)</string>
     <string name="skip_today">تخطي اليوم</string>
     <string name="update_prompt_dont_show_again">عدم الإظهار مرة أخرى</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">نافذة التحديث عند التشغيل</string>
     <string name="show_update_prompt_description">طلب تحديث كل التطبيقات عند العثور على تحديثات بعد فتح التطبيق</string>
     <string name="update_notification_channel_name">تحديثات التطبيقات</string>
-    <string name="update_notification_title">يتوفر %1$d تحديث للتطبيقات</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">يتوفر %1$d تحديث للتطبيقات</item>
+        <item quantity="other">يتوفر %1$d تحديث للتطبيقات</item>
+    </plurals>
     <string name="update_notification_text">اضغط لفتح التطبيقات وتحديثها</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">الشيفرة المصدرية</string>
     <string name="open_url_failed">تعذّر فتح الرابط</string>
     <string name="refresh">تحديث</string>
-    <string name="updates_banner">تتوفر %1$d تحديثات</string>
+    <plurals name="updates_banner">
+        <item quantity="one">تتوفر %1$d تحديثات</item>
+        <item quantity="other">تتوفر %1$d تحديثات</item>
+    </plurals>
     <string name="install_permission_title">السماح بتثبيت التطبيقات</string>
     <string name="install_permission_message">يحتاج Android إلى إذنك قبل أن يتمكن هذا التطبيق من تثبيت تطبيقات أخرى أو تحديثها. في الشاشة التالية، فعّل «السماح من هذا المصدر» ثم عُد — سيبدأ التنزيل تلقائيًا.</string>
     <string name="install_permission_open">فتح الإعدادات</string>

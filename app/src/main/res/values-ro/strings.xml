@@ -90,10 +90,8 @@
     <string name="debug_mode">Mod depanare</string>
     <string name="debug_mode_description">Salvează jurnale detaliate (max. 7 zile)</string>
     <string name="debug_view_logs">Vezi jurnale</string>
-    <string name="debug_share_logs">Distribuie jurnale</string>
     <string name="debug_logs_title">Jurnale depanare</string>
     <string name="debug_no_logs_available">Fără jurnale.\nActivați depanarea și reproduceți problema.</string>
-    <string name="debug_no_logs_to_share">Niciun jurnal de distribuit</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">Înapoi</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">Niciun fișier APK în cache</string>
     <string name="settings_clear_cache_confirm_title">Golești cache-ul APK?</string>
     <string name="settings_clear_cache_confirm_message">Toate fișierele APK descărcate (%1$s) vor fi șterse. Vor fi descărcate din nou când va fi nevoie.</string>
-    <string name="settings_cache_cleared">%1$d fișier(e) APK șterse</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">%1$d fișier(e) APK șterse</item>
+        <item quantity="other">%1$d fișier(e) APK șterse</item>
+    </plurals>
     <string name="settings_reset_button">Resetare la valori implicite</string>
     <string name="settings_reset_confirm_title">Resetare setări?</string>
     <string name="settings_reset_confirm_message">Toate setările vor fi resetate. Aceasta nu poate fi anulată.</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">Actualizează tot</string>
-    <string name="update_all_started">Se actualizează %1$d aplicații…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">Se actualizează %1$d aplicații…</item>
+        <item quantity="other">Se actualizează %1$d aplicații…</item>
+    </plurals>
     <string name="update_prompt_title">Actualizări disponibile</string>
-    <string name="update_prompt_message">%1$d aplicații au actualizări disponibile. Vrei să le actualizezi acum?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">%1$d aplicații au actualizări disponibile. Vrei să le actualizezi acum?</item>
+        <item quantity="other">%1$d aplicații au actualizări disponibile. Vrei să le actualizezi acum?</item>
+    </plurals>
     <string name="update_selected">Actualizează (%1$d)</string>
     <string name="skip_today">Sari peste azi</string>
     <string name="update_prompt_dont_show_again">Nu mai afișa</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">Fereastră de actualizare la pornire</string>
     <string name="show_update_prompt_description">Întreabă dacă să actualizezi toate aplicațiile când se găsesc actualizări după deschidere</string>
     <string name="update_notification_channel_name">Actualizări aplicații</string>
-    <string name="update_notification_title">%1$d actualizări de aplicații disponibile</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$d actualizări de aplicații disponibile</item>
+        <item quantity="other">%1$d actualizări de aplicații disponibile</item>
+    </plurals>
     <string name="update_notification_text">Atinge pentru a deschide și actualiza aplicațiile</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">Cod sursă</string>
     <string name="open_url_failed">Linkul nu a putut fi deschis</string>
     <string name="refresh">Reîmprospătează</string>
-    <string name="updates_banner">%1$d actualizări disponibile</string>
+    <plurals name="updates_banner">
+        <item quantity="one">%1$d actualizări disponibile</item>
+        <item quantity="other">%1$d actualizări disponibile</item>
+    </plurals>
     <string name="install_permission_title">Permite instalarea aplicațiilor</string>
     <string name="install_permission_message">Android are nevoie de permisiunea ta înainte ca această aplicație să poată instala sau actualiza alte aplicații. Pe ecranul următor, activează „Permite din această sursă”, apoi revino — descărcarea va porni singură.</string>
     <string name="install_permission_open">Deschide setările</string>

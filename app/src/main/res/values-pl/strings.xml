@@ -90,10 +90,8 @@
     <string name="debug_mode">Tryb debugowania</string>
     <string name="debug_mode_description">Zapisuje szczegółowe dzienniki (maks. 7 dni)</string>
     <string name="debug_view_logs">Wyświetl dzienniki</string>
-    <string name="debug_share_logs">Udostępnij dzienniki</string>
     <string name="debug_logs_title">Dzienniki debugowania</string>
     <string name="debug_no_logs_available">Brak dzienników.\nWłącz tryb debugowania i odtwórz problem.</string>
-    <string name="debug_no_logs_to_share">Brak dzienników do udostępnienia</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">Wstecz</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">Brak plików APK w pamięci podręcznej</string>
     <string name="settings_clear_cache_confirm_title">Wyczyścić pamięć podręczną APK?</string>
     <string name="settings_clear_cache_confirm_message">Wszystkie pobrane pliki APK (%1$s) zostaną usunięte. Zostaną pobrane ponownie w razie potrzeby.</string>
-    <string name="settings_cache_cleared">Wyczyszczono %1$d plik(ów) APK</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">Wyczyszczono %1$d plik(ów) APK</item>
+        <item quantity="other">Wyczyszczono %1$d plik(ów) APK</item>
+    </plurals>
     <string name="settings_reset_button">Przywróć ustawienia domyślne</string>
     <string name="settings_reset_confirm_title">Przywrócić ustawienia?</string>
     <string name="settings_reset_confirm_message">Wszystkie ustawienia zostaną przywrócone do wartości domyślnych. Nie można cofnąć.</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">Zaktualizuj wszystko</string>
-    <string name="update_all_started">Aktualizowanie %1$d aplikacji…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">Aktualizowanie %1$d aplikacji…</item>
+        <item quantity="other">Aktualizowanie %1$d aplikacji…</item>
+    </plurals>
     <string name="update_prompt_title">Dostępne aktualizacje</string>
-    <string name="update_prompt_message">%1$d aplikacji ma dostępne aktualizacje. Czy chcesz je teraz zaktualizować?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">%1$d aplikacji ma dostępne aktualizacje. Czy chcesz je teraz zaktualizować?</item>
+        <item quantity="other">%1$d aplikacji ma dostępne aktualizacje. Czy chcesz je teraz zaktualizować?</item>
+    </plurals>
     <string name="update_selected">Aktualizuj (%1$d)</string>
     <string name="skip_today">Pomiń dzisiaj</string>
     <string name="update_prompt_dont_show_again">Nie pokazuj ponownie</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">Wyskakujące okno przy uruchomieniu</string>
     <string name="show_update_prompt_description">Pytaj o aktualizację wszystkich aplikacji, gdy po otwarciu zostaną znalezione aktualizacje</string>
     <string name="update_notification_channel_name">Aktualizacje aplikacji</string>
-    <string name="update_notification_title">Dostępne aktualizacje %1$d aplikacji</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">Dostępne aktualizacje %1$d aplikacji</item>
+        <item quantity="other">Dostępne aktualizacje %1$d aplikacji</item>
+    </plurals>
     <string name="update_notification_text">Dotknij, aby otworzyć i zaktualizować aplikacje</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">Kod źródłowy</string>
     <string name="open_url_failed">Nie udało się otworzyć linku</string>
     <string name="refresh">Odśwież</string>
-    <string name="updates_banner">Dostępne aktualizacje: %1$d</string>
+    <plurals name="updates_banner">
+        <item quantity="one">Dostępne aktualizacje: %1$d</item>
+        <item quantity="other">Dostępne aktualizacje: %1$d</item>
+    </plurals>
     <string name="install_permission_title">Zezwól na instalowanie aplikacji</string>
     <string name="install_permission_message">Android potrzebuje Twojej zgody, zanim ta aplikacja będzie mogła instalować lub aktualizować inne aplikacje. Na następnym ekranie włącz „Zezwalaj z tego źródła”, a potem wróć — pobieranie rozpocznie się samo.</string>
     <string name="install_permission_open">Otwórz ustawienia</string>

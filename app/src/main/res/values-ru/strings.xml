@@ -90,10 +90,8 @@
     <string name="debug_mode">Режим отладки</string>
     <string name="debug_mode_description">Сохраняет подробные журналы (макс. 7 дней)</string>
     <string name="debug_view_logs">Просмотр журналов</string>
-    <string name="debug_share_logs">Поделиться журналами</string>
     <string name="debug_logs_title">Журналы отладки</string>
     <string name="debug_no_logs_available">Журналов нет.\nВключите режим отладки и воспроизведите проблему.</string>
-    <string name="debug_no_logs_to_share">Нет журналов для отправки</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">Назад</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">Нет кэшированных APK-файлов</string>
     <string name="settings_clear_cache_confirm_title">Очистить кэш APK?</string>
     <string name="settings_clear_cache_confirm_message">Все загруженные APK-файлы (%1$s) будут удалены. При необходимости они будут загружены снова.</string>
-    <string name="settings_cache_cleared">Очищено APK-файлов: %1$d</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">Очищено APK-файлов: %1$d</item>
+        <item quantity="other">Очищено APK-файлов: %1$d</item>
+    </plurals>
     <string name="settings_reset_button">Сбросить все настройки</string>
     <string name="settings_reset_confirm_title">Сбросить настройки?</string>
     <string name="settings_reset_confirm_message">Все настройки вернутся к значениям по умолчанию. Это нельзя отменить.</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">Обновить все</string>
-    <string name="update_all_started">Обновление %1$d приложений…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">Обновление %1$d приложений…</item>
+        <item quantity="other">Обновление %1$d приложений…</item>
+    </plurals>
     <string name="update_prompt_title">Доступны обновления</string>
-    <string name="update_prompt_message">Для %1$d приложений доступны обновления. Обновить их сейчас?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">Для %1$d приложений доступны обновления. Обновить их сейчас?</item>
+        <item quantity="other">Для %1$d приложений доступны обновления. Обновить их сейчас?</item>
+    </plurals>
     <string name="update_selected">Обновить (%1$d)</string>
     <string name="skip_today">Пропустить сегодня</string>
     <string name="update_prompt_dont_show_again">Больше не показывать</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">Всплывающее окно обновления при запуске</string>
     <string name="show_update_prompt_description">Предлагать обновить все приложения, когда после открытия найдены обновления</string>
     <string name="update_notification_channel_name">Обновления приложений</string>
-    <string name="update_notification_title">Доступно обновлений приложений: %1$d</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">Доступно обновлений приложений: %1$d</item>
+        <item quantity="other">Доступно обновлений приложений: %1$d</item>
+    </plurals>
     <string name="update_notification_text">Нажмите, чтобы открыть и обновить приложения</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">Исходный код</string>
     <string name="open_url_failed">Не удалось открыть ссылку</string>
     <string name="refresh">Обновить</string>
-    <string name="updates_banner">Доступно обновлений: %1$d</string>
+    <plurals name="updates_banner">
+        <item quantity="one">Доступно обновлений: %1$d</item>
+        <item quantity="other">Доступно обновлений: %1$d</item>
+    </plurals>
     <string name="install_permission_title">Разрешите установку приложений</string>
     <string name="install_permission_message">Android нужно ваше разрешение, чтобы это приложение могло устанавливать и обновлять другие приложения. На следующем экране включите «Разрешить установку из этого источника» и вернитесь — загрузка начнётся сама.</string>
     <string name="install_permission_open">Открыть настройки</string>

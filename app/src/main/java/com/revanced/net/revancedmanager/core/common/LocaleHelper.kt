@@ -14,12 +14,20 @@ import java.util.Locale
 class LocaleHelper {
     companion object {
         private const val TAG = "LocaleHelper"
+
+        /**
+         * The locale for a stored language code. Codes carry a region for the Spanish variants
+         * ("es-ES", "es-PE"): Locale("es-PE") reads the whole string as a language and matches no
+         * resource folder, and the callers used to cut the region off instead, so both variants
+         * silently showed values-es. A language tag keeps the region and reaches values-es-rPE.
+         */
+        fun localeFor(language: String): Locale = Locale.forLanguageTag(language)
         
         /**
          * Set locale and return new context with updated configuration
          */
         fun setLocale(context: Context, language: String): Context {
-            val locale = Locale(language)
+            val locale = localeFor(language)
             Locale.setDefault(locale)
 
             // Copy full configuration (density, screen size, night mode…) then override locale only
@@ -37,7 +45,7 @@ class LocaleHelper {
          */
         fun wrap(context: Context, language: String): ContextWrapper {
             val config = Configuration()
-            val locale = Locale(language)
+            val locale = localeFor(language)
             config.setLocale(locale)
             
             val newContext = context.createConfigurationContext(config)
@@ -57,7 +65,7 @@ class LocaleHelper {
             android.util.Log.i(TAG, "🏠 Current thread: ${Thread.currentThread().name}")
             
             // Set default locale first
-            val locale = Locale(language)
+            val locale = localeFor(language)
             val previousLocale = Locale.getDefault()
             android.util.Log.i(TAG, "🏠 Previous default locale: $previousLocale")
             

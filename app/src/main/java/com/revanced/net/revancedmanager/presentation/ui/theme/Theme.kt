@@ -6,7 +6,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.revanced.net.revancedmanager.domain.model.ThemeMode
 import com.revanced.net.revancedmanager.ui.theme.Typography
@@ -98,26 +100,35 @@ fun RevancedManagerTheme(
 
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography  = Typography,
-        content     = content
-    )
+    CompositionLocalProvider(LocalDarkTheme provides darkTheme) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography  = Typography,
+            content     = content
+        )
+    }
 }
+
+/**
+ * Whether [RevancedManagerTheme] resolved to dark. The action colors read this rather than
+ * isSystemInDarkTheme(): with the in-app theme set to Light on a phone in dark mode the system
+ * answer is the wrong one, and the buttons came out in the dark palette on a light screen.
+ */
+val LocalDarkTheme = staticCompositionLocalOf { false }
 
 // ── Extension properties for action button colors ─────────────────────────────
 val ColorScheme.downloadColor: Color
     @Composable @ReadOnlyComposable
-    get() = if (isSystemInDarkTheme()) DownloadDark else DownloadLight
+    get() = if (LocalDarkTheme.current) DownloadDark else DownloadLight
 
 val ColorScheme.updateColor: Color
     @Composable @ReadOnlyComposable
-    get() = if (isSystemInDarkTheme()) UpdateDark else UpdateLight
+    get() = if (LocalDarkTheme.current) UpdateDark else UpdateLight
 
 val ColorScheme.openColor: Color
     @Composable @ReadOnlyComposable
-    get() = if (isSystemInDarkTheme()) OpenDark else OpenLight
+    get() = if (LocalDarkTheme.current) OpenDark else OpenLight
 
 val ColorScheme.uninstallColor: Color
     @Composable @ReadOnlyComposable
-    get() = if (isSystemInDarkTheme()) UninstallDark else UninstallLight
+    get() = if (LocalDarkTheme.current) UninstallDark else UninstallLight

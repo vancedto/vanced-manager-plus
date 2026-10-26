@@ -1,5 +1,8 @@
 package com.revanced.net.revancedmanager.presentation.ui.screen
 
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,14 +21,15 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,6 +44,10 @@ import com.revanced.net.revancedmanager.presentation.ui.components.tvFocusBorder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * Full-screen settings view.
@@ -55,7 +63,7 @@ fun SettingsScreen(
     onCancel: () -> Unit,
     onResetSettings: () -> Unit,
     getLogContent: () -> String,
-    onShareLogs: () -> Unit,
+    onSaveLogs: (OutputStream) -> Boolean,
     getApkCacheInfo: () -> ApkCacheInfo,
     onClearApkCache: () -> ApkCacheInfo,
     modifier: Modifier = Modifier
@@ -68,6 +76,7 @@ fun SettingsScreen(
     var autoUpdateCheck by remember(currentConfig) { mutableStateOf(currentConfig.autoUpdateCheckEnabled) }
     var showUpdatePrompt by remember(currentConfig) { mutableStateOf(currentConfig.showUpdatePromptEnabled) }
     var showCommunityApps by remember(currentConfig) { mutableStateOf(currentConfig.showCommunityApps) }
+    var patchUpdates by remember(currentConfig) { mutableStateOf(currentConfig.patchUpdatesEnabled) }
     var showResetConfirm by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -158,6 +167,13 @@ fun SettingsScreen(
                     onCheckedChange = { showUpdatePrompt = it },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
+                SettingsSwitchRow(
+                    title = stringResource(R.string.patch_updates),
+                    subtitle = stringResource(R.string.patch_updates_description),
+                    checked = patchUpdates,
+                    onCheckedChange = { patchUpdates = it },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
                 // Storage section
                 SettingsSectionHeader(stringResource(R.string.settings_section_storage))
@@ -175,7 +191,7 @@ fun SettingsScreen(
                     debugMode = debugMode,
                     onDebugModeChange = { debugMode = it },
                     getLogContent = getLogContent,
-                    onShareLogs = onShareLogs,
+                    onSaveLogs = onSaveLogs,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
 
@@ -235,7 +251,8 @@ fun SettingsScreen(
                                 autoDeleteApkEnabled = autoDeleteApk,
                                 autoUpdateCheckEnabled = autoUpdateCheck,
                                 showUpdatePromptEnabled = showUpdatePrompt,
-                                showCommunityApps = showCommunityApps
+                                showCommunityApps = showCommunityApps,
+                                patchUpdatesEnabled = patchUpdates
                             )
                         )
                     },
@@ -393,13 +410,37 @@ private fun DebugModeSection(
     debugMode: Boolean,
     onDebugModeChange: (Boolean) -> Unit,
     getLogContent: () -> String,
-    onShareLogs: () -> Unit,
+    onSaveLogs: (OutputStream) -> Boolean,
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
     var showLogViewer by remember { mutableStateOf(false) }
     var logViewerContent by remember { mutableStateOf("") }
     var isLoadingLogs by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
+
+    // SAF: the user picks the destination, so no storage permission is needed.
+    val saveLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("text/plain")
+    ) { uri ->
+        if (uri != null) {
+            coroutineScope.launch {
+                val saved = withContext(Dispatchers.IO) {
+                    try {
+                        context.contentResolver.openOutputStream(uri)?.use { onSaveLogs(it) } ?: false
+                    } catch (e: Exception) {
+                        false
+                    }
+                }
+                Toast.makeText(
+                    context,
+                    context.getString(if (saved) R.string.debug_logs_saved else R.string.debug_logs_save_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -469,16 +510,6 @@ private fun DebugModeSection(
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    IconButton(
-                        onClick = onShareLogs,
-                        modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = stringResource(R.string.debug_share_logs),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
                 }
             }
         }
@@ -514,6 +545,30 @@ private fun DebugModeSection(
             confirmButton = {
                 TextButton(onClick = { showLogViewer = false }) {
                     Text(stringResource(R.string.close_button))
+                }
+            },
+            dismissButton = {
+                Row {
+                    TextButton(
+                        enabled = logViewerContent.isNotEmpty(),
+                        onClick = {
+                            clipboard.setText(AnnotatedString(logViewerContent))
+                            Toast.makeText(context, context.getString(R.string.debug_logs_copied), Toast.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
+                    ) {
+                        Text(stringResource(R.string.debug_copy_logs))
+                    }
+                    TextButton(
+                        enabled = logViewerContent.isNotEmpty(),
+                        onClick = {
+                            val day = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+                            saveLauncher.launch("revanced-manager-debug-$day.log")
+                        },
+                        modifier = Modifier.tvFocusBorder(shape = RoundedCornerShape(50))
+                    ) {
+                        Text(stringResource(R.string.debug_save_logs))
+                    }
                 }
             }
         )

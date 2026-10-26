@@ -1,6 +1,7 @@
 package com.revanced.net.revancedmanager.domain.model
 
 import com.revanced.net.revancedmanager.config.Config
+import com.revanced.net.revancedmanager.core.common.VersionComparator
 
 /**
  * Domain model representing a ReVanced application
@@ -62,6 +63,11 @@ data class RevancedApp(
     val sizeText: String = "",
     /** Build date of the chosen variant, ISO-8601. Formatted where it is displayed. */
     val updatedAt: String = "",
+    /**
+     * Patches bundle version of the chosen variant ("1.39.0.8"). Null for apps that are not
+     * patched, and for catalogs that do not say.
+     */
+    val patchVersion: String? = null,
     /** Every published build, including ones this device cannot run. */
     val variants: List<AppVariant> = emptyList(),
     /**
@@ -91,6 +97,17 @@ data class RevancedApp(
      */
     val isCommunityContribution: Boolean
         get() = provider != null && provider !in Config.MAINSTREAM_PROVIDERS
+
+    /**
+     * An update to a newer build of the version that is already installed — same app, newer
+     * patches. Derived rather than stored: the version comparison alone never yields
+     * UPDATE_AVAILABLE for equal versions, so only the patch check can have set it, and deriving it
+     * keeps every copy() of this model honest without each path carrying a flag along.
+     */
+    val isPatchUpdate: Boolean
+        get() = status == AppStatus.UPDATE_AVAILABLE &&
+            !currentVersion.isNullOrBlank() &&
+            VersionComparator.compare(currentVersion, latestVersion) == 0
 }
 
 /**
@@ -118,7 +135,9 @@ data class AppVariant(
     val url: String,
     val sizeBytes: Long,
     val sizeText: String,
-    val updatedAt: String
+    val updatedAt: String,
+    val patchVersion: String? = null,
+    val cliVersion: String? = null
 )
 
 /**

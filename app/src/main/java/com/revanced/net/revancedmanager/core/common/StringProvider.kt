@@ -11,6 +11,8 @@ import javax.inject.Singleton
 interface StringProvider {
     fun getString(resId: Int): String
     fun getString(resId: Int, vararg formatArgs: Any): String
+    /** A `<plurals>` resource with [quantity] as its first format argument. */
+    fun getQuantityString(resId: Int, quantity: Int): String
 }
 
 /**
@@ -27,5 +29,9 @@ class StringProviderImpl @Inject constructor(
     
     override fun getString(resId: Int, vararg formatArgs: Any): String {
         return context.getString(resId, *formatArgs)
+    }
+
+    override fun getQuantityString(resId: Int, quantity: Int): String {
+        return context.resources.getQuantityString(resId, quantity, quantity)
     }
 } 

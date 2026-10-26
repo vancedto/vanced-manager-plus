@@ -90,10 +90,8 @@
     <string name="debug_mode">Modalità debug</string>
     <string name="debug_mode_description">Salva log dettagliati (max 7 giorni)</string>
     <string name="debug_view_logs">Visualizza log</string>
-    <string name="debug_share_logs">Condividi log</string>
     <string name="debug_logs_title">Log di debug</string>
     <string name="debug_no_logs_available">Nessun log.\nAttiva la modalità debug e riproduci il problema.</string>
-    <string name="debug_no_logs_to_share">Nessun log da condividere</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">Indietro</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">Nessun file APK in cache</string>
     <string name="settings_clear_cache_confirm_title">Svuotare la cache APK?</string>
     <string name="settings_clear_cache_confirm_message">Tutti i file APK scaricati (%1$s) verranno eliminati. Verranno scaricati di nuovo quando necessario.</string>
-    <string name="settings_cache_cleared">%1$d file APK eliminati</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">%1$d file APK eliminati</item>
+        <item quantity="other">%1$d file APK eliminati</item>
+    </plurals>
     <string name="settings_reset_button">Ripristina tutto</string>
     <string name="settings_reset_confirm_title">Ripristinare le impostazioni?</string>
     <string name="settings_reset_confirm_message">Tutte le impostazioni torneranno ai valori predefiniti. Non si può annullare.</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">Aggiorna tutto</string>
-    <string name="update_all_started">Aggiornamento di %1$d app…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">Aggiornamento di %1$d app…</item>
+        <item quantity="other">Aggiornamento di %1$d app…</item>
+    </plurals>
     <string name="update_prompt_title">Aggiornamenti disponibili</string>
-    <string name="update_prompt_message">%1$d app hanno aggiornamenti disponibili. Vuoi aggiornarle ora?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">%1$d app hanno aggiornamenti disponibili. Vuoi aggiornarle ora?</item>
+        <item quantity="other">%1$d app hanno aggiornamenti disponibili. Vuoi aggiornarle ora?</item>
+    </plurals>
     <string name="update_selected">Aggiorna (%1$d)</string>
     <string name="skip_today">Salta oggi</string>
     <string name="update_prompt_dont_show_again">Non mostrare più</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">Popup di aggiornamento all\'avvio</string>
     <string name="show_update_prompt_description">Chiedi di aggiornare tutte le app quando vengono trovati aggiornamenti dopo l\'apertura</string>
     <string name="update_notification_channel_name">Aggiornamenti app</string>
-    <string name="update_notification_title">%1$d aggiornamento/i app disponibili</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$d aggiornamento/i app disponibili</item>
+        <item quantity="other">%1$d aggiornamento/i app disponibili</item>
+    </plurals>
     <string name="update_notification_text">Tocca per aprire e aggiornare le tue app</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">Codice sorgente</string>
     <string name="open_url_failed">Impossibile aprire il link</string>
     <string name="refresh">Aggiorna</string>
-    <string name="updates_banner">%1$d aggiornamento/i disponibile/i</string>
+    <plurals name="updates_banner">
+        <item quantity="one">%1$d aggiornamento/i disponibile/i</item>
+        <item quantity="other">%1$d aggiornamento/i disponibile/i</item>
+    </plurals>
     <string name="install_permission_title">Consenti installazione app</string>
     <string name="install_permission_message">Android ha bisogno del tuo permesso perché questa app possa installare o aggiornare altre app. Nella schermata successiva attiva «Consenti da questa fonte», poi torna indietro: il download partirà da solo.</string>
     <string name="install_permission_open">Apri impostazioni</string>

@@ -9,6 +9,7 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.revanced.net.revancedmanager.core.common.LocaleHelper
 import com.revanced.net.revancedmanager.data.local.preferences.PreferencesManager
+import com.revanced.net.revancedmanager.data.manager.DebugLogManager
 import com.revanced.net.revancedmanager.data.manager.UpdateCheckWorker
 import dagger.hilt.android.HiltAndroidApp
 import java.lang.ref.WeakReference
@@ -27,6 +28,9 @@ class RevancedManagerApplication : Application(), Configuration.Provider {
     
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
+
+    @Inject
+    lateinit var debugLogManager: DebugLogManager
     
     companion object {
         @Volatile
@@ -98,16 +102,17 @@ class RevancedManagerApplication : Application(), Configuration.Provider {
         
         // Apply saved language configuration using LocaleHelper
         val config = preferencesManager.getAppConfig()
-        val languageCode = if (config.language.code.contains("-")) {
-            config.language.code.split("-")[0]
-        } else {
-            config.language.code
-        }
-        
         // Set default locale
-        val locale = java.util.Locale(languageCode)
+        val locale = LocaleHelper.localeFor(config.language.code)
         java.util.Locale.setDefault(locale)
         android.util.Log.d("RevancedApp", "Set default locale to: ${java.util.Locale.getDefault()}")
+
+        // Debug mode: make sure a crash lands in the debug log before the process dies
+        val previousHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            debugLogManager.recordCrash(thread, throwable)
+            previousHandler?.uncaughtException(thread, throwable)
+        }
 
         // Daily background update check (the worker no-ops when disabled in settings)
         UpdateCheckWorker.schedule(WorkManager.getInstance(this))
@@ -125,14 +130,7 @@ class RevancedManagerApplication : Application(), Configuration.Provider {
             val languageCode = sharedPrefs.getString("language", null)
             
             if (languageCode != null) {
-                // Handle language codes with country codes (e.g., es-ES -> es)
-                val cleanLanguageCode = if (languageCode.contains("-")) {
-                    languageCode.split("-")[0]
-                } else {
-                    languageCode
-                }
-                
-                val contextWithLanguage = LocaleHelper.setLocale(context, cleanLanguageCode)
+                val contextWithLanguage = LocaleHelper.setLocale(context, languageCode)
                 super.attachBaseContext(contextWithLanguage)
                 return
             }

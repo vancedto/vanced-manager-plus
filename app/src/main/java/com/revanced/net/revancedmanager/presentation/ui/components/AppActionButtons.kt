@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
@@ -171,7 +172,7 @@ fun AppActionButtons(
                                 color = MaterialTheme.colorScheme.uninstallColor,
                                 shape = RoundedCornerShape(8.dp)
                             )
-                            .clickable { onUninstallClick() },
+                            .clickable(role = Role.Button) { onUninstallClick() },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(

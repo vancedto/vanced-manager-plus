@@ -68,21 +68,35 @@ object PackageOwnership {
     fun withInstallStatus(
         apps: List<RevancedApp>,
         installedVersionOf: (packageName: String) -> String?
+    ): List<RevancedApp> =
+        withInstalledBuilds(apps, { packageName -> installedVersionOf(packageName)?.let { InstalledBuild(it) } })
+
+    /**
+     * [withInstallStatus] with the install time as well, so a build of the same version with newer
+     * patches can read as an update (see [PatchUpdate]).
+     *
+     * @param installedBuildOf `null` when the package is not installed.
+     * @param hasNewerPatch the patch check for this pass; null when patch updates are off.
+     */
+    fun withInstalledBuilds(
+        apps: List<RevancedApp>,
+        installedBuildOf: (packageName: String) -> InstalledBuild?,
+        hasNewerPatch: ((RevancedApp, InstalledBuild) -> Boolean)? = null
     ): List<RevancedApp> {
-        val versions = apps.map { it.packageName }.distinct().associateWith(installedVersionOf)
+        val builds = apps.map { it.packageName }.distinct().associateWith(installedBuildOf)
         val owners = apps.groupBy { it.packageName }.mapNotNull { (packageName, entries) ->
-            val installed = versions[packageName] ?: return@mapNotNull null
-            ownerOf(entries, installed)?.let { packageName to it.id }
+            val installed = builds[packageName] ?: return@mapNotNull null
+            ownerOf(entries, installed.versionName)?.let { packageName to it.id }
         }.toMap()
 
         return apps.map { app ->
-            val installed = versions[app.packageName]
+            val installed = builds[app.packageName]
             when {
                 installed == null -> app.copy(currentVersion = null, status = AppStatus.NOT_INSTALLED)
                 owners[app.packageName] != app.id -> app.copy(currentVersion = null, status = AppStatus.NOT_INSTALLED)
                 else -> app.copy(
-                    currentVersion = installed,
-                    status = statusForVersions(installed, app.latestVersion)
+                    currentVersion = installed.versionName,
+                    status = statusFor(app, installed, hasNewerPatch)
                 )
             }
         }
@@ -91,4 +105,21 @@ object PackageOwnership {
     fun statusForVersions(installedVersion: String, latestVersion: String): AppStatus =
         if (VersionComparator.compare(installedVersion, latestVersion) >= 0) AppStatus.UP_TO_DATE
         else AppStatus.UPDATE_AVAILABLE
+
+    /**
+     * The settled status of [app] with [installed] on the device: the version comparison, and then
+     * the patch check for a build that compares equal.
+     */
+    fun statusFor(
+        app: RevancedApp,
+        installed: InstalledBuild,
+        hasNewerPatch: ((RevancedApp, InstalledBuild) -> Boolean)?
+    ): AppStatus {
+        val byVersion = statusForVersions(installed.versionName, app.latestVersion)
+        return if (byVersion == AppStatus.UP_TO_DATE && hasNewerPatch?.invoke(app, installed) == true) {
+            AppStatus.UPDATE_AVAILABLE
+        } else {
+            byVersion
+        }
+    }
 }

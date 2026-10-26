@@ -41,6 +41,9 @@ internal fun AppBloc.setFilter(filter: AppFilterOption) {
     if (currentState is AppState.Success) {
         _state.value = currentState.copy(filterOption = filter)
     }
+    // PROCESSING is a live view of work in flight; restored on a later launch it would open on
+    // an empty list, so the stored filter stays at whatever was chosen before it.
+    if (filter != AppFilterOption.PROCESSING) preferencesManager.saveListFilter(filter.name)
 }
 
 internal fun AppBloc.setSort(sort: AppSortOption) {
@@ -48,7 +51,18 @@ internal fun AppBloc.setSort(sort: AppSortOption) {
     if (currentState is AppState.Success) {
         _state.value = currentState.copy(sortOption = sort)
     }
+    preferencesManager.saveListSort(sort.name)
 }
+
+/** The filter chosen in an earlier session, for the first list of this one. */
+internal fun AppBloc.storedFilter(): AppFilterOption =
+    AppFilterOption.entries.find { it.name == preferencesManager.getListFilter() }
+        ?.takeIf { it != AppFilterOption.PROCESSING }
+        ?: AppFilterOption.ALL
+
+/** The sort chosen in an earlier session, for the first list of this one. */
+internal fun AppBloc.storedSort(): AppSortOption =
+    AppSortOption.entries.find { it.name == preferencesManager.getListSort() } ?: AppSortOption.CATALOG
 
 /**
  * Restore the per-app preferences that live on the device rather than in the catalog, so every
@@ -196,6 +210,8 @@ internal fun AppBloc.loadAppsFromCacheFirst() {
                         val config = loadConfigSafely()
                         _state.value = AppState.Success(
                             mergeInFlightState(applyLocalFlags(result.data)),
+                            filterOption = storedFilter(),
+                            sortOption = storedSort(),
                             config = config
                         )
                         onAppListLoaded()
@@ -269,7 +285,12 @@ internal fun AppBloc.loadApps(forceRefresh: Boolean) {
                     is Result.Success -> {
                         catalogRefreshedThisSession = true
                         val config = loadConfigSafely()
-                        _state.value = AppState.Success(mergeInFlightState(applyLocalFlags(result.data)), config = config)
+                        _state.value = AppState.Success(
+                            mergeInFlightState(applyLocalFlags(result.data)),
+                            filterOption = storedFilter(),
+                            sortOption = storedSort(),
+                            config = config
+                        )
                         onAppListLoaded()
                     }
                     is Result.Error -> {
@@ -310,8 +331,8 @@ internal fun AppBloc.pullToRefreshApps() {
                         _state.value = AppState.Success(
                             apps = mergeInFlightState(applyLocalFlags(result.data)),
                             searchQuery = latest?.searchQuery ?: "",
-                            filterOption = latest?.filterOption ?: AppFilterOption.ALL,
-                            sortOption = latest?.sortOption ?: AppSortOption.CATALOG,
+                            filterOption = latest?.filterOption ?: storedFilter(),
+                            sortOption = latest?.sortOption ?: storedSort(),
                             dialogState = latest?.dialogState,
                             config = config,
                             isRefreshing = false,
@@ -419,28 +440,39 @@ internal fun AppBloc.settleEntries(apps: List<RevancedApp>, packageName: String)
     inFlightInitiators.remove(packageName)
     val entries = apps.filter { it.packageName == packageName }
     if (entries.isEmpty()) return apps
-    val installedVersion = appManager.getInstalledVersion(packageName)
-    val settled = PackageOwnership.withInstallStatus(entries) { installedVersion }.associateBy { it.id }
+    val installed = appManager.getInstalledBuild(packageName)
+    val settled = PackageOwnership.withInstalledBuilds(
+        entries,
+        { installed },
+        installedBuildStore.newerPatchCheck()
+    ).associateBy { it.id }
     return apps.map { app -> settled[app.id]?.copy(downloadProgress = 0f) ?: app }
 }
 
 internal fun AppBloc.resolveActualStatus(packageName: String): AppStatus {
-    if (!appManager.isAppInstalled(packageName)) return AppStatus.NOT_INSTALLED
-    val installedVersion = appManager.getInstalledVersion(packageName) ?: return AppStatus.NOT_INSTALLED
+    val installed = appManager.getInstalledBuild(packageName) ?: return AppStatus.NOT_INSTALLED
     // The owner's latest version, not the first entry's: with two MicroG entries the first one
     // in catalog order may be the build that is *not* installed.
     val entries = (_state.value as? AppState.Success)?.apps.orEmpty()
-    val latestVersion = PackageOwnership.ownerOf(entries.filter { it.packageName == packageName }, installedVersion)
-        ?.latestVersion ?: return AppStatus.UP_TO_DATE
-    return statusForVersions(installedVersion, latestVersion)
+    val owner = PackageOwnership.ownerOf(entries.filter { it.packageName == packageName }, installed.versionName)
+        ?: return AppStatus.UP_TO_DATE
+    return PackageOwnership.statusFor(owner, installed, installedBuildStore.newerPatchCheck())
 }
 
-internal fun AppBloc.statusForVersions(installedVersion: String, latestVersion: String): AppStatus =
-    if (compareVersions(installedVersion, latestVersion) >= 0) AppStatus.UP_TO_DATE
-    else AppStatus.UPDATE_AVAILABLE
-
-internal fun AppBloc.compareVersions(version1: String, version2: String): Int =
-    com.revanced.net.revancedmanager.core.common.VersionComparator.compare(version1, version2)
+/**
+ * Re-derive every entry's status from what is installed, keeping in-flight work as it is. For a
+ * change that moves the line between "up to date" and "update available" without a new catalog —
+ * switching patch updates on or off.
+ */
+internal fun AppBloc.recomputeInstallStatus() {
+    val currentState = _state.value as? AppState.Success ?: return
+    val settled = PackageOwnership.withInstalledBuilds(
+        currentState.apps,
+        appManager::getInstalledBuild,
+        installedBuildStore.newerPatchCheck()
+    )
+    _state.value = currentState.copy(apps = mergeInFlightState(settled))
+}
 
 /**
  * Preserve in-flight download/install state when replacing the app list with

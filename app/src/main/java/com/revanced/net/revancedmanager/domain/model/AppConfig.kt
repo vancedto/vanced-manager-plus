@@ -4,7 +4,7 @@ package com.revanced.net.revancedmanager.domain.model
  * Configuration model for app settings
  */
 data class AppConfig(
-    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val themeMode: ThemeMode = ThemeMode.DARK, // Same fallback PreferencesManager uses for a fresh install
     val language: Language = Language.ENGLISH,
     val compactMode: Boolean = true, // Default to compact mode enabled
     val debugModeEnabled: Boolean = false,
@@ -15,7 +15,12 @@ data class AppConfig(
      * List apps patched by community providers, not only ReVanced and Morphe. Asked once on first
      * run (AppSourceDialog), then a switch in Settings. See [RevancedApp.isCommunityContribution].
      */
-    val showCommunityApps: Boolean = true
+    val showCommunityApps: Boolean = true,
+    /**
+     * Offer a newer build of the same app version — same YouTube, newer patches — as an update,
+     * not only a new app version. See PatchUpdate.
+     */
+    val patchUpdatesEnabled: Boolean = true
 )
 
 /**

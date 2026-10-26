@@ -90,10 +90,8 @@
     <string name="debug_mode">Mod Debug</string>
     <string name="debug_mode_description">Simpan log terperinci (maks. 7 hari)</string>
     <string name="debug_view_logs">Lihat Log</string>
-    <string name="debug_share_logs">Kongsi Log</string>
     <string name="debug_logs_title">Log Debug</string>
     <string name="debug_no_logs_available">Tiada log.\nAktifkan mod debug dan reproduksi masalah.</string>
-    <string name="debug_no_logs_to_share">Tiada log untuk dikongsi</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">Kembali</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">Tiada fail APK dalam cache</string>
     <string name="settings_clear_cache_confirm_title">Kosongkan cache APK?</string>
     <string name="settings_clear_cache_confirm_message">Semua fail APK yang dimuat turun (%1$s) akan dipadam. Ia akan dimuat turun semula apabila diperlukan.</string>
-    <string name="settings_cache_cleared">%1$d fail APK dikosongkan</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">%1$d fail APK dikosongkan</item>
+        <item quantity="other">%1$d fail APK dikosongkan</item>
+    </plurals>
     <string name="settings_reset_button">Tetapkan semula semua tetapan</string>
     <string name="settings_reset_confirm_title">Tetapkan Semula?</string>
     <string name="settings_reset_confirm_message">Semua tetapan akan dikembalikan ke asal. Ini tidak boleh dibatalkan.</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">Kemas kini semua</string>
-    <string name="update_all_started">Mengemas kini %1$d apl…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">Mengemas kini %1$d apl…</item>
+        <item quantity="other">Mengemas kini %1$d apl…</item>
+    </plurals>
     <string name="update_prompt_title">Kemas kini tersedia</string>
-    <string name="update_prompt_message">%1$d apl mempunyai kemas kini. Kemas kini sekarang?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">%1$d apl mempunyai kemas kini. Kemas kini sekarang?</item>
+        <item quantity="other">%1$d apl mempunyai kemas kini. Kemas kini sekarang?</item>
+    </plurals>
     <string name="update_selected">Kemas kini (%1$d)</string>
     <string name="skip_today">Langkau hari ini</string>
     <string name="update_prompt_dont_show_again">Jangan tunjukkan lagi</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">Popup kemas kini semasa dibuka</string>
     <string name="show_update_prompt_description">Tanya untuk mengemas kini semua apl apabila kemas kini ditemui selepas membuka apl</string>
     <string name="update_notification_channel_name">Kemas Kini Apl</string>
-    <string name="update_notification_title">%1$d kemas kini apl tersedia</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$d kemas kini apl tersedia</item>
+        <item quantity="other">%1$d kemas kini apl tersedia</item>
+    </plurals>
     <string name="update_notification_text">Ketik untuk membuka dan mengemas kini apl anda</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">Kod sumber</string>
     <string name="open_url_failed">Tidak dapat membuka pautan</string>
     <string name="refresh">Muat semula</string>
-    <string name="updates_banner">%1$d kemas kini tersedia</string>
+    <plurals name="updates_banner">
+        <item quantity="one">%1$d kemas kini tersedia</item>
+        <item quantity="other">%1$d kemas kini tersedia</item>
+    </plurals>
     <string name="install_permission_title">Benarkan pemasangan apl</string>
     <string name="install_permission_message">Android memerlukan kebenaran anda sebelum apl ini boleh memasang atau mengemas kini apl lain. Pada skrin seterusnya, hidupkan “Benarkan daripada sumber ini”, kemudian kembali — muat turun akan bermula sendiri.</string>
     <string name="install_permission_open">Buka tetapan</string>

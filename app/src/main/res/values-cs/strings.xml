@@ -90,10 +90,8 @@
     <string name="debug_mode">Režim ladění</string>
     <string name="debug_mode_description">Ukládá podrobné protokoly (max. 7 dní)</string>
     <string name="debug_view_logs">Zobrazit protokoly</string>
-    <string name="debug_share_logs">Sdílet protokoly</string>
     <string name="debug_logs_title">Protokoly ladění</string>
     <string name="debug_no_logs_available">Žádné protokoly.\nPovolte režim ladění a reprodukujte problém.</string>
-    <string name="debug_no_logs_to_share">Žádné protokoly ke sdílení</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">Zpět</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">Žádné soubory APK v mezipaměti</string>
     <string name="settings_clear_cache_confirm_title">Vymazat mezipaměť APK?</string>
     <string name="settings_clear_cache_confirm_message">Všechny stažené soubory APK (%1$s) budou smazány. V případě potřeby budou staženy znovu.</string>
-    <string name="settings_cache_cleared">Vymazáno %1$d souborů APK</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">Vymazáno %1$d souborů APK</item>
+        <item quantity="other">Vymazáno %1$d souborů APK</item>
+    </plurals>
     <string name="settings_reset_button">Obnovit vše na výchozí</string>
     <string name="settings_reset_confirm_title">Obnovit nastavení?</string>
     <string name="settings_reset_confirm_message">Vše bude obnoveno na výchozí hodnoty. Tuto akci nelze vrátit zpět.</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">Aktualizovat vše</string>
-    <string name="update_all_started">Aktualizuji %1$d aplikací…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">Aktualizuji %1$d aplikací…</item>
+        <item quantity="other">Aktualizuji %1$d aplikací…</item>
+    </plurals>
     <string name="update_prompt_title">Dostupné aktualizace</string>
-    <string name="update_prompt_message">%1$d aplikací má dostupné aktualizace. Chcete je nyní aktualizovat?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">%1$d aplikací má dostupné aktualizace. Chcete je nyní aktualizovat?</item>
+        <item quantity="other">%1$d aplikací má dostupné aktualizace. Chcete je nyní aktualizovat?</item>
+    </plurals>
     <string name="update_selected">Aktualizovat (%1$d)</string>
     <string name="skip_today">Přeskočit dnes</string>
     <string name="update_prompt_dont_show_again">Znovu nezobrazovat</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">Vyskakovací okno při spuštění</string>
     <string name="show_update_prompt_description">Nabídnout aktualizaci všech aplikací, když jsou po otevření nalezeny aktualizace</string>
     <string name="update_notification_channel_name">Aktualizace aplikací</string>
-    <string name="update_notification_title">%1$d dostupných aktualizací aplikací</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$d dostupných aktualizací aplikací</item>
+        <item quantity="other">%1$d dostupných aktualizací aplikací</item>
+    </plurals>
     <string name="update_notification_text">Klepnutím otevřete a aktualizujete aplikace</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">Zdrojový kód</string>
     <string name="open_url_failed">Odkaz se nepodařilo otevřít</string>
     <string name="refresh">Obnovit</string>
-    <string name="updates_banner">Dostupné aktualizace: %1$d</string>
+    <plurals name="updates_banner">
+        <item quantity="one">Dostupné aktualizace: %1$d</item>
+        <item quantity="other">Dostupné aktualizace: %1$d</item>
+    </plurals>
     <string name="install_permission_title">Povolit instalaci aplikací</string>
     <string name="install_permission_message">Android potřebuje vaše svolení, než tato aplikace bude moci instalovat nebo aktualizovat jiné aplikace. Na další obrazovce zapněte „Povolit z tohoto zdroje“ a vraťte se — stahování se spustí samo.</string>
     <string name="install_permission_open">Otevřít nastavení</string>

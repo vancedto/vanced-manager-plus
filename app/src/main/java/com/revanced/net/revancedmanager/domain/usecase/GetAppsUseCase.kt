@@ -61,6 +61,9 @@ class GetAppsUseCase @Inject constructor(
     private fun determineAppStatus(app: RevancedApp): AppStatus {
         return when {
             app.currentVersion == null -> AppStatus.NOT_INSTALLED
+            // The repository already settled it, patch check included (PackageOwnership); a
+            // version-only comparison here would undo a patch update the repository found.
+            app.status == AppStatus.UPDATE_AVAILABLE || app.status == AppStatus.UP_TO_DATE -> app.status
             compareVersions(app.currentVersion, app.latestVersion) >= 0 -> AppStatus.UP_TO_DATE
             else -> AppStatus.UPDATE_AVAILABLE
         }

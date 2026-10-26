@@ -91,10 +91,13 @@
     <string name="debug_mode">Chế độ Debug</string>
     <string name="debug_mode_description">Lưu nhật ký chi tiết để gỡ lỗi (tối đa 7 ngày)</string>
     <string name="debug_view_logs">Xem nhật ký</string>
-    <string name="debug_share_logs">Chia sẻ nhật ký</string>
+    <string name="debug_copy_logs">Sao chép</string>
+    <string name="debug_save_logs">Lưu thành file</string>
+    <string name="debug_logs_copied">Đã sao chép nhật ký</string>
+    <string name="debug_logs_saved">Đã lưu nhật ký</string>
+    <string name="debug_logs_save_failed">Không thể lưu nhật ký</string>
     <string name="debug_logs_title">Nhật ký Debug</string>
     <string name="debug_no_logs_available">Chưa có nhật ký.\nBật chế độ Debug và tái hiện lỗi trước.</string>
-    <string name="debug_no_logs_to_share">Không có nhật ký để chia sẻ</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">Quay lại</string>
@@ -112,7 +115,10 @@
     <string name="settings_clear_cache_empty">Không có tệp APK nào trong bộ nhớ đệm</string>
     <string name="settings_clear_cache_confirm_title">Xóa bộ nhớ đệm APK?</string>
     <string name="settings_clear_cache_confirm_message">Tất cả tệp APK đã tải (%1$s) sẽ bị xóa. Chúng sẽ được tải lại khi cần.</string>
-    <string name="settings_cache_cleared">Đã xóa %1$d tệp APK</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">Đã xóa %1$d tệp APK</item>
+        <item quantity="other">Đã xóa %1$d tệp APK</item>
+    </plurals>
     <string name="settings_reset_button">Đặt lại tất cả về mặc định</string>
     <string name="settings_reset_confirm_title">Đặt lại cài đặt?</string>
     <string name="settings_reset_confirm_message">Tất cả cài đặt sẽ về mặc định. Thao tác này không thể hoàn tác.</string>
@@ -123,9 +129,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">Cập nhật tất cả</string>
-    <string name="update_all_started">Đang cập nhật %1$d ứng dụng…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">Đang cập nhật %1$d ứng dụng…</item>
+        <item quantity="other">Đang cập nhật %1$d ứng dụng…</item>
+    </plurals>
     <string name="update_prompt_title">Có bản cập nhật</string>
-    <string name="update_prompt_message">Có %1$d ứng dụng có bản cập nhật. Chọn ứng dụng muốn cập nhật:</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">Có %1$d ứng dụng có bản cập nhật. Chọn ứng dụng muốn cập nhật:</item>
+        <item quantity="other">Có %1$d ứng dụng có bản cập nhật. Chọn ứng dụng muốn cập nhật:</item>
+    </plurals>
     <string name="update_selected">Cập nhật (%1$d)</string>
     <string name="skip_today">Bỏ qua hôm nay</string>
     <string name="update_prompt_dont_show_again">Không hiện lại</string>
@@ -140,7 +152,10 @@
     <string name="show_update_prompt">Hỏi cập nhật khi mở app</string>
     <string name="show_update_prompt_description">Hiện hộp thoại cập nhật tất cả khi phát hiện bản mới lúc mở ứng dụng</string>
     <string name="update_notification_channel_name">Cập nhật ứng dụng</string>
-    <string name="update_notification_title">Có %1$d bản cập nhật ứng dụng</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">Có %1$d bản cập nhật ứng dụng</item>
+        <item quantity="other">Có %1$d bản cập nhật ứng dụng</item>
+    </plurals>
     <string name="update_notification_text">Nhấn để mở và cập nhật ứng dụng</string>
 
     <!-- First-run suggestions -->
@@ -185,6 +200,14 @@
     <string name="app_details_requires_microg">Ứng dụng này cần cài MicroG để đăng nhập và phát nội dung.</string>
     <string name="copy_package_name">Sao chép tên package</string>
     <string name="package_name_copied">Đã sao chép tên package</string>
+    <string name="status_up_to_date">Đã cập nhật mới nhất</string>
+    <string name="status_update_available">Có bản cập nhật</string>
+    <string name="status_queued">Đang chờ cài đặt</string>
+    <string name="new_patch">Patch mới: %1$s</string>
+    <string name="patches_version">Patch: %1$s</string>
+    <string name="patch_update_version">patch %1$s</string>
+    <string name="patch_updates">Cập nhật khi có patch mới</string>
+    <string name="patch_updates_description">Báo cập nhật cả khi cùng phiên bản app nhưng được build lại với bản patch mới hơn</string>
     <string name="share_app">Chia sẻ</string>
     <string name="open_website">Mở trang chủ</string>
     <string name="open_app_page">Xem trên vanced.to</string>
@@ -209,7 +232,10 @@
     <string name="source_code">Mã nguồn</string>
     <string name="open_url_failed">Không mở được liên kết</string>
     <string name="refresh">Làm mới</string>
-    <string name="updates_banner">Có %1$d bản cập nhật</string>
+    <plurals name="updates_banner">
+        <item quantity="one">Có %1$d bản cập nhật</item>
+        <item quantity="other">Có %1$d bản cập nhật</item>
+    </plurals>
     <string name="install_permission_title">Cho phép cài ứng dụng</string>
     <string name="install_permission_message">Android cần bạn cho phép trước khi ứng dụng này có thể cài hoặc cập nhật ứng dụng khác. Ở màn hình tiếp theo, hãy bật “Cho phép từ nguồn này”, rồi quay lại — việc tải sẽ tự bắt đầu.</string>
     <string name="install_permission_open">Mở cài đặt</string>

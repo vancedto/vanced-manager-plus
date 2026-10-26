@@ -90,10 +90,8 @@
     <string name="debug_mode">ডিবাগ মোড</string>
     <string name="debug_mode_description">সমস্যা সমাধানের জন্য বিস্তারিত লগ সংরক্ষণ (সর্বোচ্চ ৭ দিন)</string>
     <string name="debug_view_logs">লগ দেখুন</string>
-    <string name="debug_share_logs">লগ শেয়ার করুন</string>
     <string name="debug_logs_title">ডিবাগ লগ</string>
     <string name="debug_no_logs_available">কোনো লগ নেই।\nডিবাগ মোড চালু করুন এবং সমস্যাটি পুনরায় করুন।</string>
-    <string name="debug_no_logs_to_share">শেয়ার করার জন্য কোনো লগ নেই</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">পিছনে</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">ক্যাশে কোনো APK ফাইল নেই</string>
     <string name="settings_clear_cache_confirm_title">APK ক্যাশে সাফ করবেন?</string>
     <string name="settings_clear_cache_confirm_message">ডাউনলোড করা সব APK ফাইল (%1$s) মুছে ফেলা হবে। প্রয়োজনে এগুলি আবার ডাউনলোড করা হবে।</string>
-    <string name="settings_cache_cleared">%1$d টি APK ফাইল সাফ করা হয়েছে</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">%1$d টি APK ফাইল সাফ করা হয়েছে</item>
+        <item quantity="other">%1$d টি APK ফাইল সাফ করা হয়েছে</item>
+    </plurals>
     <string name="settings_reset_button">সমস্ত সেটিংস রিসেট করুন</string>
     <string name="settings_reset_confirm_title">সেটিংস রিসেট করবেন?</string>
     <string name="settings_reset_confirm_message">সব সেটিংস ডিফল্টে ফিরে যাবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">সব আপডেট করুন</string>
-    <string name="update_all_started">%1$dটি অ্যাপ আপডেট হচ্ছে…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">%1$dটি অ্যাপ আপডেট হচ্ছে…</item>
+        <item quantity="other">%1$dটি অ্যাপ আপডেট হচ্ছে…</item>
+    </plurals>
     <string name="update_prompt_title">আপডেট উপলব্ধ</string>
-    <string name="update_prompt_message">%1$dটি অ্যাপের আপডেট উপলব্ধ। এখনই আপডেট করতে চান?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">%1$dটি অ্যাপের আপডেট উপলব্ধ। এখনই আপডেট করতে চান?</item>
+        <item quantity="other">%1$dটি অ্যাপের আপডেট উপলব্ধ। এখনই আপডেট করতে চান?</item>
+    </plurals>
     <string name="update_selected">আপডেট (%1$d)</string>
     <string name="skip_today">আজ বাদ দিন</string>
     <string name="update_prompt_dont_show_again">আর দেখাবেন না</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">চালু করার সময় আপডেট পপআপ</string>
     <string name="show_update_prompt_description">অ্যাপ খোলার পর আপডেট পাওয়া গেলে সব অ্যাপ আপডেট করতে বলুন</string>
     <string name="update_notification_channel_name">অ্যাপ আপডেট</string>
-    <string name="update_notification_title">%1$dটি অ্যাপ আপডেট উপলব্ধ</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$dটি অ্যাপ আপডেট উপলব্ধ</item>
+        <item quantity="other">%1$dটি অ্যাপ আপডেট উপলব্ধ</item>
+    </plurals>
     <string name="update_notification_text">অ্যাপ খুলতে এবং আপডেট করতে ট্যাপ করুন</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">সোর্স কোড</string>
     <string name="open_url_failed">লিংক খোলা যায়নি</string>
     <string name="refresh">রিফ্রেশ</string>
-    <string name="updates_banner">%1$dটি আপডেট উপলব্ধ</string>
+    <plurals name="updates_banner">
+        <item quantity="one">%1$dটি আপডেট উপলব্ধ</item>
+        <item quantity="other">%1$dটি আপডেট উপলব্ধ</item>
+    </plurals>
     <string name="install_permission_title">অ্যাপ ইনস্টলের অনুমতি দিন</string>
     <string name="install_permission_message">এই অ্যাপ অন্য অ্যাপ ইনস্টল বা আপডেট করার আগে Android-এর আপনার অনুমতি প্রয়োজন। পরের স্ক্রিনে “এই উৎস থেকে অনুমতি দিন” চালু করুন, তারপর ফিরে আসুন — ডাউনলোড নিজে থেকেই শুরু হবে।</string>
     <string name="install_permission_open">সেটিংস খুলুন</string>

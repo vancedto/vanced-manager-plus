@@ -64,16 +64,26 @@ fun appVersionsText(
     latestVersion: String,
     installedColor: Color = MaterialTheme.colorScheme.primary,
     latestColor: Color = MaterialTheme.colorScheme.secondary,
-    labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+    labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+    /**
+     * Set for a patch-only update: "Latest: 20.47.62" would repeat the installed version and say
+     * nothing about why an update is offered, so the patch version takes its place.
+     */
+    newPatch: String? = null
 ): AnnotatedString {
     val installedPattern = stringResource(R.string.installed_version)
     val latestPattern = stringResource(R.string.latest_version)
+    val newPatchPattern = stringResource(R.string.new_patch)
     return buildAnnotatedString {
         if (currentVersion != null) {
             appendLabelledValue(installedPattern, currentVersion, installedColor, labelColor)
             withStyle(SpanStyle(color = labelColor)) { append(SEPARATOR) }
         }
-        appendLabelledValue(latestPattern, latestVersion, latestColor, labelColor)
+        if (newPatch != null) {
+            appendLabelledValue(newPatchPattern, newPatch, latestColor, labelColor)
+        } else {
+            appendLabelledValue(latestPattern, latestVersion, latestColor, labelColor)
+        }
     }
 }
 

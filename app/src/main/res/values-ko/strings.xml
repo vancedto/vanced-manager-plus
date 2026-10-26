@@ -90,10 +90,8 @@
     <string name="debug_mode">디버그 모드</string>
     <string name="debug_mode_description">문제 해결용 로그 저장 (최대 7일)</string>
     <string name="debug_view_logs">로그 보기</string>
-    <string name="debug_share_logs">로그 공유</string>
     <string name="debug_logs_title">디버그 로그</string>
     <string name="debug_no_logs_available">로그 없음.\n디버그 모드 켜고 문제를 재현하세요.</string>
-    <string name="debug_no_logs_to_share">공유할 로그 없음</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">뒤로</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">캐시된 APK 파일 없음</string>
     <string name="settings_clear_cache_confirm_title">APK 캐시를 지우시겠어요?</string>
     <string name="settings_clear_cache_confirm_message">다운로드한 모든 APK 파일(%1$s)이 삭제됩니다. 필요할 때 다시 다운로드됩니다.</string>
-    <string name="settings_cache_cleared">APK 파일 %1$d개를 삭제했습니다</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">APK 파일 %1$d개를 삭제했습니다</item>
+        <item quantity="other">APK 파일 %1$d개를 삭제했습니다</item>
+    </plurals>
     <string name="settings_reset_button">모든 설정 초기화</string>
     <string name="settings_reset_confirm_title">설정 초기화?</string>
     <string name="settings_reset_confirm_message">모든 설정이 기본값으로 초기화됩니다. 되돌릴 수 없습니다.</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">모두 업데이트</string>
-    <string name="update_all_started">%1$d개 앱 업데이트 중…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">%1$d개 앱 업데이트 중…</item>
+        <item quantity="other">%1$d개 앱 업데이트 중…</item>
+    </plurals>
     <string name="update_prompt_title">업데이트 사용 가능</string>
-    <string name="update_prompt_message">%1$d개 앱에 업데이트가 있습니다. 지금 업데이트하시겠습니까?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">%1$d개 앱에 업데이트가 있습니다. 지금 업데이트하시겠습니까?</item>
+        <item quantity="other">%1$d개 앱에 업데이트가 있습니다. 지금 업데이트하시겠습니까?</item>
+    </plurals>
     <string name="update_selected">업데이트 (%1$d)</string>
     <string name="skip_today">오늘 건너뛰기</string>
     <string name="update_prompt_dont_show_again">다시 표시 안 함</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">실행 시 업데이트 팝업</string>
     <string name="show_update_prompt_description">앱을 연 후 업데이트가 발견되면 모든 앱을 업데이트할지 묻기</string>
     <string name="update_notification_channel_name">앱 업데이트</string>
-    <string name="update_notification_title">%1$d개 앱 업데이트 사용 가능</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$d개 앱 업데이트 사용 가능</item>
+        <item quantity="other">%1$d개 앱 업데이트 사용 가능</item>
+    </plurals>
     <string name="update_notification_text">탭하여 앱을 열고 업데이트하세요</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">소스 코드</string>
     <string name="open_url_failed">링크를 열 수 없습니다</string>
     <string name="refresh">새로고침</string>
-    <string name="updates_banner">업데이트 %1$d개 있음</string>
+    <plurals name="updates_banner">
+        <item quantity="one">업데이트 %1$d개 있음</item>
+        <item quantity="other">업데이트 %1$d개 있음</item>
+    </plurals>
     <string name="install_permission_title">앱 설치 허용</string>
     <string name="install_permission_message">이 앱이 다른 앱을 설치하거나 업데이트하려면 Android에서 권한을 허용해야 합니다. 다음 화면에서 “이 출처 허용”을 켠 뒤 돌아오면 다운로드가 자동으로 시작됩니다.</string>
     <string name="install_permission_open">설정 열기</string>

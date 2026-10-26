@@ -90,10 +90,8 @@
     <string name="debug_mode">Debug Mode</string>
     <string name="debug_mode_description">Nag-iimbak ng detalyadong logs (max 7 araw)</string>
     <string name="debug_view_logs">Tingnan ang Logs</string>
-    <string name="debug_share_logs">Ibahagi ang Logs</string>
     <string name="debug_logs_title">Mga Debug Log</string>
     <string name="debug_no_logs_available">Walang logs.\nI-enable ang debug mode at i-reproduce ang problema.</string>
-    <string name="debug_no_logs_to_share">Walang logs para ibahagi</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">Bumalik</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">Walang naka-cache na APK file</string>
     <string name="settings_clear_cache_confirm_title">I-clear ang APK cache?</string>
     <string name="settings_clear_cache_confirm_message">Buburahin ang lahat ng na-download na APK file (%1$s). Muli itong ida-download kapag kailangan.</string>
-    <string name="settings_cache_cleared">Na-clear ang %1$d APK file</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">Na-clear ang %1$d APK file</item>
+        <item quantity="other">Na-clear ang %1$d APK file</item>
+    </plurals>
     <string name="settings_reset_button">I-reset ang lahat ng settings</string>
     <string name="settings_reset_confirm_title">I-reset ang Settings?</string>
     <string name="settings_reset_confirm_message">Lahat ng settings ay ibabalik sa default. Hindi ito maibabalik.</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">I-update lahat</string>
-    <string name="update_all_started">Ina-update ang %1$d (na) app…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">Ina-update ang %1$d (na) app…</item>
+        <item quantity="other">Ina-update ang %1$d (na) app…</item>
+    </plurals>
     <string name="update_prompt_title">May available na update</string>
-    <string name="update_prompt_message">May available na update ang %1$d (na) app. Gusto mo ba silang i-update ngayon?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">May available na update ang %1$d (na) app. Gusto mo ba silang i-update ngayon?</item>
+        <item quantity="other">May available na update ang %1$d (na) app. Gusto mo ba silang i-update ngayon?</item>
+    </plurals>
     <string name="update_selected">I-update (%1$d)</string>
     <string name="skip_today">Laktawan ngayon</string>
     <string name="update_prompt_dont_show_again">Huwag nang ipakita muli</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">Update popup sa pagbukas</string>
     <string name="show_update_prompt_description">Magtanong na i-update ang lahat ng app kapag may nakitang update pagkatapos buksan ang app</string>
     <string name="update_notification_channel_name">Mga Update ng App</string>
-    <string name="update_notification_title">%1$d (na) update ng app ang available</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$d (na) update ng app ang available</item>
+        <item quantity="other">%1$d (na) update ng app ang available</item>
+    </plurals>
     <string name="update_notification_text">I-tap para buksan at i-update ang iyong mga app</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">Source code</string>
     <string name="open_url_failed">Hindi mabuksan ang link</string>
     <string name="refresh">I-refresh</string>
-    <string name="updates_banner">%1$d update ang available</string>
+    <plurals name="updates_banner">
+        <item quantity="one">%1$d update ang available</item>
+        <item quantity="other">%1$d update ang available</item>
+    </plurals>
     <string name="install_permission_title">Payagan ang pag-install ng app</string>
     <string name="install_permission_message">Kailangan ng Android ang iyong pahintulot bago makapag-install o makapag-update ang app na ito ng ibang app. Sa susunod na screen, i-on ang “Payagan mula sa source na ito”, saka bumalik — kusang magsisimula ang download.</string>
     <string name="install_permission_open">Buksan ang settings</string>

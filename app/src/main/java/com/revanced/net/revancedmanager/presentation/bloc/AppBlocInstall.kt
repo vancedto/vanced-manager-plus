@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.config.Config
 import com.revanced.net.revancedmanager.core.common.InFlightAttribution
+import com.revanced.net.revancedmanager.core.common.InstalledBuildRecord
 import com.revanced.net.revancedmanager.core.common.MicroGRequirement
 import com.revanced.net.revancedmanager.core.common.PackageOwnership
 import com.revanced.net.revancedmanager.core.common.Result
+import com.revanced.net.revancedmanager.core.common.VersionComparator
 import com.revanced.net.revancedmanager.data.manager.InstallationResult
 import com.revanced.net.revancedmanager.domain.model.AppStatus
 import com.revanced.net.revancedmanager.domain.model.InstallFailureReason
@@ -120,12 +122,14 @@ private suspend fun AppBloc.runInstallation(request: AppBloc.PendingInstallation
                 Log.w(TAG_BLOC, "Installation timed out: $packageName")
                 handleInstallationAborted(packageName, "User cancelled or timeout")
             }
-            is InstallationResult.Success ->
+            is InstallationResult.Success -> {
+                recordInstalledBuild(packageName)
                 handleInstallationSuccess(
                     packageName,
                     appManager.getInstalledVersion(packageName) ?: "Unknown",
                     source = "PackageInstaller result"
                 )
+            }
             is InstallationResult.Failed -> {
                 val reason = InstallFailureReason.from(result.statusCode, result.error)
                 if (reason == InstallFailureReason.ABORTED) handleInstallationAborted(packageName, result.error)
@@ -203,7 +207,9 @@ internal fun AppBloc.handleInstallationSuccess(
         installedVersion
     ) ?: return
 
-    val newStatus = statusForVersions(installedVersion, app.latestVersion)
+    val newStatus = appManager.getInstalledBuild(packageName)
+        ?.let { PackageOwnership.statusFor(app, it, installedBuildStore.newerPatchCheck()) }
+        ?: PackageOwnership.statusForVersions(installedVersion, app.latestVersion)
     // Success arrives via both PackageInstaller results and the system
     // PACKAGE_ADDED broadcast — skip the second delivery.
     if (app.status == newStatus && app.currentVersion == installedVersion) {
@@ -216,6 +222,32 @@ internal fun AppBloc.handleInstallationSuccess(
 
     _state.value = currentState.copy(apps = settleEntries(currentState.apps, packageName))
     showToast(stringProvider.getString(R.string.installation_completed))
+}
+
+/**
+ * Remember which patches the build this manager just installed carries, so the patch-update check
+ * knows exactly instead of going by install time (see PatchUpdate).
+ *
+ * Only from our own PackageInstaller result — a PACKAGE_ADDED broadcast can be anyone's install.
+ * The patch version is the owner entry's chosen build, which is what was downloaded unless the
+ * catalog moved in between; it is recorded only when the installed version is that build's
+ * version, so a catalog that moved to a new app version records nothing rather than a wrong pair.
+ */
+internal fun AppBloc.recordInstalledBuild(packageName: String) {
+    val installed = appManager.getInstalledBuild(packageName) ?: return
+    val apps = (_state.value as? AppState.Success)?.apps ?: return
+    val owner = PackageOwnership.ownerOf(apps.filter { it.packageName == packageName }, installed.versionName)
+        ?: return
+    val patchVersion = owner.patchVersion ?: return
+    if (VersionComparator.compare(installed.versionName, owner.latestVersion) != 0) return
+    installedBuildStore.put(
+        packageName,
+        InstalledBuildRecord(
+            versionName = installed.versionName,
+            patchVersion = patchVersion,
+            lastUpdateTime = installed.lastUpdateTime
+        )
+    )
 }
 
 /**

@@ -90,10 +90,8 @@
     <string name="debug_mode">Modo Debug</string>
     <string name="debug_mode_description">Guarda registros detallados (máx. 7 días)</string>
     <string name="debug_view_logs">Ver registros</string>
-    <string name="debug_share_logs">Compartir registros</string>
     <string name="debug_logs_title">Registros de Debug</string>
     <string name="debug_no_logs_available">Sin registros.\nActiva el modo debug y reproduce el problema.</string>
-    <string name="debug_no_logs_to_share">No hay registros para compartir</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">Atrás</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">No hay archivos APK en caché</string>
     <string name="settings_clear_cache_confirm_title">¿Borrar caché de APK?</string>
     <string name="settings_clear_cache_confirm_message">Se eliminarán todos los archivos APK descargados (%1$s). Se descargarán de nuevo cuando se necesiten.</string>
-    <string name="settings_cache_cleared">Se borraron %1$d archivo(s) APK</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">Se borraron %1$d archivo(s) APK</item>
+        <item quantity="other">Se borraron %1$d archivo(s) APK</item>
+    </plurals>
     <string name="settings_reset_button">Restablecer ajustes</string>
     <string name="settings_reset_confirm_title">¿Restablecer ajustes?</string>
     <string name="settings_reset_confirm_message">Todos los ajustes se restablecerán. Esta acción no se puede deshacer.</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">Actualizar todo</string>
-    <string name="update_all_started">Actualizando %1$d app(s)…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">Actualizando %1$d app(s)…</item>
+        <item quantity="other">Actualizando %1$d app(s)…</item>
+    </plurals>
     <string name="update_prompt_title">Actualizaciones disponibles</string>
-    <string name="update_prompt_message">%1$d app(s) tienen actualizaciones disponibles. ¿Quieres actualizarlas ahora?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">%1$d app(s) tienen actualizaciones disponibles. ¿Quieres actualizarlas ahora?</item>
+        <item quantity="other">%1$d app(s) tienen actualizaciones disponibles. ¿Quieres actualizarlas ahora?</item>
+    </plurals>
     <string name="update_selected">Actualizar (%1$d)</string>
     <string name="skip_today">Omitir hoy</string>
     <string name="update_prompt_dont_show_again">No volver a mostrar</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">Ventana de actualización al iniciar</string>
     <string name="show_update_prompt_description">Preguntar si actualizar todas las apps cuando se encuentren actualizaciones al abrir la app</string>
     <string name="update_notification_channel_name">Actualizaciones de apps</string>
-    <string name="update_notification_title">%1$d actualización(es) de apps disponibles</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$d actualización(es) de apps disponibles</item>
+        <item quantity="other">%1$d actualización(es) de apps disponibles</item>
+    </plurals>
     <string name="update_notification_text">Toca para abrir y actualizar tus apps</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">Código fuente</string>
     <string name="open_url_failed">No se pudo abrir el enlace</string>
     <string name="refresh">Actualizar</string>
-    <string name="updates_banner">%1$d actualización(es) disponible(s)</string>
+    <plurals name="updates_banner">
+        <item quantity="one">%1$d actualización(es) disponible(s)</item>
+        <item quantity="other">%1$d actualización(es) disponible(s)</item>
+    </plurals>
     <string name="install_permission_title">Permitir instalar apps</string>
     <string name="install_permission_message">Android necesita tu permiso para que esta app pueda instalar o actualizar otras apps. En la siguiente pantalla, activa «Permitir de esta fuente» y vuelve: la descarga empezará sola.</string>
     <string name="install_permission_open">Abrir ajustes</string>

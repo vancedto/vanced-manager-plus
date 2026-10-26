@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.core.common.InFlightAttribution
 import com.revanced.net.revancedmanager.core.common.StringProvider
+import com.revanced.net.revancedmanager.data.local.InstalledBuildStore
 import com.revanced.net.revancedmanager.data.local.preferences.PreferencesManager
 import com.revanced.net.revancedmanager.data.manager.AppDownloadManager
 import com.revanced.net.revancedmanager.data.manager.AppManager
@@ -57,6 +58,7 @@ class AppBloc @Inject constructor(
     internal val downloadManager: AppDownloadManager,
     internal val appManager: AppManager,
     internal val preferencesManager: PreferencesManager,
+    internal val installedBuildStore: InstalledBuildStore,
     internal val stringProvider: StringProvider,
     internal val packageInstaller: RevancedPackageInstaller,
     internal val packageChangedReceiver: PackageChangedReceiver,
@@ -369,7 +371,11 @@ class AppBloc @Inject constructor(
     fun handleEvent(event: AppEvent) {
         when (event) {
             is AppEvent.LoadApps -> loadApps(forceRefresh = false)
-            is AppEvent.RefreshApps -> loadApps(forceRefresh = true)
+            // The top-bar button (the only refresh on TV, where there is nothing to pull) used to go
+            // through loadApps, which blanks the screen and drops search, filter, sort and any open
+            // dialog. Pull-to-refresh keeps all of that and already falls back to loadApps when no
+            // list is on screen yet (Loading/Error), so both now share it.
+            is AppEvent.RefreshApps -> pullToRefreshApps()
             is AppEvent.PullToRefreshApps -> pullToRefreshApps()
             is AppEvent.LoadAppsFromCacheFirst -> loadAppsFromCacheFirst()
             is AppEvent.BackgroundRefreshApps -> backgroundRefreshApps()

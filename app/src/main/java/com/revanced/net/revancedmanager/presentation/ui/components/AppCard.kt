@@ -9,11 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowCircleUp
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.InstallMobile
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,16 +23,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil3.compose.SubcomposeAsyncImage
-import coil3.compose.SubcomposeAsyncImageContent
+import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.domain.model.AppStatus
 import com.revanced.net.revancedmanager.domain.model.RevancedApp
+import com.revanced.net.revancedmanager.presentation.ui.theme.openColor
+import com.revanced.net.revancedmanager.presentation.ui.theme.updateColor
 
 /**
  * Card component for displaying app information
@@ -82,31 +80,7 @@ fun AppCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                SubcomposeAsyncImage(
-                    model = app.iconUrl,
-                    contentDescription = "${app.title} icon",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(10.dp)),
-                    contentScale = ContentScale.Crop,
-                    loading = {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp
-                        )
-                    },
-                    error = {
-                        Icon(
-                            imageVector = Icons.Filled.Download,
-                            contentDescription = "App icon placeholder",
-                            modifier = Modifier.size(48.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    },
-                    success = {
-                        SubcomposeAsyncImageContent()
-                    }
-                )
+                AppIcon(url = app.iconUrl, size = 48.dp, cornerRadius = 10.dp)
                 
                 Spacer(modifier = Modifier.width(8.dp))
                 
@@ -120,7 +94,11 @@ fun AppCard(
                     )
                     
                     Text(
-                        text = appVersionsText(app.currentVersion, app.latestVersion),
+                        text = appVersionsText(
+                            app.currentVersion,
+                            app.latestVersion,
+                            newPatch = app.patchVersion?.takeIf { app.isPatchUpdate }
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -203,16 +181,16 @@ private fun AppStatusIndicator(
         AppStatus.UP_TO_DATE -> {
             Icon(
                 imageVector = Icons.Default.CheckCircle,
-                contentDescription = null,
-                tint = Color(0xFF10B981),
+                contentDescription = stringResource(R.string.status_up_to_date),
+                tint = MaterialTheme.colorScheme.openColor,
                 modifier = modifier.size(18.dp)
             )
         }
         AppStatus.UPDATE_AVAILABLE -> {
             Icon(
                 imageVector = Icons.Default.ArrowCircleUp,
-                contentDescription = null,
-                tint = Color(0xFFF59E0B),
+                contentDescription = stringResource(R.string.status_update_available),
+                tint = MaterialTheme.colorScheme.updateColor,
                 modifier = modifier.size(18.dp)
             )
         }
@@ -229,7 +207,7 @@ private fun AppStatusIndicator(
         AppStatus.READY_TO_INSTALL -> {
             Icon(
                 imageVector = Icons.Default.InstallMobile,
-                contentDescription = null,
+                contentDescription = stringResource(R.string.status_queued),
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = modifier.size(18.dp)
             )

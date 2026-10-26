@@ -107,10 +107,13 @@
     <string name="debug_mode">Debug Mode</string>
     <string name="debug_mode_description">Save detailed logs for troubleshooting (max 7 days)</string>
     <string name="debug_view_logs">View Logs</string>
-    <string name="debug_share_logs">Share Logs</string>
+    <string name="debug_copy_logs">Copy</string>
+    <string name="debug_save_logs">Save as file</string>
+    <string name="debug_logs_copied">Logs copied</string>
+    <string name="debug_logs_saved">Logs saved</string>
+    <string name="debug_logs_save_failed">Could not save logs</string>
     <string name="debug_logs_title">Debug Logs</string>
     <string name="debug_no_logs_available">No debug logs available.\nEnable debug mode and reproduce the issue first.</string>
-    <string name="debug_no_logs_to_share">No debug logs to share</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">Back</string>
@@ -127,7 +130,10 @@
     <string name="settings_clear_cache_empty">No cached APK files</string>
     <string name="settings_clear_cache_confirm_title">Clear APK cache?</string>
     <string name="settings_clear_cache_confirm_message">All downloaded APK files (%1$s) will be deleted. They will be downloaded again when needed.</string>
-    <string name="settings_cache_cleared">Cleared %1$d APK file(s)</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">Cleared %1$d APK file</item>
+        <item quantity="other">Cleared %1$d APK files</item>
+    </plurals>
     <string name="settings_reset_button">Reset all settings to defaults</string>
     <string name="settings_reset_confirm_title">Reset Settings?</string>
     <string name="settings_reset_confirm_message">All settings will be reset to their default values. This cannot be undone.</string>
@@ -138,9 +144,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">Update all</string>
-    <string name="update_all_started">Updating %1$d app(s)…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">Updating %1$d app…</item>
+        <item quantity="other">Updating %1$d apps…</item>
+    </plurals>
     <string name="update_prompt_title">Updates available</string>
-    <string name="update_prompt_message">%1$d app(s) have updates available. Pick the ones to update:</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">%1$d app has an update available:</item>
+        <item quantity="other">%1$d apps have updates available. Pick the ones to update:</item>
+    </plurals>
     <string name="update_selected">Update (%1$d)</string>
     <string name="skip_today">Skip today</string>
     <string name="update_prompt_dont_show_again">Don\'t show again</string>
@@ -155,7 +167,10 @@
     <string name="show_update_prompt">Update popup on launch</string>
     <string name="show_update_prompt_description">Ask to update all apps when updates are found after opening the app</string>
     <string name="update_notification_channel_name">App Updates</string>
-    <string name="update_notification_title">%1$d app update(s) available</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$d app update available</item>
+        <item quantity="other">%1$d app updates available</item>
+    </plurals>
     <string name="update_notification_text">Tap to open and update your apps</string>
 
     <!-- First-run suggestions -->
@@ -200,6 +215,14 @@
     <string name="app_details_requires_microg">This app needs MicroG installed to sign in and play content.</string>
     <string name="copy_package_name">Copy package name</string>
     <string name="package_name_copied">Package name copied</string>
+    <string name="status_up_to_date">Up to date</string>
+    <string name="status_update_available">Update available</string>
+    <string name="status_queued">Queued for install</string>
+    <string name="new_patch">New patch: %1$s</string>
+    <string name="patches_version">Patches: %1$s</string>
+    <string name="patch_update_version">patches %1$s</string>
+    <string name="patch_updates">Updates with newer patches</string>
+    <string name="patch_updates_description">Also offer an update when the same app version is rebuilt with newer patches</string>
     <string name="share_app">Share</string>
     <string name="open_website">Open website</string>
     <string name="open_app_page">View on vanced.to</string>
@@ -224,7 +247,10 @@
     <string name="source_code">Source code</string>
     <string name="open_url_failed">Couldn\'t open the link</string>
     <string name="refresh">Refresh</string>
-    <string name="updates_banner">%1$d update(s) available</string>
+    <plurals name="updates_banner">
+        <item quantity="one">%1$d update available</item>
+        <item quantity="other">%1$d updates available</item>
+    </plurals>
     <string name="install_permission_title">Allow app installs</string>
     <string name="install_permission_message">Android needs your permission before this app can install or update other apps. On the next screen, turn on “Allow from this source”, then come back — the download will start by itself.</string>
     <string name="install_permission_open">Open settings</string>

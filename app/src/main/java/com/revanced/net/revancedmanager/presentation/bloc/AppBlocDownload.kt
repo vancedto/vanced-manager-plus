@@ -306,7 +306,7 @@ private fun AppBloc.updateApps(appsToUpdate: List<RevancedApp>) {
     if (appsToUpdate.isEmpty()) return
 
     Log.i(TAG_BLOC, "Updating ${appsToUpdate.size} app(s)")
-    showToast(stringProvider.getString(R.string.update_all_started, appsToUpdate.size))
+    showToast(stringProvider.getQuantityString(R.plurals.update_all_started, appsToUpdate.size))
     requestDownloads(appsToUpdate)
 }
 

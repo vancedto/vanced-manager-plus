@@ -87,6 +87,7 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -103,7 +104,6 @@ import com.revanced.net.revancedmanager.presentation.bloc.AppState
 import com.revanced.net.revancedmanager.presentation.bloc.DialogState
 import com.revanced.net.revancedmanager.presentation.bloc.clearApkCache
 import com.revanced.net.revancedmanager.presentation.bloc.getApkCacheInfo
-import com.revanced.net.revancedmanager.presentation.bloc.shareDebugLogs
 import com.revanced.net.revancedmanager.presentation.ui.components.AppCard
 import com.revanced.net.revancedmanager.presentation.ui.components.AppDialogHost
 import com.revanced.net.revancedmanager.presentation.ui.components.ProcessingIndicatorButton
@@ -794,7 +794,7 @@ private fun UpdateAllBanner(
         )
         Spacer(modifier = Modifier.width(10.dp))
         Text(
-            text = stringResource(R.string.updates_banner, count),
+            text = pluralStringResource(R.plurals.updates_banner, count, count),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f),

@@ -147,12 +147,4 @@ sealed class DialogState {
         val onTurnOff: () -> Unit
     ) : DialogState()
 }
-
-/**
- * Represents individual app states for UI updates
- */
-data class AppUiState(
-    val app: RevancedApp,
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null
-) 
+ 

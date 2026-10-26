@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -190,7 +191,7 @@ fun UpdatePromptDialog(dialogState: DialogState.UpdatePrompt) {
         text = {
             Column {
                 Text(
-                    text = stringResource(R.string.update_prompt_message, dialogState.apps.size),
+                    text = pluralStringResource(R.plurals.update_prompt_message, dialogState.apps.size, dialogState.apps.size),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -200,7 +201,12 @@ fun UpdatePromptDialog(dialogState: DialogState.UpdatePrompt) {
                             app = app,
                             // The version change is what the user is being asked about; the package
                             // name is a tap away on the app's own page.
-                            subtitle = versionSubtitle(app.currentVersion, app.latestVersion),
+                            subtitle = if (app.isPatchUpdate && app.patchVersion != null) {
+                                "v${app.latestVersion} · " +
+                                    stringResource(R.string.patch_update_version, app.patchVersion)
+                            } else {
+                                versionSubtitle(app.currentVersion, app.latestVersion)
+                            },
                             isChecked = checked[app.id] == true,
                             onCheckedChange = { checked[app.id] = it }
                         )

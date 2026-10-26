@@ -1,7 +1,9 @@
 package com.revanced.net.revancedmanager.core.di
 
 import android.content.Context
-import android.content.pm.ApplicationInfo
+import android.os.SystemClock
+import android.util.Log
+import com.revanced.net.revancedmanager.data.manager.redactUrl
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -12,9 +14,10 @@ import kotlinx.serialization.json.Json
 import okhttp3.Cache
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.Interceptor
 import retrofit2.Retrofit
 import java.io.File
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -46,22 +49,27 @@ object NetworkModule {
     }
 
     /**
-     * Header logging is a debug aid; release builds have nothing to gain from it.
-     * Read off the manifest's debuggable flag rather than BuildConfig, which this module is not
-     * set up to generate.
+     * One line per request for the debug log: method, host+path, status and time. Query strings
+     * are dropped via [redactUrl] and headers/bodies are never logged, so it is safe in release
+     * builds, where a user with debug mode on is who needs it.
      */
     @Provides
     @Singleton
-    fun provideHttpLoggingInterceptor(
-        @ApplicationContext context: Context
-    ): HttpLoggingInterceptor {
-        val debuggable = (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
-        return HttpLoggingInterceptor().apply {
-            level = if (debuggable) {
-                HttpLoggingInterceptor.Level.HEADERS
-            } else {
-                HttpLoggingInterceptor.Level.NONE
-            }
+    fun provideRequestLogInterceptor(): Interceptor = Interceptor { chain ->
+        val request = chain.request()
+        val target = redactUrl(request.url.toString())
+        val start = SystemClock.elapsedRealtime()
+        try {
+            val response = chain.proceed(request)
+            Log.i(
+                "Http",
+                "${request.method} $target -> ${response.code} " +
+                    "(${SystemClock.elapsedRealtime() - start} ms${if (response.cacheResponse != null) ", cached" else ""})"
+            )
+            response
+        } catch (e: IOException) {
+            Log.w("Http", "${request.method} $target failed after ${SystemClock.elapsedRealtime() - start} ms: ${e.javaClass.simpleName}: ${e.message}")
+            throw e
         }
     }
 
@@ -70,10 +78,10 @@ object NetworkModule {
     @ApiClient
     fun provideApiOkHttpClient(
         @ApplicationContext context: Context,
-        loggingInterceptor: HttpLoggingInterceptor
+        requestLogInterceptor: Interceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
+            .addInterceptor(requestLogInterceptor)
             // The v3 catalog is one document of about a megabyte at ~500 apps, refetched on every
             // refresh. Caddy serves it with an ETag, so with a cache here each refresh after the
             // first is a ~200 byte conditional request and OkHttp replays the body from disk.

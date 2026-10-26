@@ -22,6 +22,12 @@ internal fun AppBloc.saveSettings(config: AppConfig) {
         is AppState.Loading -> Unit
     }
 
+    // Patch updates on or off moves apps between "up to date" and "update available" with no new
+    // catalog, so the statuses are re-derived here rather than on the next refresh.
+    if (previousConfig.patchUpdatesEnabled != config.patchUpdatesEnabled) {
+        recomputeInstallStatus()
+    }
+
     // Start or stop log capture when debug mode changes
     if (previousConfig.debugModeEnabled != config.debugModeEnabled) {
         if (config.debugModeEnabled) {
@@ -35,8 +41,7 @@ internal fun AppBloc.saveSettings(config: AppConfig) {
 
     // Language change: apply locale then recreate activity (don't show toast — activity is about to restart)
     if (previousConfig.language != config.language) {
-        val code = config.language.code.split("-")[0]
-        LocaleHelper.applyLocaleToActivity(context, code)
+        LocaleHelper.applyLocaleToActivity(context, config.language.code)
     } else {
         // No locale change: safe to show toast in current language
         showToast(stringProvider.getString(R.string.configuration_saved))
@@ -45,6 +50,7 @@ internal fun AppBloc.saveSettings(config: AppConfig) {
 
 internal fun AppBloc.resetSettings() {
     Log.i(TAG_BLOC, "=== RESET SETTINGS ===")
+    val previousConfig = loadConfigSafely()
     val defaults = AppConfig()
     preferencesManager.saveAppConfig(defaults)
 
@@ -52,6 +58,9 @@ internal fun AppBloc.resetSettings() {
         is AppState.Success -> _state.value = s.copy(config = defaults)
         is AppState.Error   -> _state.value = s.copy(config = defaults)
         is AppState.Loading -> Unit
+    }
+    if (previousConfig.patchUpdatesEnabled != defaults.patchUpdatesEnabled) {
+        recomputeInstallStatus()
     }
 
     if (defaults.debugModeEnabled != true) {
@@ -63,12 +72,9 @@ internal fun AppBloc.resetSettings() {
     LocaleHelper.applyLocaleToActivity(context, Language.ENGLISH.code)
 }
 
-internal fun AppBloc.shareDebugLogs() {
-    val shared = debugLogManager.shareLatestLog()
-    if (!shared) {
-        showToast(stringProvider.getString(R.string.debug_no_logs_to_share))
-    }
-}
+/** Writes the latest debug log file to [out]; false when there is nothing to save. */
+internal fun AppBloc.saveDebugLogs(out: java.io.OutputStream): Boolean =
+    debugLogManager.copyLatestLogTo(out)
 
 internal fun AppBloc.loadConfiguration() {
     val config = try {
@@ -134,6 +140,6 @@ internal fun AppBloc.clearApkCache(): ApkCacheInfo {
     // completed downloads on the next app start
     downloadManager.pruneFinishedWork()
 
-    showToast(stringProvider.getString(R.string.settings_cache_cleared, deleted))
+    showToast(stringProvider.getQuantityString(R.plurals.settings_cache_cleared, deleted))
     return getApkCacheInfo()
 }

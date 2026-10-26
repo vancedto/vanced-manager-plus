@@ -90,10 +90,8 @@
     <string name="debug_mode">Debug-Modus</string>
     <string name="debug_mode_description">Detaillierte Protokolle speichern (max. 7 Tage)</string>
     <string name="debug_view_logs">Protokolle anzeigen</string>
-    <string name="debug_share_logs">Protokolle teilen</string>
     <string name="debug_logs_title">Debug-Protokolle</string>
     <string name="debug_no_logs_available">Keine Protokolle.\nDebug-Modus aktivieren und Problem reproduzieren.</string>
-    <string name="debug_no_logs_to_share">Keine Protokolle zum Teilen</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">Zurück</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">Keine APK-Dateien im Cache</string>
     <string name="settings_clear_cache_confirm_title">APK-Cache leeren?</string>
     <string name="settings_clear_cache_confirm_message">Alle heruntergeladenen APK-Dateien (%1$s) werden gelöscht. Sie werden bei Bedarf erneut heruntergeladen.</string>
-    <string name="settings_cache_cleared">%1$d APK-Datei(en) gelöscht</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">%1$d APK-Datei(en) gelöscht</item>
+        <item quantity="other">%1$d APK-Datei(en) gelöscht</item>
+    </plurals>
     <string name="settings_reset_button">Alle Einstellungen zurücksetzen</string>
     <string name="settings_reset_confirm_title">Einstellungen zurücksetzen?</string>
     <string name="settings_reset_confirm_message">Alle Einstellungen werden auf Standardwerte zurückgesetzt. Dies kann nicht rückgängig gemacht werden.</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">Alle aktualisieren</string>
-    <string name="update_all_started">%1$d App(s) werden aktualisiert…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">%1$d App(s) werden aktualisiert…</item>
+        <item quantity="other">%1$d App(s) werden aktualisiert…</item>
+    </plurals>
     <string name="update_prompt_title">Updates verfügbar</string>
-    <string name="update_prompt_message">Für %1$d App(s) sind Updates verfügbar. Möchtest du sie jetzt aktualisieren?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">Für %1$d App(s) sind Updates verfügbar. Möchtest du sie jetzt aktualisieren?</item>
+        <item quantity="other">Für %1$d App(s) sind Updates verfügbar. Möchtest du sie jetzt aktualisieren?</item>
+    </plurals>
     <string name="update_selected">Aktualisieren (%1$d)</string>
     <string name="skip_today">Heute überspringen</string>
     <string name="update_prompt_dont_show_again">Nicht mehr anzeigen</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">Update-Popup beim Start</string>
     <string name="show_update_prompt_description">Beim Öffnen der App fragen, ob alle Apps aktualisiert werden sollen, wenn Updates gefunden werden</string>
     <string name="update_notification_channel_name">App-Updates</string>
-    <string name="update_notification_title">%1$d App-Update(s) verfügbar</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$d App-Update(s) verfügbar</item>
+        <item quantity="other">%1$d App-Update(s) verfügbar</item>
+    </plurals>
     <string name="update_notification_text">Tippen, um deine Apps zu öffnen und zu aktualisieren</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">Quellcode</string>
     <string name="open_url_failed">Link konnte nicht geöffnet werden</string>
     <string name="refresh">Aktualisieren</string>
-    <string name="updates_banner">%1$d Update(s) verfügbar</string>
+    <plurals name="updates_banner">
+        <item quantity="one">%1$d Update(s) verfügbar</item>
+        <item quantity="other">%1$d Update(s) verfügbar</item>
+    </plurals>
     <string name="install_permission_title">App-Installationen erlauben</string>
     <string name="install_permission_message">Android braucht deine Erlaubnis, bevor diese App andere Apps installieren oder aktualisieren darf. Aktiviere auf dem nächsten Bildschirm „Von dieser Quelle zulassen“ und kehre dann zurück – der Download startet von selbst.</string>
     <string name="install_permission_open">Einstellungen öffnen</string>

@@ -20,7 +20,7 @@ import com.revanced.net.revancedmanager.presentation.bloc.AppState
 import com.revanced.net.revancedmanager.presentation.bloc.clearApkCache
 import com.revanced.net.revancedmanager.presentation.bloc.loadConfigSafely
 import com.revanced.net.revancedmanager.presentation.bloc.getApkCacheInfo
-import com.revanced.net.revancedmanager.presentation.bloc.shareDebugLogs
+import com.revanced.net.revancedmanager.presentation.bloc.saveDebugLogs
 import com.revanced.net.revancedmanager.presentation.ui.screen.AppDetailScreen
 import com.revanced.net.revancedmanager.presentation.ui.screen.MainScreen
 import com.revanced.net.revancedmanager.presentation.ui.screen.SettingsScreen
@@ -108,7 +108,7 @@ fun AppNavHost() {
                     navController.popBackStack()
                 },
                 getLogContent = { bloc.debugLogManager.getLastLines() },
-                onShareLogs = { bloc.shareDebugLogs() },
+                onSaveLogs = { out -> bloc.saveDebugLogs(out) },
                 getApkCacheInfo = { bloc.getApkCacheInfo() },
                 onClearApkCache = { bloc.clearApkCache() }
             )

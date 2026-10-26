@@ -90,10 +90,8 @@
     <string name="debug_mode">डीबग मोड</string>
     <string name="debug_mode_description">समस्या निवारण के लिए लॉग सहेजें (अधिकतम 7 दिन)</string>
     <string name="debug_view_logs">लॉग देखें</string>
-    <string name="debug_share_logs">लॉग साझा करें</string>
     <string name="debug_logs_title">डीबग लॉग</string>
     <string name="debug_no_logs_available">कोई लॉग नहीं।\nडीबग मोड चालू करें और समस्या दोहराएं।</string>
-    <string name="debug_no_logs_to_share">साझा करने के लिए कोई लॉग नहीं</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">वापस</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">कोई कैश की गई APK फ़ाइल नहीं</string>
     <string name="settings_clear_cache_confirm_title">APK कैश साफ़ करें?</string>
     <string name="settings_clear_cache_confirm_message">सभी डाउनलोड की गई APK फ़ाइलें (%1$s) हटा दी जाएँगी। आवश्यकता होने पर उन्हें फिर से डाउनलोड किया जाएगा।</string>
-    <string name="settings_cache_cleared">%1$d APK फ़ाइल(ें) साफ़ की गईं</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">%1$d APK फ़ाइल(ें) साफ़ की गईं</item>
+        <item quantity="other">%1$d APK फ़ाइल(ें) साफ़ की गईं</item>
+    </plurals>
     <string name="settings_reset_button">सभी सेटिंग्स रीसेट करें</string>
     <string name="settings_reset_confirm_title">सेटिंग्स रीसेट करें?</string>
     <string name="settings_reset_confirm_message">सभी सेटिंग्स डिफ़ॉल्ट पर रीसेट होंगी। यह पूर्ववत नहीं किया जा सकता।</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">सभी अपडेट करें</string>
-    <string name="update_all_started">%1$d ऐप अपडेट हो रहे हैं…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">%1$d ऐप अपडेट हो रहे हैं…</item>
+        <item quantity="other">%1$d ऐप अपडेट हो रहे हैं…</item>
+    </plurals>
     <string name="update_prompt_title">अपडेट उपलब्ध</string>
-    <string name="update_prompt_message">%1$d ऐप के अपडेट उपलब्ध हैं। क्या आप उन्हें अभी अपडेट करना चाहते हैं?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">%1$d ऐप के अपडेट उपलब्ध हैं। क्या आप उन्हें अभी अपडेट करना चाहते हैं?</item>
+        <item quantity="other">%1$d ऐप के अपडेट उपलब्ध हैं। क्या आप उन्हें अभी अपडेट करना चाहते हैं?</item>
+    </plurals>
     <string name="update_selected">अपडेट करें (%1$d)</string>
     <string name="skip_today">आज छोड़ें</string>
     <string name="update_prompt_dont_show_again">दोबारा न दिखाएँ</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">लॉन्च पर अपडेट पॉपअप</string>
     <string name="show_update_prompt_description">ऐप खोलने के बाद अपडेट मिलने पर सभी ऐप अपडेट करने के लिए पूछें</string>
     <string name="update_notification_channel_name">ऐप अपडेट</string>
-    <string name="update_notification_title">%1$d ऐप अपडेट उपलब्ध</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$d ऐप अपडेट उपलब्ध</item>
+        <item quantity="other">%1$d ऐप अपडेट उपलब्ध</item>
+    </plurals>
     <string name="update_notification_text">अपने ऐप खोलने और अपडेट करने के लिए टैप करें</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">सोर्स कोड</string>
     <string name="open_url_failed">लिंक नहीं खुल सका</string>
     <string name="refresh">रीफ़्रेश करें</string>
-    <string name="updates_banner">%1$d अपडेट उपलब्ध</string>
+    <plurals name="updates_banner">
+        <item quantity="one">%1$d अपडेट उपलब्ध</item>
+        <item quantity="other">%1$d अपडेट उपलब्ध</item>
+    </plurals>
     <string name="install_permission_title">ऐप इंस्टॉल करने की अनुमति दें</string>
     <string name="install_permission_message">इस ऐप को दूसरे ऐप इंस्टॉल या अपडेट करने से पहले Android को आपकी अनुमति चाहिए। अगली स्क्रीन पर “इस स्रोत से अनुमति दें” चालू करें, फिर वापस आएँ — डाउनलोड अपने आप शुरू हो जाएगा।</string>
     <string name="install_permission_open">सेटिंग्स खोलें</string>

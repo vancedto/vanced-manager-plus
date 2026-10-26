@@ -90,10 +90,8 @@
     <string name="debug_mode">调试模式</string>
     <string name="debug_mode_description">保存详细日志（最多7天）</string>
     <string name="debug_view_logs">查看日志</string>
-    <string name="debug_share_logs">分享日志</string>
     <string name="debug_logs_title">调试日志</string>
     <string name="debug_no_logs_available">暂无日志。\n请开启调试模式并复现问题。</string>
-    <string name="debug_no_logs_to_share">无可分享的日志</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">返回</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">没有缓存的 APK 文件</string>
     <string name="settings_clear_cache_confirm_title">清除 APK 缓存？</string>
     <string name="settings_clear_cache_confirm_message">所有已下载的 APK 文件（%1$s）将被删除。需要时会重新下载。</string>
-    <string name="settings_cache_cleared">已清除 %1$d 个 APK 文件</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">已清除 %1$d 个 APK 文件</item>
+        <item quantity="other">已清除 %1$d 个 APK 文件</item>
+    </plurals>
     <string name="settings_reset_button">恢复所有默认设置</string>
     <string name="settings_reset_confirm_title">重置设置？</string>
     <string name="settings_reset_confirm_message">所有设置将恢复为默认值，此操作不可撤销。</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">全部更新</string>
-    <string name="update_all_started">正在更新 %1$d 个应用…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">正在更新 %1$d 个应用…</item>
+        <item quantity="other">正在更新 %1$d 个应用…</item>
+    </plurals>
     <string name="update_prompt_title">有可用更新</string>
-    <string name="update_prompt_message">%1$d 个应用有可用更新。是否立即更新？</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">%1$d 个应用有可用更新。是否立即更新？</item>
+        <item quantity="other">%1$d 个应用有可用更新。是否立即更新？</item>
+    </plurals>
     <string name="update_selected">更新 (%1$d)</string>
     <string name="skip_today">今天跳过</string>
     <string name="update_prompt_dont_show_again">不再显示</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">启动时显示更新弹窗</string>
     <string name="show_update_prompt_description">打开应用后发现更新时询问是否更新所有应用</string>
     <string name="update_notification_channel_name">应用更新</string>
-    <string name="update_notification_title">%1$d 个应用有更新</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$d 个应用有更新</item>
+        <item quantity="other">%1$d 个应用有更新</item>
+    </plurals>
     <string name="update_notification_text">点按以打开并更新你的应用</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">源代码</string>
     <string name="open_url_failed">无法打开链接</string>
     <string name="refresh">刷新</string>
-    <string name="updates_banner">有 %1$d 个更新可用</string>
+    <plurals name="updates_banner">
+        <item quantity="one">有 %1$d 个更新可用</item>
+        <item quantity="other">有 %1$d 个更新可用</item>
+    </plurals>
     <string name="install_permission_title">允许安装应用</string>
     <string name="install_permission_message">本应用需要获得你的授权，才能安装或更新其他应用。请在下一个页面中开启“允许来自此来源的应用”，然后返回——下载会自动开始。</string>
     <string name="install_permission_open">打开设置</string>

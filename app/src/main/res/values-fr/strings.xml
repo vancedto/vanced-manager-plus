@@ -90,10 +90,8 @@
     <string name="debug_mode">Mode débogage</string>
     <string name="debug_mode_description">Enregistre les journaux détaillés (max 7 jours)</string>
     <string name="debug_view_logs">Voir les journaux</string>
-    <string name="debug_share_logs">Partager les journaux</string>
     <string name="debug_logs_title">Journaux de débogage</string>
     <string name="debug_no_logs_available">Aucun journal.\nActivez le mode débogage et reproduisez le problème.</string>
-    <string name="debug_no_logs_to_share">Aucun journal à partager</string>
 
     <!-- Settings Screen (full-screen) -->
     <string name="back">Retour</string>
@@ -111,7 +109,10 @@
     <string name="settings_clear_cache_empty">Aucun fichier APK en cache</string>
     <string name="settings_clear_cache_confirm_title">Vider le cache APK ?</string>
     <string name="settings_clear_cache_confirm_message">Tous les fichiers APK téléchargés (%1$s) seront supprimés. Ils seront téléchargés à nouveau si nécessaire.</string>
-    <string name="settings_cache_cleared">%1$d fichier(s) APK supprimé(s)</string>
+    <plurals name="settings_cache_cleared">
+        <item quantity="one">%1$d fichier(s) APK supprimé(s)</item>
+        <item quantity="other">%1$d fichier(s) APK supprimé(s)</item>
+    </plurals>
     <string name="settings_reset_button">Réinitialiser tous les paramètres</string>
     <string name="settings_reset_confirm_title">Réinitialiser les paramètres ?</string>
     <string name="settings_reset_confirm_message">Tous les paramètres seront réinitialisés. Cette action est irréversible.</string>
@@ -122,9 +123,15 @@
 
     <!-- Update all / update prompt -->
     <string name="update_all">Tout mettre à jour</string>
-    <string name="update_all_started">Mise à jour de %1$d application(s)…</string>
+    <plurals name="update_all_started">
+        <item quantity="one">Mise à jour de %1$d application(s)…</item>
+        <item quantity="other">Mise à jour de %1$d application(s)…</item>
+    </plurals>
     <string name="update_prompt_title">Mises à jour disponibles</string>
-    <string name="update_prompt_message">%1$d application(s) ont des mises à jour disponibles. Voulez-vous les mettre à jour maintenant ?</string>
+    <plurals name="update_prompt_message">
+        <item quantity="one">%1$d application(s) ont des mises à jour disponibles. Voulez-vous les mettre à jour maintenant ?</item>
+        <item quantity="other">%1$d application(s) ont des mises à jour disponibles. Voulez-vous les mettre à jour maintenant ?</item>
+    </plurals>
     <string name="update_selected">Mettre à jour (%1$d)</string>
     <string name="skip_today">Ignorer aujourd\'hui</string>
     <string name="update_prompt_dont_show_again">Ne plus afficher</string>
@@ -139,7 +146,10 @@
     <string name="show_update_prompt">Fenêtre de mise à jour au démarrage</string>
     <string name="show_update_prompt_description">Proposer de mettre à jour toutes les applications lorsque des mises à jour sont trouvées après l\'ouverture</string>
     <string name="update_notification_channel_name">Mises à jour des applications</string>
-    <string name="update_notification_title">%1$d mise(s) à jour d\'application disponibles</string>
+    <plurals name="update_notification_title">
+        <item quantity="one">%1$d mise(s) à jour d\'application disponibles</item>
+        <item quantity="other">%1$d mise(s) à jour d\'application disponibles</item>
+    </plurals>
     <string name="update_notification_text">Appuyez pour ouvrir et mettre à jour vos applications</string>
 
     <!-- First-run suggestions -->
@@ -205,7 +215,10 @@
     <string name="source_code">Code source</string>
     <string name="open_url_failed">Impossible d\'ouvrir le lien</string>
     <string name="refresh">Actualiser</string>
-    <string name="updates_banner">%1$d mise(s) à jour disponible(s)</string>
+    <plurals name="updates_banner">
+        <item quantity="one">%1$d mise(s) à jour disponible(s)</item>
+        <item quantity="other">%1$d mise(s) à jour disponible(s)</item>
+    </plurals>
     <string name="install_permission_title">Autoriser l\'installation d\'applis</string>
     <string name="install_permission_message">Android a besoin de votre autorisation pour que cette appli puisse installer ou mettre à jour d\'autres applis. Sur l\'écran suivant, activez « Autoriser cette source », puis revenez : le téléchargement démarrera tout seul.</string>
     <string name="install_permission_open">Ouvrir les paramètres</string>

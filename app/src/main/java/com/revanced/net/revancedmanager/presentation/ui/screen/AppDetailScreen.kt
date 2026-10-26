@@ -48,13 +48,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.revanced.net.revancedmanager.R
 import com.revanced.net.revancedmanager.config.Config
 import com.revanced.net.revancedmanager.core.common.MicroGRequirement
@@ -66,12 +65,14 @@ import com.revanced.net.revancedmanager.presentation.bloc.AppEvent
 import com.revanced.net.revancedmanager.presentation.bloc.AppState
 import com.revanced.net.revancedmanager.presentation.ui.components.AppActionButtons
 import com.revanced.net.revancedmanager.presentation.ui.components.AppDialogHost
+import com.revanced.net.revancedmanager.presentation.ui.components.AppIcon
 import com.revanced.net.revancedmanager.presentation.ui.components.DownloadProgressBar
 import com.revanced.net.revancedmanager.presentation.ui.components.SettingsSwitchRow
 import com.revanced.net.revancedmanager.presentation.ui.components.appMetaText
 import com.revanced.net.revancedmanager.presentation.ui.components.labelledValue
 import com.revanced.net.revancedmanager.presentation.ui.components.tvFocusBorder
 import com.revanced.net.revancedmanager.presentation.ui.theme.noiseBackground
+import com.revanced.net.revancedmanager.presentation.ui.theme.updateColor
 
 /**
  * One app in full: everything the v3 catalog carries that the list has no room for — the long
@@ -360,14 +361,11 @@ private fun HeaderSection(app: RevancedApp) {
     val context = LocalContext.current
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        AsyncImage(
+        AppIcon(
             // The 200px icon exists for exactly this; the list keeps using the 64px one.
-            model = app.iconLargeUrl.takeIf { it.isNotBlank() } ?: app.iconUrl,
-            contentDescription = null,
-            modifier = Modifier
-                .size(96.dp)
-                .clip(RoundedCornerShape(20.dp)),
-            contentScale = ContentScale.Crop
+            url = app.iconLargeUrl.takeIf { it.isNotBlank() } ?: app.iconUrl,
+            size = 96.dp,
+            cornerRadius = 20.dp
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -397,6 +395,7 @@ private fun HeaderSection(app: RevancedApp) {
             // Tapping copies it — the same thing the overflow menu offers, within reach of the
             // thumb that is already on the name.
             val packageCopied = stringResource(R.string.package_name_copied)
+            val copyLabel = stringResource(R.string.copy_package_name)
             Text(
                 text = app.packageName,
                 style = MaterialTheme.typography.labelSmall,
@@ -404,7 +403,7 @@ private fun HeaderSection(app: RevancedApp) {
                 modifier = Modifier
                     .clip(RoundedCornerShape(4.dp))
                     .tvFocusBorder(shape = RoundedCornerShape(4.dp))
-                    .clickable {
+                    .clickable(onClickLabel = copyLabel, role = Role.Button) {
                         copyToClipboard(context, app.packageName)
                         Toast.makeText(context, packageCopied, Toast.LENGTH_SHORT).show()
                     }
@@ -430,6 +429,21 @@ private fun HeaderSection(app: RevancedApp) {
                 ),
                 style = MaterialTheme.typography.labelMedium
             )
+            // The patches the offered build was made with. On a patch-only update this is the
+            // reason the update exists, so it is worded and coloured as the news it is.
+            app.patchVersion?.let { patch ->
+                Text(
+                    text = labelledValue(
+                        pattern = stringResource(
+                            if (app.isPatchUpdate) R.string.new_patch else R.string.patches_version
+                        ),
+                        value = patch,
+                        valueColor = if (app.isPatchUpdate) MaterialTheme.colorScheme.updateColor
+                                     else MaterialTheme.colorScheme.secondary
+                    ),
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
 
             appMetaText(app.sizeText, app.updatedAt)?.let { meta ->
                 Text(text = meta, style = MaterialTheme.typography.labelSmall)
@@ -557,6 +571,13 @@ private fun VariantRow(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
+                variant.patchVersion?.let { patch ->
+                    Text(
+                        text = stringResource(R.string.patches_version, patch),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
                 if (isSelected) {
                     Text(
                         text = stringResource(R.string.app_details_variant_selected),
